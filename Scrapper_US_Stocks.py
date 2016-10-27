@@ -30,7 +30,7 @@ class Scrapper_US_Stocks:
         self.updated_stock_list = []
 
         self.quarter_dates = {5: '2016-06-30', 4: '2016-03-31', 3: '2015-12-31', 2: '2015-09-30', 1: '2015-06-30'}
-        self.quarter_names = {5: 'Q116', 4: 'Q415', 3: 'Q315', 2: 'Q215',1: 'Q115'}
+        self.quarter_names = {5: 'Q216', 4: 'Q116', 3: 'Q415', 2: 'Q315',1: 'Q215'}
 
         if platform.system() == 'Windows':
             self.PHANTOMJS_PATH = './phantomjs.exe'
@@ -64,26 +64,7 @@ class Scrapper_US_Stocks:
             data.append(dd)
         # print data
         return data
-
-    def getXpaths(self):
-        select_sql = "select quater_sequence, revenue_xpath, profit_xpath, opm_xpath, ebit_xpath from stocksdb.xpaths order by quater_sequence desc "
-
-        self.cur.execute(select_sql)
-
-        rows = self.cur.fetchall()
-        xpaths = list()
-        for row in rows:
-            # print row[0], row[1]
-            dd = dict()
-            dd["quater_sequence"] = row[0]
-            dd["revenue_xpath"] = row[1]
-            dd["profit_xpath"] = row[2]
-            dd["opm_xpath"] = row[3]
-            dd["ebit_xpath"] = row[4]
-            xpaths.append(dd)
-        # print data
-        return xpaths
-
+    """
     def getStockList(self):
         select_sql = "select * from (SELECT sn.fullid, sn.nseid FROM stocksdb.fa_quaterly_data_us_stocks qd, stocksdb.stock_names sn where qd.quater_sequence = 5 " \
                      " and (qd.quater_name = '" + Constants.previous_quarter + "' or qd.quater_name = '" + Constants.prev_to_previous_quarter + "' ) "
@@ -106,7 +87,27 @@ class Scrapper_US_Stocks:
             data.append(dd)
         # print data
         return data
+    """
 
+    def getXpaths(self):
+        select_sql = "select quater_sequence, revenue_xpath, profit_xpath, opm_xpath, ebit_xpath,date_xpath from stocksdb.xpaths where siteID = 'yahoo' order by quater_sequence desc "
+
+        self.cur.execute(select_sql)
+
+        rows = self.cur.fetchall()
+        xpaths = list()
+        for row in rows:
+            # print row[0], row[1]
+            dd = dict()
+            dd["quater_sequence"] = row[0]
+            dd["revenue_xpath"] = row[1]
+            dd["profit_xpath"] = row[2]
+            dd["opm_xpath"] = row[3]
+            dd["ebit_xpath"] = row[4]
+            dd["date_xpath"] = row[5]
+            xpaths.append(dd)
+        # print data
+        return xpaths
 
     def updateQuaterlyData(self, row):
 
@@ -137,6 +138,16 @@ class Scrapper_US_Stocks:
             now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             for row in xpaths:
                 try:
+                    date = self.browser.find_element_by_xpath(row["date_xpath"]).text
+                    print date[-10:]
+                    date = date[-10:]
+                    quarter_name = self.quarter_names[count]
+                    quarter_date = self.quarter_dates[count]
+                    if quarter_date == date:
+                        print 'match'
+                    else:
+                        print 'no match'
+
                     quater_seq = row["quater_sequence"]
                     rev = float((self.browser.find_element_by_xpath(row["revenue_xpath"]).text).replace(",", ""))
                     profit = float((self.browser.find_element_by_xpath(row["profit_xpath"]).text).replace(",", ""))
@@ -151,8 +162,6 @@ class Scrapper_US_Stocks:
 
                     insert_sql = ("INSERT INTO "+table_name+" (fullid, quater_sequence, period,quater_name,  revenueC, profitC, profit_margin, opmC, operating_profit_margin, ebidtaC, ebidt_margin, last_modified, created_on ) VALUES (%s, %s, %s, %s,%s, %s, %s,%s, %s,%s,%s, %s,%s )")
 
-                    quarter_name = self.quarter_names[count]
-                    quarter_date = self.quarter_dates[count]
 
 
                     data_quater = (fullid, quater_seq,quarter_date, quarter_name, rev, profit, profitMargin, op, opMargin, ebit, ebitMargin, now, now)
@@ -221,11 +230,11 @@ class Scrapper_US_Stocks:
             if 'B' in debtStr:
                 debtStr = debtStr.replace("B", "")
                 debt = float((debtStr).replace(",", ""))
-                debt = debt * 1000000000
+                debt = debt * 1000  ## convert biullion into millions
             elif 'M' in debtStr:
                 debtStr = debtStr.replace("M", "")
                 debt = float((debtStr).replace(",", ""))
-                debt = debt * 1000000
+                #debt = debt * 1000000
             elif 'N/A' in debtStr:
                 debt = float((debtStr).replace("N/A", "0.0"))
                 debt = debt * 0
@@ -285,7 +294,7 @@ class Scrapper_US_Stocks:
 
         # Since everything went fine, update the 'update_now' flag to c
         if (self.all_good_flag):
-            self.quandlDataObject.setUpdateNowFlag(fullid, table_name)
+            self.quandlDataObject.setUpdateNowFlag(fullid, table_name, 'c')
 
 
 start_time = time.time()

@@ -20,13 +20,13 @@ class UpdateOnlyIfLastQuaterResultsDeclared_Secondary:
         # _stocks = self.getStocks()
 
     def getStockList(self):
-        select_sql = "select * from (SELECT sn.nseid, sn.data_type FROM stocksdb.fa_quaterly_data_secondary qd, stocksdb.stock_names sn where qd.quater_sequence = 5 "\
+        select_sql = "select * from (SELECT sn.nseid, sn.data_type FROM stocksdb.fa_quaterly_data_secondary qd, stocksdb.stock_names sn where qd.quater_sequence = 5 and "\
                      " (qd.quater_name = '"+Constants.previous_quarter+"' or qd.quater_name = '"+Constants.prev_to_previous_quarter+"' ) "
         select_sql += " and qd.fullid=sn.fullid "
         select_sql += "union SELECT sn.nseid, sn.data_type FROM stocksdb.stock_names sn where enable_for_vendor_data ='2' and update_now = 'y' "
         select_sql += ") sn order by nseid"
 
-
+        print select_sql
         self.cur.execute(select_sql)
         rows = self.cur.fetchall()
         data = list()

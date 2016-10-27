@@ -431,7 +431,7 @@ class QuandlDataModule:
 
         # Since everything went fine, update the 'update_now' flag to c
         if(self.all_good_flag):
-            self.setUpdateNowFlag(fullid,table_name )
+            self.setUpdateNowFlag(fullid,table_name, 'c' )
 
 #        else:
             #updateSql = "update stock_names set update_now = 'e' where fullid = '%s' " % fullid
@@ -466,7 +466,7 @@ class QuandlDataModule:
         print "Number of rows delete: %d" % self.cur.rowcount
         return self.cur.rowcount
 
-    def setUpdateNowFlag(self, fullid,table_name ):
+    def setUpdateNowFlag(self, fullid,table_name, update_flag ):
 
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         if "secondary" in table_name:
@@ -475,14 +475,29 @@ class QuandlDataModule:
             vendor_data_flag = "3"
         else:
             vendor_data_flag = "1"
-        updateSql = "update stock_names set update_now = 'c', enable_for_vendor_data='%s', last_modified='%s' where fullid = '%s' " % (
-        vendor_data_flag, now, fullid)
-        print updateSql
+        updateSql = "update stock_names set update_now = '%s', enable_for_vendor_data='%s', last_modified='%s' where fullid = '%s' " % (
+            update_flag, vendor_data_flag, now, fullid)
+        #print updateSql
         self.cur.execute(updateSql)
         self.con.commit()
-        self.updated_stock_list.append(fullid)
-        print "updated the update_now column to c"
+        #self.updated_stock_list.append(fullid)
+        print "updated the update_now column to ", update_flag
 
+    def setIsVideoAvailable(self, fullid ):
+        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        updateSql = "update stock_names set is_video_available = 'y', last_modified='%s' where fullid = '%s' " % ( now, fullid)
+        #print updateSql
+        self.cur.execute(updateSql)
+        self.con.commit()
+        print "updated the is_video_available column to y"
+
+    def setVideoAsOldToRecreateNextTime(self, fullid ):
+        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        updateSql = "update stock_recommended_videos set last_modified = '2000-01-01 00:00:00'  where fullid = '%s' " % ( fullid)
+        #print updateSql
+        self.cur.execute(updateSql)
+        self.con.commit()
+        print "updated the stock_recommended_videos:last_updated column to old date"
 
 
     def __del__(self):

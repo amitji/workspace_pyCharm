@@ -71,3 +71,15 @@ gEBITQ3_Xpath='//*[@id="fs-table"]/tbody/tr[17]/td[4]'
 gEBITQ2_Xpath='//*[@id="fs-table"]/tbody/tr[17]/td[5]'
 gEBITQ1_Xpath='//*[@id="fs-table"]/tbody/tr[17]/td[6]'
 
+
+#Screener.in url & xpaths
+screenerBaseUrl = 'https://www.screener.in/company/'
+screenerBaseUrl_part2='/consolidated/'
+
+
+# Final Rating Weightages
+revenueW = 0.5
+roeW = 0.25
+icW = 0.25  # Interest Coverage ratio
+deW = 0.25 #debt equity ratio
+genericW = 1.0
