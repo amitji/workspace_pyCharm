@@ -23,8 +23,8 @@ class FinalRatingModule:
 
         self.no_of_quarter_to_comapre = 4 #  if you change this then you need to change the weigtage for row, ic, de
         #self.rating_total = self.no_of_quarter_to_comapre * (1+2+2+2+2+.5+.5+.5)
-        self.rating_total = Decimal(self.no_of_quarter_to_comapre * 2 *(C.revenueW+ 4* C.genericW+ C.roeW+C.icW+C.deW))
-        print self.rating_total
+        self.rating_total = Decimal(self.no_of_quarter_to_comapre * 2 *(3* C.genericW+ 2*C.opmANDebitW+C.roeW+C.icW+C.deW))
+        #print self.rating_total
         #self.scrapper_exception_list = []
         self.sql_exception_list = []
         self.updated_stock_list = []
@@ -266,14 +266,10 @@ class FinalRatingModule:
 
 
             #Apply weightages
-            revT = revT*Decimal(C.revenueW)
-            #profitT = profitT
-            #opmT = opmT
-            #pmT = pmT
-            #ebitT = ebitT
-            roeT = roeT*Decimal(C.roeW)
-            icT = icT*Decimal(C.icW)
-            deT = deT*Decimal(C.deW)
+            # revT = revT*Decimal(C.revenueW)
+            # roeT = roeT*Decimal(C.roeW)
+            # icT = icT*Decimal(C.icW)
+            # deT = deT*Decimal(C.deW)
 
             # delete earlier records
             delete_sql = "delete from final_rating where fullid = '%s'" % fullid
@@ -281,11 +277,10 @@ class FinalRatingModule:
             self.con.commit()
 
 
-            total = Decimal(revT+profitT+opmT+pmT+ebitT+roeT+icT+deT)
+            #total = Decimal(revT+profitT+opmT+pmT+ebitT+roeT+icT+deT)
+            total = Decimal(revT + profitT + pmT + (opmT +ebitT)*Decimal(C.opmANDebitW) + roeT*Decimal(C.roeW) + icT*Decimal(C.icW) + deT*Decimal(C.deW))
             percentage_rating = '{0:.3g}'.format((total/self.rating_total)*10)  # 7*2*3  seven param * point * rows
-            #convert it on scale of 10
-            #percentage_rating = percentage_rating /10
-            #percentage_rating = float("{0:.2f}".format(percentage_rating))
+            print "Final Rating", total, "/", self.rating_total, "->", percentage_rating
             data = (fullid, revT, profitT, opmT, pmT, ebitT, roeT, icT, deT,total, percentage_rating, now, now )
             insert_sql = "insert into final_rating (fullid, revenue,profit,op_profit,ebit, profit_margin,roe, interest_cover,debt_equity_ratio, total, percentage_rating, last_modified, created_on)" \
                          " values (%s,%s, %s,%s,%s,%s,%s,%s,%s,%s,%s, %s,%s) "
@@ -306,46 +301,55 @@ class FinalRatingModule:
             self.quandlDataObject.setVideoAsOldToRecreateNextTime(fullid)
             self.updated_stock_list.append(nseid)
 
-start_time = time.time()
-thisObj = FinalRatingModule()
-stock_names= thisObj.getStockList()
-print stock_names
-print "Number of Stocks processing - " , len(stock_names)
-totalCount = len(stock_names)
-count = 0
-for row in stock_names:
-    # print row
-    count = count + 1
-    print "\n\ncalling updateFinalRatingData for - ", row['nseid'], "(", count, "/", totalCount, ")"
-    enable_for_vendor_data = row['enable_for_vendor_data']
-    if enable_for_vendor_data == '1':
-        qd_table_name = "fa_quaterly_data"
-        fr_table_name = "fa_financial_ratio"
-        thisObj.updateFinalRatingTempData(row,qd_table_name,fr_table_name)
-        if (thisObj.all_good_flag):
-            thisObj.updateFinalRatingData(row,qd_table_name,fr_table_name)
-        else:
-            print "*** Amit -  Since updateFinalRatingTempData FAILED , not calling updateFinalRatingData.Move to next one "
-    elif enable_for_vendor_data == '2':
-        qd_table_name = "fa_quaterly_data_secondary"
-        fr_table_name = "fa_financial_ratio_secondary"
-        thisObj.updateFinalRatingTempData(row,qd_table_name,fr_table_name)
-        if (thisObj.all_good_flag):
-            thisObj.updateFinalRatingData(row, qd_table_name, fr_table_name)
+
+    def updateFinalRating(self,row,qd_table_name,fr_table_name ):
+        self.updateFinalRatingTempData(row,qd_table_name,fr_table_name)
+        if (self.all_good_flag):
+            self.updateFinalRatingData(row,qd_table_name,fr_table_name)
         else:
             print "*** Amit -  Since updateFinalRatingTempData FAILED , not calling updateFinalRatingData.Move to next one "
 
+    def updateAll(self,stock_names ):
+        start_time = time.time()
+        print stock_names
+        print "Number of Stocks processing - " , len(stock_names)
+        totalCount = len(stock_names)
+        count = 0
+        for row in stock_names:
+            # print row
+            count = count + 1
+            print "\n\ncalling updateFinalRatingData for - ", row['nseid'], "(", count, "/", totalCount, ")"
+            enable_for_vendor_data = row['enable_for_vendor_data']
+            if enable_for_vendor_data == '1':
+                qd_table_name = "fa_quaterly_data"
+                fr_table_name = "fa_financial_ratio"
+                self.updateFinalRating(row,qd_table_name,fr_table_name)
+                # thisObj.updateFinalRatingTempData(row,qd_table_name,fr_table_name)
+                # if (thisObj.all_good_flag):
+                #     thisObj.updateFinalRatingData(row,qd_table_name,fr_table_name)
+                # else:
+                #     print "*** Amit -  Since updateFinalRatingTempData FAILED , not calling updateFinalRatingData.Move to next one "
+            elif enable_for_vendor_data == '2':
+                qd_table_name = "fa_quaterly_data_secondary"
+                fr_table_name = "fa_financial_ratio_secondary"
+                self.updateFinalRating(row, qd_table_name, fr_table_name)
+                # thisObj.updateFinalRatingTempData(row,qd_table_name,fr_table_name)
+                # if (thisObj.all_good_flag):
+                #     thisObj.updateFinalRatingData(row, qd_table_name, fr_table_name)
+                # else:
+                #     print "*** Amit -  Since updateFinalRatingTempData FAILED , not calling updateFinalRatingData.Move to next one "
 
 
-print "\n\n sql_exception_list  - "
-print thisObj.sql_exception_list
 
-print "\n Updated Stock list for - ", len(thisObj.updated_stock_list), " Stocks"
-print thisObj.updated_stock_list
+        print "\n\n sql_exception_list  - "
+        print self.sql_exception_list
 
-print "\n qData_missing_stock_list list for - ", len(thisObj.qData_missing_stock_list), " Stocks"
-print thisObj.qData_missing_stock_list
+        print "\n Updated Stock list for - ", len(self.updated_stock_list), " Stocks"
+        print self.updated_stock_list
+
+        print "\n qData_missing_stock_list list for - ", len(self.qData_missing_stock_list), " Stocks"
+        print self.qData_missing_stock_list
 
 
-print("\n\nTime Taken --- in minutes ---" , int((time.time() - start_time))/60 )
-#EmailUtil.send_email("Update Final Rating Exeption List",thisObj.sql_exception_list,  "")
+        print("\n\nTime Taken --- in minutes ---" , int((time.time() - start_time))/60 )
+        #EmailUtil.send_email("Update Final Rating Exeption List",self.sql_exception_list,  "")

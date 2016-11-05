@@ -78,8 +78,9 @@ screenerBaseUrl_part2='/consolidated/'
 
 
 # Final Rating Weightages
-revenueW = 0.5
+# revenueW = 1.0
 roeW = 0.25
 icW = 0.25  # Interest Coverage ratio
 deW = 0.25 #debt equity ratio
+opmANDebitW = 0.5
 genericW = 1.0

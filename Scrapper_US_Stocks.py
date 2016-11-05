@@ -295,6 +295,7 @@ class Scrapper_US_Stocks:
         # Since everything went fine, update the 'update_now' flag to c
         if (self.all_good_flag):
             self.quandlDataObject.setUpdateNowFlag(fullid, table_name, 'c')
+            self.updated_stock_list.append(nseid)
 
 
 start_time = time.time()
@@ -316,7 +317,7 @@ for row in stock_names:
     thisObj.updateFinancialRatios(row)
 
 
-print "\n\n scrapper_exception_list  - "
+print "\n\n scrapper_exception_list  - ", len(thisObj.scrapper_exception_list), " Stocks"
 print thisObj.scrapper_exception_list
 
 print "\n\n sql_exception_list  - "

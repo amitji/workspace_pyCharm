@@ -155,7 +155,7 @@ if __name__ == "__main__":
 
 
 
-        print "\n\n scrapper_exception_list  - "
+        print "\n\n scrapper_exception_list  - ", len(thisObj.scrapper_exception_list), " Stocks"
         print thisObj.scrapper_exception_list
 
         print "\n\n sql_exception_list  - "
