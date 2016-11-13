@@ -160,11 +160,11 @@ class Scrapper_US_Stocks:
 
                     print 'quater_seq - ',quater_seq,rev, profit, op, ebit, profitMargin, opMargin, ebitMargin
 
-                    insert_sql = ("INSERT INTO "+table_name+" (fullid, quater_sequence, period,quater_name,  revenueC, profitC, profit_margin, opmC, operating_profit_margin, ebidtaC, ebidt_margin, last_modified, created_on ) VALUES (%s, %s, %s, %s,%s, %s, %s,%s, %s,%s,%s, %s,%s )")
+                    insert_sql = ("INSERT INTO "+table_name+" (nseid, fullid, quater_sequence, period,quater_name,  revenueC, profitC, profit_margin, opmC, operating_profit_margin, ebidtaC, ebidt_margin, last_modified, created_on ) VALUES (%s, %s, %s, %s, %s,%s, %s, %s,%s, %s,%s,%s, %s,%s )")
 
 
 
-                    data_quater = (fullid, quater_seq,quarter_date, quarter_name, rev, profit, profitMargin, op, opMargin, ebit, ebitMargin, now, now)
+                    data_quater = (nseid, fullid, quater_seq,quarter_date, quarter_name, rev, profit, profitMargin, op, opMargin, ebit, ebitMargin, now, now)
                     self.cur.execute(insert_sql, data_quater)
                     count = count-1
 

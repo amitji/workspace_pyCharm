@@ -12,11 +12,15 @@ class FinalRatingCalculationProcess:
 
         self.finalRatingModule = FinalRatingModule.FinalRatingModule()
 
+    # def __del__(self):
+    #     # self.con.close
+    #     # self.cur.close()
+    #     print "\n\n*****  deleting FinalRatingCalculationProcess  "
 
     def getStockList(self):
         #select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and update_now='y' "
         select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and is_video_available='y' "
-        #select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where nseid in ('8KMILES') "
+        #select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where nseid in ('8KMILES', 'MPSLTD','DIVISLAB') "
 
         self.cur.execute(select_sql)
 
@@ -34,4 +38,4 @@ class FinalRatingCalculationProcess:
 thisObj = FinalRatingCalculationProcess()
 stock_names= thisObj.getStockList()
 thisObj.finalRatingModule.updateAll(stock_names)
-
+#thisObj.finalRatingModule.calibrateAllRatings()

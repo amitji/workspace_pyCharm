@@ -12,7 +12,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 import datetime
 
-import FinalRatingModule
+# import FinalRatingModule
 import QuandlDataModule
 #import Scrapper_US_Stocks_Fin_Ratio_Update
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
@@ -26,7 +26,7 @@ class Module_Scrapper_Screener_India_Stocks:
         self.cur = self.con.cursor()
 
         self.quandlDataObject = QuandlDataModule.QuandlDataModule()
-        self.finalRatingModule = FinalRatingModule.FinalRatingModule()
+        # self.finalRatingModule = FinalRatingModule.FinalRatingModule()
 
 
         self.xpaths = self.getXpaths()
@@ -65,30 +65,6 @@ class Module_Scrapper_Screener_India_Stocks:
 
         self.profitIndStr = ""
         self.revenueIndStr = ""
-
-    def getStockList(self):
-
-
-        #select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and update_now='y' "
-        #select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and enable_for_vendor_data = 'e' "
-        #select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and enable_for_vendor_data = 'z' "
-        #select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and update_now='A' "
-        select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where nseid in ('BHARATFIN') "
-
-
-        self.cur.execute(select_sql)
-
-        rows = self.cur.fetchall()
-        data = list()
-        for row in rows:
-            # print row[0], row[1]
-            dd = dict()
-            dd["fullid"] = row[0]
-            dd["nseid"] = row[1]
-            dd["enable_for_vendor_data"] = row[2]
-            data.append(dd)
-        # print data
-        return data
 
 
     def getXpaths(self):
@@ -262,7 +238,7 @@ class Module_Scrapper_Screener_India_Stocks:
                     print 'quater_seq - ',quater_seq,rev, profit, op, ebit, profitMargin, opMargin, ebitMargin
 
 
-                    records.append((fullid, quater_seq,quarter_date, quarter_name, rev, profit,op,ebit, rev_growth,rev_growth_rate, profit_growth, profit_growth_rate, \
+                    records.append((nseid,fullid, quater_seq,quarter_date, quarter_name, rev, profit,op,ebit, rev_growth,rev_growth_rate, profit_growth, profit_growth_rate, \
                                    profitMargin,  opMargin,  ebitMargin, now, now))
 
                     # # data_quater = (fullid, quater_seq,quarter_date, quarter_name, rev, profit,op,ebit, rev_growth,rev_growth_rate, profit_growth, profit_growth_rate, \
@@ -284,9 +260,9 @@ class Module_Scrapper_Screener_India_Stocks:
 
                 #records_list_template = ','.join(['%s'] * len(records))
                 insert_sql = (
-                "INSERT INTO " + table_name + " (fullid, quater_sequence, period,quater_name,  revenueC, profitC, opmC, ebidtaC, revenue_growth,revenue_growth_rate, " \
+                "INSERT INTO " + table_name + " (nseid, fullid, quater_sequence, period,quater_name,  revenueC, profitC, opmC, ebidtaC, revenue_growth,revenue_growth_rate, " \
                                               "profit_growth, profit_growth_rate,  profit_margin,operating_profit_margin, ebidt_margin,  last_modified, created_on )" \
-                                              "VALUES (%s, %s, %s, %s,%s, %s, %s,%s, %s,%s,%s, %s,%s,%s,%s, %s,%s )")
+                                              "VALUES (%s, %s, %s, %s, %s,%s, %s, %s,%s, %s,%s,%s, %s,%s,%s,%s, %s,%s )")
                 self.cur.executemany(insert_sql, records)
                 self.con.commit()
                 #reverse teh indicator string because Quarter Seq was from 1->5 instead 5->1
@@ -446,6 +422,7 @@ class Module_Scrapper_Screener_India_Stocks:
         start_time = time.time()
         totalCount = len(stock_names)
         count = 0
+
         for row in stock_names:
             count = count + 1
             print "\n\n****************************************************************************"
@@ -458,7 +435,7 @@ class Module_Scrapper_Screener_India_Stocks:
                 if (self.all_good_flag):
                     print "\n\ncalling updateFinancialRatios for - ", row['nseid'], "(", count, "/", totalCount, ")"
                     self.updateFinancialRatios(row, qd_table_name, fr_table_name)
-                    self.finalRatingModule.updateFinalRating(row, qd_table_name, fr_table_name)
+                    # self.finalRatingModule.updateFinalRating(row, qd_table_name, fr_table_name)
                 else:
                     print "*** Amit -  Since updateQuaterlyData FAILED , not calling updateFinancialRatios.Move to next one "
             elif enable_for_vendor_data == '2':
@@ -468,9 +445,11 @@ class Module_Scrapper_Screener_India_Stocks:
                 if (self.all_good_flag):
                     print "\n\ncalling updateFinancialRatios for - ", row['nseid'], "(", count, "/", totalCount, ")"
                     self.updateFinancialRatios(row, qd_table_name, fr_table_name)
-                    self.finalRatingModule.updateFinalRating(row, qd_table_name, fr_table_name)
+                    # self.finalRatingModule.updateFinalRating(row, qd_table_name, fr_table_name)
                 else:
                     print "*** Amit -  Since updateQuaterlyData FAILED , not calling updateFinancialRatios.Move to next one "
+
+
         print "\n\n scrapper_exception_list  - "
         print self.scrapper_exception_list
 

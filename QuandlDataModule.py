@@ -33,6 +33,12 @@ class QuandlDataModule:
                         '2015-06-30': 'Q115', '2015-03-31': 'Q414', '2014-12-31': 'Q314'}
 
         # _stocks = self.getStocks()
+
+    # def __del__(self):
+    #     # self.con.close
+    #     # self.cur.close()
+    #     print "\n\n*****  deleting FinalRatingCalculationProcess  "
+
     """
     def getStocksEnabledForVendorData(self):
         self.cur.execute("SELECT distinct nseid, data_type FROM stock_names where enable_for_vendor_data = '1' and update_now = 'y' order by nseid")
@@ -155,7 +161,7 @@ class QuandlDataModule:
                 ebidtdataC = ebidtdata['STANDALONE']
                 ebidtmdataC = ebidtmdata['STANDALONE']
 
-            insert_sql = ("INSERT INTO " + table_name + " (fullid, quater_sequence, period,quater_name,  revenueC, profitC,  profit_margin, opmC, operating_profit_margin, ebidtaC, ebidt_margin, last_modified, created_on ) VALUES (%s, %s, %s, %s,%s, %s, %s,%s, %s,%s,%s, %s,%s )")
+            insert_sql = ("INSERT INTO " + table_name + " (nseid,fullid, quater_sequence, period,quater_name,  revenueC, profitC,  profit_margin, opmC, operating_profit_margin, ebidtaC, ebidt_margin, last_modified, created_on ) VALUES (%s,%s, %s, %s, %s,%s, %s, %s,%s, %s,%s,%s, %s,%s )")
 
             rSize = len(rdataC)
             pSize = len(pdataC)
@@ -185,7 +191,7 @@ class QuandlDataModule:
                     ebidt = float("{0:.2f}".format(ebidtdataC[key]))
                     ebidtm  = float("{0:.4f}".format(ebidtmdataC[key]))*100
 
-                    data_quater = (fullid, count, date,quarter, rev, profit,profitMargin, operatingProfit, operatingProfitMargin, ebidt, ebidtm,  now, now)
+                    data_quater = (nseid, fullid, count, date,quarter, rev, profit,profitMargin, operatingProfit, operatingProfitMargin, ebidt, ebidtm,  now, now)
                     self.cur.execute(insert_sql, data_quater)
                     print "Insert executed for table " + table_name + ", date -  ", date
                     count = count - 1;

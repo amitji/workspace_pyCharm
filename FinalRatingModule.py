@@ -21,6 +21,8 @@ class FinalRatingModule:
         self.compare_percentage_negative_1 = -10
         #self.compare_percentage_negative_2 = -20
 
+        self.max_final_rating = None  # This will be set to max with every stock calculation and then used for calibration
+
         self.no_of_quarter_to_comapre = 4 #  if you change this then you need to change the weigtage for row, ic, de
         #self.rating_total = self.no_of_quarter_to_comapre * (1+2+2+2+2+.5+.5+.5)
         self.rating_total = Decimal(self.no_of_quarter_to_comapre * 2 *(3* C.genericW+ 2*C.opmANDebitW+C.roeW+C.icW+C.deW))
@@ -31,6 +33,25 @@ class FinalRatingModule:
         self.qData_missing_stock_list = []
 
         self.quandlDataObject = QuandlDataModule.QuandlDataModule()
+
+    # def __del__(self):
+    #
+    #     # self.con.close
+    #     # self.cur.close()
+    #     print "\n\n*****  deleting FinalRatingModule "
+
+
+    def getMaxFinalRating(self):
+        select_sql = "select max(percentage_rating) max_rating from stocksdb.final_rating "
+
+        self.cur.execute(select_sql)
+
+        rows = self.cur.fetchall()
+        maxR = None
+        for row in rows:
+            maxR = row[0]
+
+        return maxR
 
     def getStockList(self):
         #select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and update_now='y' "
@@ -279,8 +300,9 @@ class FinalRatingModule:
 
             #total = Decimal(revT+profitT+opmT+pmT+ebitT+roeT+icT+deT)
             total = Decimal(revT + profitT + pmT + (opmT +ebitT)*Decimal(C.opmANDebitW) + roeT*Decimal(C.roeW) + icT*Decimal(C.icW) + deT*Decimal(C.deW))
-            percentage_rating = '{0:.3g}'.format((total/self.rating_total)*10)  # 7*2*3  seven param * point * rows
-            print "Final Rating", total, "/", self.rating_total, "->", percentage_rating
+            percentage_rating = '{0:.2f}'.format((total/self.rating_total)*10)
+
+            print " Final Rating", percentage_rating
             data = (fullid, revT, profitT, opmT, pmT, ebitT, roeT, icT, deT,total, percentage_rating, now, now )
             insert_sql = "insert into final_rating (fullid, revenue,profit,op_profit,ebit, profit_margin,roe, interest_cover,debt_equity_ratio, total, percentage_rating, last_modified, created_on)" \
                          " values (%s,%s, %s,%s,%s,%s,%s,%s,%s,%s,%s, %s,%s) "
@@ -309,6 +331,45 @@ class FinalRatingModule:
         else:
             print "*** Amit -  Since updateFinalRatingTempData FAILED , not calling updateFinalRatingData.Move to next one "
 
+
+    def calibrateAllRatings(self, stock_names = None):
+
+        self.max_final_rating = Decimal(self.getMaxFinalRating())
+        if stock_names is None:
+            select_sql = "select fullid, percentage_rating from stocksdb.final_rating "
+            self.cur.execute(select_sql)
+            rows = self.cur.fetchall()
+        else:
+            fullidList = " where fullid in ( "
+            for row in stock_names:
+                fullidList += "'"+row["fullid"]+"',"
+
+            fullidList = fullidList[:-1]
+            fullidList += " )"
+            print fullidList
+            select_sql = "select fullid, percentage_rating from stocksdb.final_rating " + fullidList
+            self.cur.execute(select_sql)
+            rows = self.cur.fetchall()
+
+        for row in rows:
+            fullid = row[0]
+
+            percentage_rating = Decimal(row[1])
+            print "Before Calibration Rating for ",fullid," - ", percentage_rating, ",  max rating - ", self.max_final_rating
+            # if percentage_rating > self.max_final_rating:
+            #     self.max_final_rating = percentage_rating
+
+            # Calibrate this with the max rating so that is does not look bad..
+            percentage_rating = (percentage_rating * 10) / self.max_final_rating
+            percentage_rating = '{0:.2f}'.format(percentage_rating)  # 7*2*3  seven param * point * rows
+            now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            updateSql = "update final_rating set percentage_rating = '%s', last_modified='%s' where fullid = '%s' " % (
+                percentage_rating,now, fullid)
+            self.cur.execute(updateSql)
+            print "updated Calibrated Final Rating to - ", percentage_rating
+
+        self.con.commit()
+
     def updateAll(self,stock_names ):
         start_time = time.time()
         print stock_names
@@ -324,22 +385,14 @@ class FinalRatingModule:
                 qd_table_name = "fa_quaterly_data"
                 fr_table_name = "fa_financial_ratio"
                 self.updateFinalRating(row,qd_table_name,fr_table_name)
-                # thisObj.updateFinalRatingTempData(row,qd_table_name,fr_table_name)
-                # if (thisObj.all_good_flag):
-                #     thisObj.updateFinalRatingData(row,qd_table_name,fr_table_name)
-                # else:
-                #     print "*** Amit -  Since updateFinalRatingTempData FAILED , not calling updateFinalRatingData.Move to next one "
             elif enable_for_vendor_data == '2':
                 qd_table_name = "fa_quaterly_data_secondary"
                 fr_table_name = "fa_financial_ratio_secondary"
                 self.updateFinalRating(row, qd_table_name, fr_table_name)
-                # thisObj.updateFinalRatingTempData(row,qd_table_name,fr_table_name)
-                # if (thisObj.all_good_flag):
-                #     thisObj.updateFinalRatingData(row, qd_table_name, fr_table_name)
-                # else:
-                #     print "*** Amit -  Since updateFinalRatingTempData FAILED , not calling updateFinalRatingData.Move to next one "
 
-
+        # Now calibrate all rating with respect to max rating
+        #commented because each stock becomes depended on other stocks rating and if few stock rating changes then you have tp calculate all stocsk again
+        #self.calibrateAllRatings(stock_names)
 
         print "\n\n sql_exception_list  - "
         print self.sql_exception_list

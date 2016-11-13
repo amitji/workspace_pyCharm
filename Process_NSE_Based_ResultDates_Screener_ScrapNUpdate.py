@@ -1,28 +1,23 @@
+##Amit - purpose - Scrap the screener based on the results dates csv file mentioned below.
+# Get all data for Quarter_date and Financial_ratio tables, update Final rating etc.
 
-import Constants
 import csv
-import sys
-import EmailUtil
 import DBManager
-import requests
-from pandas import pandas
 import platform
-import time
-from bs4 import BeautifulSoup
 from selenium import webdriver
-import datetime
+import FinalRatingModule
 
 import Module_Scrapper_Screener_India_Stocks
 
 
-class NSE_Results_Date_Scrapper:
+class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
 
     def __init__(self):
         self.con = DBManager.connectDB()
         self.cur = self.con.cursor()
 
         self.module_Scrapper_Screener_India_Stocks = Module_Scrapper_Screener_India_Stocks.Module_Scrapper_Screener_India_Stocks()
-
+        self.finalRatingModule = FinalRatingModule.FinalRatingModule()
         if platform.system() == 'Windows':
             self.PHANTOMJS_PATH = './phantomjs.exe'
         else:
@@ -58,20 +53,32 @@ class NSE_Results_Date_Scrapper:
     def csv_reader(self,file_obj):
         reader = csv.DictReader(file_obj, delimiter=',')
         nseidString= ''
+        count = 0
         for line in reader:
             print(line["Symbol"]),
             print(line["BoardMeetingDate"])
             nseidString+=  "'%s'," % line["Symbol"]
+            count +=1
             #call the Sc
+        print "Total records in CSV files to be processed- ", count
         print nseidString
         nseidString = nseidString[:-1]
         nseidString = '('+nseidString+')'
         print nseidString
-        stock_names = self.getStockDetails(nseidString )
-        self.module_Scrapper_Screener_India_Stocks.updateAll(stock_names)
+        return nseidString
+
 
     def getStockDetails(self,nseidString ):
-        select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where nseid in %s " %nseidString
+
+        #expalin sql - following sql will only take those nseid where latest quater data is NOT laread scrapped.
+        # This is to avoid scrapping ones alreay have latest data.
+        select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where nseid in "
+        select_sql += "(select nseid from"
+        select_sql += "(select nseid from stocksdb.fa_quaterly_data_secondary where  period = '2016-06-30' and quater_sequence=5 and nseid in %s " %nseidString
+        select_sql += " union "
+        select_sql += "select nseid from stocksdb.fa_quaterly_data where period = '2016-06-30' and quater_sequence=5 and  nseid in %s ) temp ) " %nseidString
+
+        #select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where nseid in %s " %nseidString
 
         print select_sql
         self.cur.execute(select_sql)
@@ -90,7 +97,12 @@ class NSE_Results_Date_Scrapper:
 
 
 # ----------------------------------------------------------------------
-thisObj = NSE_Results_Date_Scrapper()
+thisObj = Process_NSE_Based_ResultDates_Screener_ScrapNUpdate()
+#csv_path = "BM_Last_15_DaysResults.csv"
 csv_path = "BM_Last_1_WeekResults.csv"
 with open(csv_path, "rb") as f_obj:
-    thisObj.csv_reader(f_obj)
+    nseidString = thisObj.csv_reader(f_obj)
+stock_names = thisObj.getStockDetails(nseidString)
+thisObj.module_Scrapper_Screener_India_Stocks.updateAll(stock_names)
+thisObj.finalRatingModule.updateAll(stock_names)
+
