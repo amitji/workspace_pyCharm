@@ -29,8 +29,11 @@ class Scrapper_US_Stocks:
         self.sql_exception_list = []
         self.updated_stock_list = []
 
-        self.quarter_dates = {5: '2016-06-30', 4: '2016-03-31', 3: '2015-12-31', 2: '2015-09-30', 1: '2015-06-30'}
-        self.quarter_names = {5: 'Q216', 4: 'Q116', 3: 'Q415', 2: 'Q315',1: 'Q215'}
+        # self.quarter_dates = {5: '2016-06-30', 4: '2016-03-31', 3: '2015-12-31', 2: '2015-09-30', 1: '2015-06-30'}
+        # self.quarter_names = {5: 'Q216', 4: 'Q116', 3: 'Q415', 2: 'Q315',1: 'Q215'}
+
+        self.quarter_dates = {5: '2016-09-30', 4: '2016-06-30', 3: '2016-03-31', 2: '2015-12-31', 1: '2015-09-30'}
+        self.quarter_names = {5: 'Q316', 4: 'Q216', 3: 'Q116', 2: 'Q415', 1: 'Q315'}
 
         if platform.system() == 'Windows':
             self.PHANTOMJS_PATH = './phantomjs.exe'
@@ -43,14 +46,15 @@ class Scrapper_US_Stocks:
 
     def getStockList(self):
 
-        select_sql = "select * from (SELECT sn.fullid, sn.nseid FROM stocksdb.fa_quaterly_data_us_stocks qd, stocksdb.stock_names sn where qd.quater_sequence = 5 " \
-                     " and (qd.quater_name = '" + Constants.previous_quarter + "' or qd.quater_name = '" + Constants.prev_to_previous_quarter + "' ) "
-        select_sql += " and qd.fullid=sn.fullid "
-        select_sql += "union SELECT sn.fullid, sn.nseid FROM stocksdb.stock_names sn where exchange = 'NASDAQ' and update_now = 'y' "
-        select_sql += ") sn order by nseid"
+        # select_sql = "select * from (SELECT sn.fullid, sn.nseid FROM stocksdb.fa_quaterly_data_us_stocks qd, stocksdb.stock_names sn where qd.quater_sequence = 5 " \
+        #              " and (qd.quater_name = '" + Constants.previous_quarter + "' or qd.quater_name = '" + Constants.prev_to_previous_quarter + "' ) "
+        # select_sql += " and qd.fullid=sn.fullid "
+        # select_sql += "union SELECT sn.fullid, sn.nseid FROM stocksdb.stock_names sn where exchange = 'NASDAQ' and update_now = 'y' "
+        # select_sql += ") sn order by nseid"
 
         #select_sql = "select fullid, nseid from stocksdb.stock_names sn where exchange='NASDAQ' and update_now='y' "
-        #select_sql = "select fullid, nseid from stocksdb.stock_names sn where exchange='NASDAQ' "
+
+        select_sql = "select fullid, nseid from stocksdb.stock_names sn where exchange='NASDAQ' "
 
         self.cur.execute(select_sql)
 
@@ -158,22 +162,24 @@ class Scrapper_US_Stocks:
                     opMargin = (op/rev)*100
                     ebitMargin = (ebit / rev) * 100
 
-                    print 'quater_seq - ',quater_seq,rev, profit, op, ebit, profitMargin, opMargin, ebitMargin
+                    #print 'quater_seq - ',quater_seq,rev, profit, op, ebit, profitMargin, opMargin, ebitMargin
 
                     insert_sql = ("INSERT INTO "+table_name+" (nseid, fullid, quater_sequence, period,quater_name,  revenueC, profitC, profit_margin, opmC, operating_profit_margin, ebidtaC, ebidt_margin, last_modified, created_on ) VALUES (%s, %s, %s, %s, %s,%s, %s, %s,%s, %s,%s,%s, %s,%s )")
 
 
 
                     data_quater = (nseid, fullid, quater_seq,quarter_date, quarter_name, rev, profit, profitMargin, op, opMargin, ebit, ebitMargin, now, now)
+                    print 'data_quater - ',data_quater
                     self.cur.execute(insert_sql, data_quater)
                     count = count-1
 
                 except Exception, e:
                     print str(e)
+
                     print "\n******Amit - Exception in inserting data in ", table_name, " for - " + fullid
                     self.scrapper_exception_list.append(nseid)
                     self.all_good_flag = False
-                    pass
+                    #pass
 
             #set update_now to 'n' so that next time its not picked..
             # updateSql = "update stock_names set update_now = 'n', last_modified='%s' where fullid = '%s' " % (now, fullid)
@@ -330,4 +336,4 @@ print("\n\nTime Taken --- in minutes ---" , int((time.time() - start_time))/60 )
 
 # url = "http://localhost:8080/StockCircuitServer/spring/stockcircuit/calculateFADataPostPythonProcess"
 # print "Now run the URL ", url
-EmailUtil.send_email("Scrapper Exeption List",thisObj.scrapper_exception_list,  "")
+EmailUtil.send_email("Scrapper_US_Stocks:Scrapper Exeption List", thisObj.scrapper_exception_list, "")

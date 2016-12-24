@@ -168,6 +168,6 @@ if __name__ == "__main__":
 
         # url = "http://localhost:8080/StockCircuitServer/spring/stockcircuit/calculateFADataPostPythonProcess"
         # print "Now run the URL ", url
-        EmailUtil.send_email("Scrapper Exeption List",thisObj.scrapper_exception_list,  "Sleeping for a day, Bye!!")
+        EmailUtil.send_email("Scrapper_US_Stocks:Scrapper Exeption List", thisObj.scrapper_exception_list, "Sleeping for a day, Bye!!")
         print "Sleeping for a day, Bye!!"
         time.sleep(86400)  # 3600 seconds = 1 hour, 24 hrs

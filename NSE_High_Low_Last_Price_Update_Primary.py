@@ -42,7 +42,7 @@ class NSE_High_Low_Last_Price_Update_Primary:
 
 #run for primary stock
 print "run for primary stocks"
-NSE_High_Low_Last_Price_Update_Primary().run('fa_financial_ratio')
+thisObj = NSE_High_Low_Last_Price_Update_Primary()
+thisObj.run('fa_financial_ratio')
 
-
-EmailUtil.send_email("NSE_High_Low_Last_Price_Update_Primary"," ", "none")
+EmailUtil.send_email("NSE_High_Low_Last_Price_Update_Primary", thisObj.quandlDataObject.qd_exception_list, "none")

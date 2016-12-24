@@ -1,28 +1,47 @@
+import smtplib
+
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+
 def __init__(self):
     print "Calling GetNSELiveData constructor"
 
 def send_email( process_name,updated_stock_list, url):
-    import smtplib
+    # me == my email address
+    # you == recipient's email address
+    me = "amit@stockcircuit.in"
+    me_pwd = "Amit1973$"
+    you = "amitji@gmail.com"
 
-    gmail_user = "amit@stockcircuit.in"
-    gmail_pwd = "amit1973"
-    FROM = "amit@stockcircuit.in"
-    TO = "amitji@gmail.com"
-    SUBJECT = "Process finished - ", process_name
-    TEXT = "Updated List is  - ", updated_stock_list
-    TEXT += "Now run the URL - " , url
+    # Create message container - the correct MIME type is multipart/alternative.
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = "Process finished - "+ process_name
+    msg['From'] = me
+    msg['To'] = you
+
+    #print type(updated_stock_list)
+	
+    part1 = MIMEText(updated_stock_list, 'html')
+    msg.attach(part1)
+
+    # SUBJECT = "Process finished - ", process_name
+    # TEXT = "Updated List is  - ", updated_stock_list
+    # TEXT += "Now run the URL - " , url
 
     # Prepare actual message
-    message = """From: %s\nTo: %s\nSubject: %s\n\n%s
-    """ % (FROM, ", ".join(TO), SUBJECT, TEXT)
+    # message = """From: %s\nTo: %s\nSubject: %s\n\n%s
+    # """ % (FROM, ", ".join(TO), SUBJECT, TEXT)
     try:
         #server = smtplib.SMTP("smtp.gmail.com", 465)
-        server = smtplib.SMTP("mail.stockcircuit.in", 25)
+        server = smtplib.SMTP("mail.stockcircuit.in", 587)
 
         server.ehlo()
         server.starttls()
-        server.login(gmail_user, gmail_pwd)
-        server.sendmail(FROM, TO, message)
+        server.login(me, me_pwd)
+        #server.sendmail(me, you, msg)
+	#print "msg as string", msg.as_string()
+        server.sendmail(me, you, msg.as_string())
         server.close()
         print 'successfully sent the mail'
     except  Exception, e2:
