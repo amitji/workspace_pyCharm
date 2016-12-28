@@ -20,12 +20,18 @@ def send_email( subject,updated_stock_list, url):
     msg['From'] = me
     msg['To'] = you
 
-    #print type(updated_stock_list)
-	
-    part1 = MIMEText(updated_stock_list, 'html')
-    #part2 = MIMEText("url = "+url, 'html')
+    # html = """\
+    # <html>
+    #   <head></head>
+    #   <body>"""
+    # html += updated_stock_list
+    # html +="""\
+    #   </body>
+    # </html>
+    # """
+    #part1 = MIMEText(updated_stock_list, 'html')
+    part1 = MIMEText("<table></table>", 'html')
     msg.attach(part1)
-    #msg.attach(part2)
 
     # SUBJECT = "Process finished - ", process_name
     # TEXT = "Updated List is  - ", updated_stock_list
@@ -35,14 +41,12 @@ def send_email( subject,updated_stock_list, url):
     # message = """From: %s\nTo: %s\nSubject: %s\n\n%s
     # """ % (FROM, ", ".join(TO), SUBJECT, TEXT)
     try:
-        #server = smtplib.SMTP("smtp.gmail.com", 465)
+        #server = smtplib.SMTP("smtp.gmail.com", 587)
         server = smtplib.SMTP("mail.stockcircuit.in", 587)
 
         server.ehlo()
         server.starttls()
         server.login(me, me_pwd)
-        #server.sendmail(me, you, msg)
-        #print "msg as string", msg.as_string()
         server.sendmail(me, you, msg.as_string())
         server.close()
         print 'successfully sent the mail'
