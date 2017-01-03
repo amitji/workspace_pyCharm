@@ -127,4 +127,4 @@ print("\n\nTime Taken --- in minutes ---" , int((time.time() - start_time))/60 )
 
 url = "http://localhost:8080/StockCircuitServer/spring/stockcircuit/calculateFADataPostPythonProcess_Secondary"
 print "Now run the URL ", url
-EmailUtil.send_email("UpdateOnlyIfLastQuaterResultsDeclared_Secondary", thisObj.quandlDataObject.updated_stock_list, url)
+EmailUtil.send_email("UpdateOnlyIfLastQuaterResultsDeclared_Secondary", thisObj.quandlDataObject.updated_stock_list,  url)

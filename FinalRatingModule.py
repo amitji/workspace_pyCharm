@@ -318,10 +318,9 @@ class FinalRatingModule:
 
 
         if (self.all_good_flag):
-            # Following three updates are done in Module_Scrapper_Screener_India_Stocks
-            #self.quandlDataObject.setUpdateNowFlag(fullid, qd_table_name, 'n')
-            #self.quandlDataObject.setIsVideoAvailable(fullid)
-            #self.quandlDataObject.setVideoAsOldToRecreateNextTime(fullid)
+            self.quandlDataObject.setUpdateNowFlag(fullid, qd_table_name, 'n')
+            self.quandlDataObject.setIsVideoAvailable(fullid)
+            self.quandlDataObject.setVideoAsOldToRecreateNextTime(fullid)
             self.updated_stock_list.append(nseid)
 
 
@@ -373,7 +372,7 @@ class FinalRatingModule:
 
     def updateAll(self,stock_names ):
         start_time = time.time()
-        #print stock_names
+        print stock_names
         print "Number of Stocks processing - " , len(stock_names)
         totalCount = len(stock_names)
         count = 0
@@ -390,24 +389,20 @@ class FinalRatingModule:
                 qd_table_name = "fa_quaterly_data_secondary"
                 fr_table_name = "fa_financial_ratio_secondary"
                 self.updateFinalRating(row, qd_table_name, fr_table_name)
-            else:# enable_for_vendor_data other than '1' & '2':
-                qd_table_name = "fa_quaterly_data_secondary"
-                fr_table_name = "fa_financial_ratio_secondary"
-                self.updateFinalRating(row, qd_table_name, fr_table_name)
 
         # Now calibrate all rating with respect to max rating
         #commented because each stock becomes depended on other stocks rating and if few stock rating changes then you have tp calculate all stocsk again
         #self.calibrateAllRatings(stock_names)
 
-        print "\n\n FinalRatingModule::sql_exception_list  - "
+        print "\n\n sql_exception_list  - "
         print self.sql_exception_list
 
-        print "\n FinalRatingModule::Updated Stock list for - ", len(self.updated_stock_list), " Stocks"
+        print "\n Updated Stock list for - ", len(self.updated_stock_list), " Stocks"
         print self.updated_stock_list
 
-        print "\n FinalRatingModule::qData_missing_stock_list list for - ", len(self.qData_missing_stock_list), " Stocks"
+        print "\n qData_missing_stock_list list for - ", len(self.qData_missing_stock_list), " Stocks"
         print self.qData_missing_stock_list
 
 
-        #print("\n\nTime Taken --- in minutes ---" , int((time.time() - start_time))/60 )
+        print("\n\nTime Taken --- in minutes ---" , int((time.time() - start_time))/60 )
         #EmailUtil.send_email("Update Final Rating Exeption List",self.sql_exception_list,  "")

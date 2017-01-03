@@ -152,9 +152,6 @@ class Module_Scrapper_Screener_India_Stocks:
                 if short_quarter_date == temp_date:
                     print 'latest quarter STANDALONE results available', short_quarter_date, temp_date
                     quarter_version = 2
-                elif short_quarter_date_v1 == temp_date:
-                    print 'one quarter previous STANDALONE results available', short_quarter_date_v1, temp_date
-                    quarter_version = 1
                 else:
                     print 'looks 2 quarter old data so skipping this stock',  temp_date
                     quarter_version = 0
@@ -203,15 +200,9 @@ class Module_Scrapper_Screener_India_Stocks:
                     op = float((self.browser.find_element_by_xpath(row["opm_xpath"]).text).replace(",", ""))
                     ebit = float((self.browser.find_element_by_xpath(row["ebit_xpath"]).text).replace(",", ""))
 
-                    profitMargin = None
-                    opMargin = None
-                    ebitMargin = None
-                    if rev != 0:
-                        profitMargin = (profit/rev)*100
-                        opMargin = (op/rev)*100
-                        ebitMargin = (ebit / rev) * 100
-                    else:
-                        print "Rev is ZERO"
+                    profitMargin = (profit/rev)*100
+                    opMargin = (op/rev)*100
+                    ebitMargin = (ebit / rev) * 100
 
                     #calculate growth rates
                     rev_growth = None
@@ -226,16 +217,10 @@ class Module_Scrapper_Screener_India_Stocks:
                         print prev_rev, prev_profit
 
                         rev_growth = rev-prev_rev
-                        if prev_rev != 0:
-                            rev_growth_rate = (100*rev_growth)/prev_rev
-                        else:
-                            print "prev_rev is ZER0 - ", prev_rev
+                        rev_growth_rate = (100*rev_growth)/prev_rev
 
                         profit_growth = profit - prev_profit
-                        if prev_profit !=0:
-                            profit_growth_rate = (100 * profit_growth) / prev_profit
-                        else:
-                            print "prev_profit is ZER0 - ", prev_profit
+                        profit_growth_rate = (100 * profit_growth) / prev_profit
 
                         if rev > prev_rev:
                             self.revenueIndStr += "1"
@@ -463,24 +448,15 @@ class Module_Scrapper_Screener_India_Stocks:
                     # self.finalRatingModule.updateFinalRating(row, qd_table_name, fr_table_name)
                 else:
                     print "*** Amit -  Since updateQuaterlyData FAILED , not calling updateFinancialRatios.Move to next one "
-            else:   # enable_for_vendor_data is 'e', 'z' or something else:
-                print "*** Amit - BEWARE PROCESSING enable_for_vendor_data = ", enable_for_vendor_data, " DATA"
-                qd_table_name = "fa_quaterly_data_secondary"
-                fr_table_name = "fa_financial_ratio_secondary"
-                self.updateQuaterlyData(row, qd_table_name, fr_table_name)
-                if (self.all_good_flag):
-                    print "\n\ncalling updateFinancialRatios for - ", row['nseid'], "(", count, "/", totalCount, ")"
-                    self.updateFinancialRatios(row, qd_table_name, fr_table_name)
-                    # self.finalRatingModule.updateFinalRating(row, qd_table_name, fr_table_name)
 
 
-        print "\n\n Module_Scrapper_Screener_India_Stocks::scrapper_exception_list  - "
+        print "\n\n scrapper_exception_list  - "
         print self.scrapper_exception_list
 
-        print "\n\n Module_Scrapper_Screener_India_Stocks::sql_exception_list  - "
+        print "\n\n sql_exception_list  - "
         print self.sql_exception_list
 
-        print "\n Module_Scrapper_Screener_India_Stocks::Updated Stock list for - ", len(self.updated_stock_list), " Stocks"
+        print "\n Updated Stock list for - ", len(self.updated_stock_list), " Stocks"
         print self.updated_stock_list
 
         print("\n\nTime Taken --- in minutes ---", int((time.time() - start_time)) / 60)
@@ -488,7 +464,7 @@ class Module_Scrapper_Screener_India_Stocks:
         print "\n\n **** NOW RUN THE FINAL RATING PROCESS FOR THE SAME SET OF STOCKS"
         # url = "http://localhost:8080/StockCircuitServer/spring/stockcircuit/calculateFADataPostPythonProcess"
         # print "Now run the URL ", url
-        EmailUtil.send_email("Module_Scrapper_Screener_India_Stocks:Scrapper Exeption List", self.scrapper_exception_list, "")
+        EmailUtil.send_email("Scrapper Exeption List", self.scrapper_exception_list, "")
 
 
 
