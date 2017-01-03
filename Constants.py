@@ -12,7 +12,7 @@ latest_quarter_date = '2016-06-30 00:00:00'
 previous_quarter = 'Q415'
 prev_to_previous_quarter = 'Q315'
 
-Authkey = '5_pRK9pKefuvZzHe-MkS'
+Authkey = '5_pRK9pKefuvZzHe-MkSy'
 
 
 #dataset suffix

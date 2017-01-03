@@ -45,4 +45,5 @@ print "run for primary stocks"
 thisObj = NSE_High_Low_Last_Price_Update_Primary()
 thisObj.run('fa_financial_ratio')
 
-EmailUtil.send_email("NSE_High_Low_Last_Price_Update_Primary", thisObj.quandlDataObject.qd_exception_list, "none")
+EmailUtil.send_email_as_text("NSE_High_Low_Last_Price_Update_Primary", " ", "none")
+#EmailUtil.send_email("NSE_High_Low_Last_Price_Update_Primary", thisObj.quandlDataObject.qd_exception_list, "none")

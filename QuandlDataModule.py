@@ -18,7 +18,7 @@ class QuandlDataModule:
 
     def __init__(self):
         # print "Calling parent constructor"
-        self.Authkey = '5_pRK9pKefuvZzHe-MkS'
+        self.Authkey = '5_pRK9pKefuvZzHe-MkSy'
         self.con = DBManager.connectDB()
         self.cur = self.con.cursor()
         self.qd_exception_list = []

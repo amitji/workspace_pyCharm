@@ -21,7 +21,7 @@ def send_email( subject,updated_stock_list, url):
     msg['To'] = you
 
     #print type(updated_stock_list)
-	
+
     part1 = MIMEText(updated_stock_list, 'html')
     #part2 = MIMEText("url = "+url, 'html')
     msg.attach(part1)
@@ -50,3 +50,30 @@ def send_email( subject,updated_stock_list, url):
         print "error e2 - ", str(e2)
         print "\n******Amit - failed to send mail, some exception sending email"
 
+
+def send_email_as_text(process_name, updated_stock_list, url):
+    import smtplib
+    gmail_user = "amit@stockcircuit.in"
+    gmail_pwd = "Amit1973$"
+    FROM = "amit@stockcircuit.in"
+    TO = "amitji@gmail.com"
+    SUBJECT = "Process finished - ", process_name
+    TEXT = "Updated List is  - ", updated_stock_list
+    TEXT += "Now run the URL - ", url
+
+    message = """From: %s\nTo: %s\nSubject: %s\n\n%s
+    """ % (FROM, ", ".join(TO), SUBJECT, TEXT)
+
+
+    try:
+        # server = smtplib.SMTP("smtp.gmail.com", 465)
+        server = smtplib.SMTP("mail.stockcircuit.in", 587)
+        server.ehlo()
+        server.starttls()
+        server.login(gmail_user, gmail_pwd)
+        server.sendmail(FROM, TO, message)
+        server.close()
+        print 'successfully sent the mail'
+    except  Exception, e2:
+        print "error e2 - ", str(e2)
+        print "\n******Amit - failed to send mail, some exception sending email"

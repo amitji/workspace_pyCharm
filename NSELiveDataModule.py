@@ -9,7 +9,8 @@ def __init__(self):
 
 
 def getNSELiveData( nseid):
-    Authkey = '5_pRK9pKefuvZzHe-MkS'
+    Authkey = '5_pRK9pKefuvZzHe-MkSy'
+
     nse_dataset = "NSE" + "/" + nseid
     mydata = quandl.get(nse_dataset, authtoken=Authkey, rows=250, sort_order="desc")
 
