@@ -61,44 +61,26 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
             count +=1
             #call the Sc
         print "Total records in CSV files to be processed- ", count
-        #print nseidString
+        print nseidString
         nseidString = nseidString[:-1]
         nseidString = '('+nseidString+')'
-        #print nseidString
+        print nseidString
         return nseidString
 
 
     def getStockDetails(self,nseidString ):
 
-        #expalin sql - following sql will only take those nseid where latest quater data is NOT already scrapped.
+        #expalin sql - following sql will only take those nseid where latest quater data is NOT laread scrapped.
         # This is to avoid scrapping ones alreay have latest data.
-        '''
         select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where nseid in "
         select_sql += "(select nseid from"
         select_sql += "(select nseid from stocksdb.fa_quaterly_data_secondary where  period = '2016-06-30' and quater_sequence=5 and nseid in %s " %nseidString
         select_sql += " union "
         select_sql += "select nseid from stocksdb.fa_quaterly_data where period = '2016-06-30' and quater_sequence=5 and  nseid in %s ) temp ) " %nseidString
 
-
-
-        ####################################################################
-        # This sql is to pick those stocks which has 2 Quater old data. This is needed once in a while when data is not updated
-
-        select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where nseid in "
-        select_sql += "(select nseid from"
-        select_sql += "(select nseid from stocksdb.fa_quaterly_data_secondary where  period = '2016-03-31' and quater_sequence=5 and nseid in %s " % nseidString
-        select_sql += " union "
-        select_sql += "select nseid from stocksdb.fa_quaterly_data where period = '2016-03-31' and quater_sequence=5 and  nseid in %s ) temp ) " % nseidString
-        '''
-        ##########################################################################
-        # This will run for all the stcoks in the CSV file irrespective they are already updated for latest results.
-        #Dont run it without thinking
         #select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where nseid in %s " %nseidString
-        ## call this for single stock
-        select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where nseid in ('OPTOCIRCUI') "
-        ##########################################################################
 
-        #print select_sql
+        print select_sql
         self.cur.execute(select_sql)
 
         rows = self.cur.fetchall()
@@ -118,12 +100,9 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
 thisObj = Process_NSE_Based_ResultDates_Screener_ScrapNUpdate()
 #csv_path = "BM_Last_15_DaysResults.csv"
 csv_path = "BM_Last_1_WeekResults.csv"
-#csv_path = "BM_Last_3_MonthsResults.csv"
-
 with open(csv_path, "rb") as f_obj:
     nseidString = thisObj.csv_reader(f_obj)
 stock_names = thisObj.getStockDetails(nseidString)
-print "And processing ", stock_names.__len__(), " stocks"
 thisObj.module_Scrapper_Screener_India_Stocks.updateAll(stock_names)
 thisObj.finalRatingModule.updateAll(stock_names)
 

@@ -45,5 +45,5 @@ print "\n\n\n run for secondary stocks"
 thisObj = NSE_High_Low_Last_Price_Update_Secondary()
 thisObj.run('fa_financial_ratio_secondary')
 
-EmailUtil.send_email_as_text("NSE_High_Low_Last_Price_Update_Secondary", " ", "none")
+EmailUtil.send_email_as_text("NSE_High_Low_Last_Price_Update_Secondary", thisObj.quandlDataObject.qd_exception_list, "none")
 #EmailUtil.send_email("NSE_High_Low_Last_Price_Update_Secondary", thisObj.quandlDataObject.qd_exception_list, "none")
