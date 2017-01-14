@@ -5,7 +5,7 @@ import csv
 import DBManager
 import platform
 from selenium import webdriver
-import FinalRatingModule
+import Module_Final_Rating
 
 import Module_Scrapper_Screener_India_Stocks
 
@@ -17,7 +17,7 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
         self.cur = self.con.cursor()
 
         self.module_Scrapper_Screener_India_Stocks = Module_Scrapper_Screener_India_Stocks.Module_Scrapper_Screener_India_Stocks()
-        self.finalRatingModule = FinalRatingModule.FinalRatingModule()
+        self.finalRatingModule = Module_Final_Rating.Module_Final_Rating()
         if platform.system() == 'Windows':
             self.PHANTOMJS_PATH = './phantomjs.exe'
         else:
@@ -70,15 +70,17 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
 
     def getStockDetails(self,nseidString ):
 
-        #expalin sql - following sql will only take those nseid where latest quater data is NOT laread scrapped.
-        # This is to avoid scrapping ones alreay have latest data.
-        select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where nseid in "
-        select_sql += "(select nseid from"
-        select_sql += "(select nseid from stocksdb.fa_quaterly_data_secondary where  period = '2016-06-30' and quater_sequence=5 and nseid in %s " %nseidString
-        select_sql += " union "
-        select_sql += "select nseid from stocksdb.fa_quaterly_data where period = '2016-06-30' and quater_sequence=5 and  nseid in %s ) temp ) " %nseidString
+        ###expalin sql - following sql will only take those nseid where latest quater data is NOT laread scrapped.
+        ###This is to avoid scrapping ones alreay have latest data.
 
-        #select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where nseid in %s " %nseidString
+        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in "
+        select_sql += "(select nseid from"
+        select_sql += "(select nseid from stocksdb.fa_quaterly_data_secondary where  period = '2016-09-30' and quater_sequence=5 and nseid in %s " %nseidString
+        select_sql += " union "
+        select_sql += "select nseid from stocksdb.fa_quaterly_data where period = '2016-09-30' and quater_sequence=5 and  nseid in %s ) temp ) " %nseidString
+
+        ###Explain Sql - This sql will update all stcoks in the csv file wheather they are already updated or not.
+        #select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in %s " %nseidString
 
         print select_sql
         self.cur.execute(select_sql)
@@ -91,6 +93,7 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
             dd["fullid"] = row[0]
             dd["nseid"] = row[1]
             dd["enable_for_vendor_data"] = row[2]
+            dd["industry_vertical"] = row[3]
             data.append(dd)
         # print data
         return data
@@ -98,8 +101,8 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
 
 # ----------------------------------------------------------------------
 thisObj = Process_NSE_Based_ResultDates_Screener_ScrapNUpdate()
-#csv_path = "BM_Last_15_DaysResults.csv"
-csv_path = "BM_Last_1_WeekResults.csv"
+csv_path = "BM_Last_15_DaysResults.csv"
+#csv_path = "BM_Last_1_WeekResults.csv"
 with open(csv_path, "rb") as f_obj:
     nseidString = thisObj.csv_reader(f_obj)
 stock_names = thisObj.getStockDetails(nseidString)

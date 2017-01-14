@@ -34,13 +34,14 @@ class Module_Scrapper_Screener_India_Stocks:
         self.sql_exception_list = []
         self.updated_stock_list = []
 
-        self.quarter_dates = {5: '2016-09-30', 4: '2016-06-30', 3: '2016-03-31', 2: '2015-12-31', 1: '2015-09-30'}
-        self.screener_quarter_dates = {5: 'Sep 2016',4: 'June 2016', 3: 'Mar 2016', 2: 'Dec 2015', 1: 'Sep 2015'}
-        self.quarter_names = {5: 'Q216', 4: 'Q116', 3: 'Q415', 2: 'Q315', 1: 'Q215'}
+        self.quarter_dates_v1 = {5: '2016-09-30', 4: '2016-06-30', 3: '2016-03-31', 2: '2015-12-31', 1: '2015-09-30'}
+        self.screener_quarter_dates_v1 = {5: 'Sep 2016',4: 'June 2016', 3: 'Mar 2016', 2: 'Dec 2015', 1: 'Sep 2015'}
+        self.quarter_names_v1 = {5: 'Q216', 4: 'Q116', 3: 'Q415', 2: 'Q315', 1: 'Q215'}
 
-        self.quarter_dates_v1 = {5: '2016-06-30', 4: '2016-03-31', 3: '2015-12-31', 2: '2015-09-30', 1: '2015-06-30'}
-        self.quarter_names_v1 = {5: 'Q216', 4: 'Q116', 3: 'Q415', 2: 'Q315', 2: 'Q215', 1: 'Q115'}
-        self.screener_quarter_dates_v1 = {5: 'June 2016', 4: 'Mar 2016', 3: 'Dec 2015', 2: 'Sep 2015', 1: 'June 2015'}
+        self.quarter_dates = {5: '2016-12-31',4: '2016-09-30', 3: '2016-06-30', 2: '2016-03-31', 1: '2015-12-31'}
+        self.screener_quarter_dates = {5: 'Dec 2016', 4: 'Sep 2016',3: 'June 2016', 2: 'Mar 2016', 1: 'Dec 2015'}
+        self.quarter_names = {5: 'Q316',4: 'Q216', 3: 'Q116', 2: 'Q415', 1: 'Q315'}
+
 
 
         if platform.system() == 'Windows':
@@ -155,6 +156,7 @@ class Module_Scrapper_Screener_India_Stocks:
                 else:
                     print 'looks 2 quarter old data so skipping this stock',  temp_date
                     quarter_version = 0
+                    self.scrapper_exception_list.append(nseid)
                     self.all_good_flag = False
                     return
 
@@ -200,9 +202,9 @@ class Module_Scrapper_Screener_India_Stocks:
                     op = float((self.browser.find_element_by_xpath(row["opm_xpath"]).text).replace(",", ""))
                     ebit = float((self.browser.find_element_by_xpath(row["ebit_xpath"]).text).replace(",", ""))
 
-                    profitMargin = (profit/rev)*100
-                    opMargin = (op/rev)*100
-                    ebitMargin = (ebit / rev) * 100
+                    profitMargin = (profit/abs(rev))*100  # abs() is used for negative denominator
+                    opMargin = (op/abs(rev))*100
+                    ebitMargin = (ebit / abs(rev)) * 100
 
                     #calculate growth rates
                     rev_growth = None
@@ -217,10 +219,10 @@ class Module_Scrapper_Screener_India_Stocks:
                         print prev_rev, prev_profit
 
                         rev_growth = rev-prev_rev
-                        rev_growth_rate = (100*rev_growth)/prev_rev
+                        rev_growth_rate = (100*rev_growth)/abs(prev_rev) # abs() is used for negative denominator
 
                         profit_growth = profit - prev_profit
-                        profit_growth_rate = (100 * profit_growth) / prev_profit
+                        profit_growth_rate = (100 * profit_growth) / abs(prev_profit)
 
                         if rev > prev_rev:
                             self.revenueIndStr += "1"
@@ -461,7 +463,9 @@ class Module_Scrapper_Screener_India_Stocks:
 
         print("\n\nTime Taken --- in minutes ---", int((time.time() - start_time)) / 60)
 
-        print "\n\n **** NOW RUN THE FINAL RATING PROCESS FOR THE SAME SET OF STOCKS"
+        print "\n\n ************************************************************************"
+        print "NOW RUN THE FINAL RATING PROCESS FOR THE SAME SET OF STOCKS"
+        print "************************************************************************"
         # url = "http://localhost:8080/StockCircuitServer/spring/stockcircuit/calculateFADataPostPythonProcess"
         # print "Now run the URL ", url
         EmailUtil.send_email_as_text("Scrapper Exeption List", self.scrapper_exception_list, "")

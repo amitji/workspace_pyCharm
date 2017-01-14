@@ -4,7 +4,7 @@ import csv
 import DBManager
 import platform
 from selenium import webdriver
-import FinalRatingModule
+import Module_Final_Rating
 import datetime
 
 import Module_Scrapper_Screener_India_Stocks
@@ -17,7 +17,6 @@ class NSE_Result_Calendar_Update_Process:
         self.cur = self.con.cursor()
 
         self.module_Scrapper_Screener_India_Stocks = Module_Scrapper_Screener_India_Stocks.Module_Scrapper_Screener_India_Stocks()
-        self.finalRatingModule = FinalRatingModule.FinalRatingModule()
         if platform.system() == 'Windows':
             self.PHANTOMJS_PATH = './phantomjs.exe'
         else:
