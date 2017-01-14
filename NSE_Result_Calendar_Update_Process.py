@@ -17,6 +17,7 @@ class NSE_Result_Calendar_Update_Process:
         self.cur = self.con.cursor()
 
         self.module_Scrapper_Screener_India_Stocks = Module_Scrapper_Screener_India_Stocks.Module_Scrapper_Screener_India_Stocks()
+        self.finalRatingModule = Module_Final_Rating.Module_Final_Rating()
         if platform.system() == 'Windows':
             self.PHANTOMJS_PATH = './phantomjs.exe'
         else:

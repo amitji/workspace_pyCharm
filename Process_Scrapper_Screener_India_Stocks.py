@@ -40,5 +40,6 @@ class Process_Scrapper_Screener_India_Stock:
 
 thisObj = Process_Scrapper_Screener_India_Stock()
 stock_names= thisObj.getStockList()
+#thisObj.module_Scrapper_Screener_India_Stocks.updateAll(stock_names)
 thisObj.finalRatingModule.updateAll(stock_names)
 
