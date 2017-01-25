@@ -7,6 +7,7 @@ import itertools
 import datetime
 import QuandlDataModule
 import Constants as C
+import operator
 
 
 class Module_Final_Rating:
@@ -31,6 +32,8 @@ class Module_Final_Rating:
         self.sql_exception_list = []
         self.updated_stock_list = []
         self.qData_missing_stock_list = []
+
+        self.ratingDict = {}
 
         self.quandlDataObject = QuandlDataModule.QuandlDataModule()
 
@@ -419,15 +422,26 @@ class Module_Final_Rating:
             self.cur.execute(delete_sql)
             self.con.commit()
 
+            #get the latest quarter for which result exists
+            select_sql = "select quater_name FROM "+qd_table_name+" where quater_sequence=5 and fullid='%s' " %(fullid)
+            self.cur.execute(select_sql)
 
+            rows = self.cur.fetchall()
+            latest_quarter = None
+            data = list()
+            for row in rows:
+                latest_quarter = row[0]
+
+            print "latest_quarter- ",latest_quarter
             #total = Decimal(revT+profitT+opmT+pmT+ebitT+roeT+icT+deT)
             total = Decimal(revT + profitT + pmT + (opmT +ebitT)*Decimal(C.opmANDebitW) + roeT*Decimal(C.roeW) + icT*Decimal(C.icW) + deT*Decimal(C.deW))
             percentage_rating = '{0:.2f}'.format((total/self.rating_total)*10)
 
             print " Final Rating", percentage_rating
-            data = (fullid, revT, profitT, opmT, pmT, ebitT, roeT, icT, deT,total, percentage_rating, now, now )
-            insert_sql = "insert into final_rating (fullid, revenue,profit,op_profit,ebit, profit_margin,roe, interest_cover,debt_equity_ratio, total, percentage_rating, last_modified, created_on)" \
-                         " values (%s,%s, %s,%s,%s,%s,%s,%s,%s,%s,%s, %s,%s) "
+            self.ratingDict[fullid+"["+latest_quarter+"]"] = percentage_rating
+            data = (fullid, percentage_rating,latest_quarter, revT, profitT, opmT, pmT, ebitT, roeT, icT, deT,total, now, now )
+            insert_sql = "insert into final_rating (fullid, percentage_rating, latest_quarter, revenue,profit,op_profit,ebit, profit_margin,roe, interest_cover,debt_equity_ratio, total, last_modified, created_on)" \
+                         " values (%s,%s, %s,%s,%s,%s,%s,%s,%s,%s,%s, %s,%s,%s) "
             self.cur.execute(insert_sql, data)
             self.con.commit()
 
@@ -525,9 +539,11 @@ class Module_Final_Rating:
         print "\n qData_missing_stock_list list for - ", len(self.qData_missing_stock_list), " Stocks"
         print self.qData_missing_stock_list
 
+        self.ratingDict = sorted(self.ratingDict.items(), key=operator.itemgetter(1))
+        print "\n Final rating Dictionary - ", self.ratingDict
 
         print("\n\nTime Taken --- in minutes ---" , int((time.time() - start_time))/60 )
-        #EmailUtil.send_email("Update Final Rating Exeption List",self.sql_exception_list,  "")
+        EmailUtil.send_email_as_text("Final rating Dictionary - ",self.ratingDict,  "")
 
 
 

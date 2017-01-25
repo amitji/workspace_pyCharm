@@ -58,7 +58,7 @@ def send_email_as_text(process_name, updated_stock_list, url):
     FROM = "amit@stockcircuit.in"
     TO = "amitji@gmail.com"
     SUBJECT = "Process finished - ", process_name
-    TEXT = "Exception List is  - ", updated_stock_list
+    TEXT = process_name, updated_stock_list
     TEXT += "Now run the URL - ", url
 
     message = """From: %s\nTo: %s\nSubject: %s\n\n%s

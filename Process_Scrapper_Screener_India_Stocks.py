@@ -20,8 +20,11 @@ class Process_Scrapper_Screener_India_Stock:
         # select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and enable_for_vendor_data = 'e' "
         # select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and enable_for_vendor_data = 'z' "
         # select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and update_now='A' "
-        #select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in ('UCOBANK') "
-        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names_temp sn"
+        #select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names_temp sn"
+        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in ('SINTEX') "
+
+        #run this sql to recalculate the ratings only. Comment module_Scrapper_Screener_India_Stocks.updateAll function below.
+        #select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where fullid in (select fullid from stocksdb.final_rating ) "
         self.cur.execute(select_sql)
 
         rows = self.cur.fetchall()
@@ -40,6 +43,6 @@ class Process_Scrapper_Screener_India_Stock:
 
 thisObj = Process_Scrapper_Screener_India_Stock()
 stock_names= thisObj.getStockList()
-#thisObj.module_Scrapper_Screener_India_Stocks.updateAll(stock_names)
+thisObj.module_Scrapper_Screener_India_Stocks.updateAll(stock_names)
 thisObj.finalRatingModule.updateAll(stock_names)
 

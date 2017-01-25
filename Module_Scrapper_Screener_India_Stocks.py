@@ -47,7 +47,8 @@ class Module_Scrapper_Screener_India_Stocks:
         if platform.system() == 'Windows':
             self.PHANTOMJS_PATH = './phantomjs.exe'
         else:
-            self.PHANTOMJS_PATH = './phantomjs'
+            #self.PHANTOMJS_PATH = './phantomjs'
+            self.PHANTOMJS_PATH = '/home/shopbindaas/python-workspace/phantomjs'
 
         self.browser = webdriver.PhantomJS(self.PHANTOMJS_PATH)
 
@@ -451,7 +452,7 @@ class Module_Scrapper_Screener_India_Stocks:
                 else:
                     print "*** Amit -  Since updateQuaterlyData FAILED , not calling updateFinancialRatios.Move to next one "
 
-
+        self.browser.quit();
         print "\n\n scrapper_exception_list  - "
         print self.scrapper_exception_list
 
@@ -468,7 +469,7 @@ class Module_Scrapper_Screener_India_Stocks:
         print "************************************************************************"
         # url = "http://localhost:8080/StockCircuitServer/spring/stockcircuit/calculateFADataPostPythonProcess"
         # print "Now run the URL ", url
-        EmailUtil.send_email_as_text("Scrapper Exeption List", self.scrapper_exception_list, "")
+        EmailUtil.send_email_as_text("Scrapper Exeption List - ", self.scrapper_exception_list, "")
 
 
 
