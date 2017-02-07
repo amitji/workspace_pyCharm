@@ -34,6 +34,6 @@ soup = BeautifulSoup(page)
 
 sgx_table = soup.find("table",{"class":"indexes"})
 
-complete_html = "<br/><br/>SGX Nifty<br/>"+str(sgx_table)+"<br/><br/><br/>"+str(table1)
-#print complete_html
+complete_html = "<br/><br/>"+url+"<br/>SGX Nifty<br/>"+str(sgx_table)+"<br/><br/><br/>"+str(table1)
+print complete_html
 EmailUtil.send_email("SGX Nifty & FII numbers", complete_html, "")
