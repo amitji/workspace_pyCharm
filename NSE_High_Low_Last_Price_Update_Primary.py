@@ -14,12 +14,12 @@ class NSE_High_Low_Last_Price_Update_Primary:
         print "Calling NSE_High_Low_Last_Price_Update_Primary constructor"
         self.con = DBManager.connectDB()
         self.cur = self.con.cursor()
-        self.quandlDataObject = NSE_High_Low_Last_Price_Module.NSE_High_Low_Last_Price_Update()
+        self.nseHighLowModule = NSE_High_Low_Last_Price_Module.NSE_High_Low_Last_Price_Update()
 
     def run(self, table_name):
         #obj = NSE_High_Low_Last_Price_Update()
         start_time = time.time()
-        stock_names =  self.quandlDataObject.getStocksMarkedForUpdates(table_name)
+        stock_names =  self.nseHighLowModule.getStocksMarkedForUpdates(table_name)
         print stock_names
         print "Number of Stocks processing - ", len(stock_names)
 
@@ -31,12 +31,12 @@ class NSE_High_Low_Last_Price_Update_Primary:
             # print row
             count = count + 1
             print "\n\ncalling MSE_Hogh_Low for - ", row['fullid'], "(", count, "/", totalCount, ")"
-            self.quandlDataObject.updateLiveData(row, table_name)
+            self.nseHighLowModule.updateLiveData(row, table_name)
 
         print "\n\n Quarterly Data Exception list - "
-        print  self.quandlDataObject.qd_exception_list
+        print  self.nseHighLowModule.qd_exception_list
         print "\nFinancial Ratio Exception list - "
-        print  self.quandlDataObject.fr_exception_list
+        print  self.nseHighLowModule.fr_exception_list
 
         print("\n\nTime Taken --- in minutes ---", int((time.time() - start_time)) / 60)
 
@@ -45,5 +45,4 @@ print "run for primary stocks"
 thisObj = NSE_High_Low_Last_Price_Update_Primary()
 thisObj.run('fa_financial_ratio')
 
-EmailUtil.send_email_as_text("NSE_High_Low_Last_Price_Update_Primary", thisObj.quandlDataObject.qd_exception_list, "none")
-#EmailUtil.send_email("NSE_High_Low_Last_Price_Update_Primary", thisObj.quandlDataObject.qd_exception_list, "none")
+EmailUtil.send_email_as_text("NSE_High_Low_Last_Price_Update_Primary", thisObj.nseHighLowModule.fr_exception_list, "")

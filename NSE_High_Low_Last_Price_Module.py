@@ -21,10 +21,9 @@ class NSE_High_Low_Last_Price_Update:
         # _stocks = self.getStocks()
 
     def getStocksMarkedForUpdates(self, table_name):
-        #self.cur.execute("SELECT distinct nseid, data_type FROM stock_names where enable_for_vendor_data = '1' order by fullid ")
-        self.cur.execute(
-            #"SELECT distinct fullid FROM fa_financial_ratio where update_now = 'y' order by fullid ")
-            "SELECT distinct fullid FROM "+table_name+"  order by fullid ")
+
+
+        self.cur.execute(sql)
         rows = self.cur.fetchall()
         data = list()
         for row in rows:
@@ -42,6 +41,8 @@ class NSE_High_Low_Last_Price_Update:
         #fullid = "NSE:" + nseid
         nseid = fullid.split("NSE:",1)[1]
         nseidModified = nseid.replace("&", "")
+        nseidModified = nseid.replace("-", "_")
+
 
         try:
             #nse = Nse()

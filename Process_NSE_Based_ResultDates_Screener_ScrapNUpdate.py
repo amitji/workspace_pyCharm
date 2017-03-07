@@ -8,6 +8,7 @@ import Module_Final_Rating
 import requests
 import datetime
 import Module_Scrapper_Screener_India_Stocks
+import Constants
 
 
 class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
@@ -46,9 +47,19 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
 
         select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in "
         select_sql += "(select nseid from"
-        select_sql += "(select nseid from stocksdb.fa_quaterly_data_secondary where  period != '2016-12-31' and quater_sequence=5 and nseid in %s " %nseidString
+        select_sql += "(select nseid from stocksdb.fa_quaterly_data_secondary where  period != '"+Constants.latest_period+"' and quater_sequence=5 and nseid in %s " %nseidString
         select_sql += " union "
-        select_sql += "select nseid from stocksdb.fa_quaterly_data where period != '2016-12-31' and quater_sequence=5 and  nseid in %s ) temp ) " %nseidString
+        select_sql += "select nseid from stocksdb.fa_quaterly_data where period != '"+Constants.latest_period+"' and quater_sequence=5 and  nseid in %s ) temp ) " %nseidString
+
+        '''
+        ###Explain sql -  this sql will try update all those stocks whihc does  not have latest quater results. This could be reason that
+        # Nse calendar does not have entry for those
+        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in "
+        select_sql += "(select nseid from"
+        select_sql += "(select nseid from stocksdb.fa_quaterly_data_secondary where  period != '"+Constants.latest_period+"' and quater_sequence=5 "
+        select_sql += " union "
+        select_sql += "select nseid from stocksdb.fa_quaterly_data where period != '"+Constants.latest_period+"'  and quater_sequence=5  ) temp ) "
+        '''
 
         ###Explain Sql - This sql will update all stcoks in the csv file wheather they are already updated or not.
         #select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in %s " %nseidString

@@ -2,7 +2,7 @@
 # fa_financial_ratio_us_stocks table
 
 
-import Constants
+import Constants as const
 import EmailUtil
 import DBManager
 import platform
@@ -33,15 +33,6 @@ class Module_Scrapper_Screener_India_Stocks:
         self.scrapper_exception_list = []
         self.sql_exception_list = []
         self.updated_stock_list = []
-
-        self.quarter_dates_v1 = {5: '2016-09-30', 4: '2016-06-30', 3: '2016-03-31', 2: '2015-12-31', 1: '2015-09-30'}
-        self.screener_quarter_dates_v1 = {5: 'Sep 2016',4: 'June 2016', 3: 'Mar 2016', 2: 'Dec 2015', 1: 'Sep 2015'}
-        self.quarter_names_v1 = {5: 'Q216', 4: 'Q116', 3: 'Q415', 2: 'Q315', 1: 'Q215'}
-
-        self.quarter_dates = {5: '2016-12-31',4: '2016-09-30', 3: '2016-06-30', 2: '2016-03-31', 1: '2015-12-31'}
-        self.screener_quarter_dates = {5: 'Dec 2016', 4: 'Sep 2016',3: 'June 2016', 2: 'Mar 2016', 1: 'Dec 2015'}
-        self.quarter_names = {5: 'Q316',4: 'Q216', 3: 'Q116', 2: 'Q415', 1: 'Q315'}
-
 
 
         if platform.system() == 'Windows':
@@ -121,7 +112,7 @@ class Module_Scrapper_Screener_India_Stocks:
 
             #self.browser.get('https://www.screener.in')
             try:
-                self.browser.get(Constants.screenerBaseUrl + nseid+Constants.screenerBaseUrl_part2)
+                self.browser.get(const.screenerBaseUrl + nseid+const.screenerBaseUrl_part2)
                 time.sleep(5)
 
                 #determine what is latest quarter data available. Based on that you use different dates sets.
@@ -129,15 +120,15 @@ class Module_Scrapper_Screener_India_Stocks:
                 temp_date = self.browser.find_element_by_xpath(temp_record["date_xpath"]).text
             except Exception, e3:
                 print "Exception in Consolidated , try STANDALONE"
-                self.browser.get(Constants.screenerBaseUrl + nseid)
+                self.browser.get(const.screenerBaseUrl + nseid)
                 time.sleep(5)
                 # determine what is latest quarter data available. Based on that you use different dates sets.
                 temp_record = self.xpaths[4]
                 temp_date = self.browser.find_element_by_xpath(temp_record["date_xpath"]).text
 
-            short_quarter_date = self.screener_quarter_dates[5]
-            short_quarter_date_v1 = self.screener_quarter_dates_v1[5]
-            #short_quarter_date_prev_prev = self.screener_quarter_dates[3]
+            short_quarter_date = const.screener_quarter_dates[5]
+            short_quarter_date_v1 = const.screener_quarter_dates_v1[5]
+            #short_quarter_date_prev_prev = const.screener_quarter_dates[3]
             quarter_version = 2
             if short_quarter_date == temp_date:
                 print 'latest quarter results available', short_quarter_date, temp_date
@@ -147,7 +138,7 @@ class Module_Scrapper_Screener_India_Stocks:
                 quarter_version = 1
             else:
                 print 'looks 2 quarter old data so try STANDALONE for this stock, last Q date was - ', temp_date
-                self.browser.get(Constants.screenerBaseUrl + nseid )
+                self.browser.get(const.screenerBaseUrl + nseid )
                 time.sleep(5)
                 temp_record = self.xpaths[4]
                 temp_date = self.browser.find_element_by_xpath(temp_record["date_xpath"]).text
@@ -174,13 +165,13 @@ class Module_Scrapper_Screener_India_Stocks:
                     #print date[-10:]
                     #date = date[-10:]
                     if quarter_version == 2:
-                        quarter_name = self.quarter_names[count]
-                        quarter_date = self.quarter_dates[count]
-                        short_quarter_date = self.screener_quarter_dates[count]
+                        quarter_name = const.quarter_names[count]
+                        quarter_date = const.quarter_dates[count]
+                        short_quarter_date = const.screener_quarter_dates[count]
                     elif quarter_version == 1:
-                        quarter_name = self.quarter_names_v1[count]
-                        quarter_date = self.quarter_dates_v1[count]
-                        short_quarter_date = self.screener_quarter_dates_v1[count]
+                        quarter_name = const.quarter_names_v1[count]
+                        quarter_date = const.quarter_dates_v1[count]
+                        short_quarter_date = const.screener_quarter_dates_v1[count]
                     else:
                         print "sholdn't reached here !!!!!!!!!!!!!!!! "
 
