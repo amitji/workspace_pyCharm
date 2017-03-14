@@ -460,7 +460,7 @@ class Module_Scrapper_Screener_India_Stocks:
         print "************************************************************************"
         # url = "http://localhost:8080/StockCircuitServer/spring/stockcircuit/calculateFADataPostPythonProcess"
         # print "Now run the URL ", url
-        EmailUtil.send_email_as_text("Scrapper Exeption List - ", self.scrapper_exception_list, "")
+        EmailUtil.send_email_as_text("Process_NSE_Based_ResultDates_Screener_ScrapNUpdate", self.scrapper_exception_list, "")
 
 
 

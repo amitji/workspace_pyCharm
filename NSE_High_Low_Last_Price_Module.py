@@ -43,7 +43,7 @@ class NSE_High_Low_Last_Price_Update:
         #fullid = "NSE:" + nseid
         nseid = fullid.split("NSE:",1)[1]
         nseidModified = nseid.replace("&", "")
-        nseidModified = nseid.replace("-", "_")
+        nseidModified = nseidModified.replace("-", "_")
 
 
         try:

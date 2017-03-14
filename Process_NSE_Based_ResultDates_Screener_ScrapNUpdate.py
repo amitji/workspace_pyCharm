@@ -88,10 +88,11 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
 
         nseidString= ''
         count = 0
+        print "Stocks names from BM_Last_1_WeekResults.csv file to be processed - "
         for line in reader:
-            print line
-            print(line["Symbol"]),
-            print(line["BoardMeetingDate"])
+            #print line
+            #print(line["Symbol"]),
+            #print(line["BoardMeetingDate"])
             nseidString+=  "'%s'," % line["Symbol"]
             count +=1
             #call the Sc
