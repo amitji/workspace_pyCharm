@@ -1,7 +1,7 @@
 '''
 Created on Nov 30, 2015
 
-@author: amahe6
+@author: Amit Maheshwari
 '''
 #!/usr/bin/python
 import mysql.connector

@@ -88,7 +88,7 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
 
         nseidString= ''
         count = 0
-        print "Stocks names from BM_Last_1_WeekResults.csv file to be processed - "
+
         for line in reader:
             #print line
             #print(line["Symbol"]),
@@ -97,7 +97,8 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
             count +=1
             #call the Sc
         print "Total records in CSV files to be processed- ", count
-        print nseidString
+        print "Stocks names from BM_Last_1_WeekResults.csv file to be processed - "
+        #print nseidString
         nseidString = nseidString[:-1]
         nseidString = '('+nseidString+')'
         print nseidString
@@ -116,6 +117,10 @@ nseidString = thisObj.getCSVDataFromNSE()
 #     nseidString = thisObj.csv_reader(f_obj)
 
 stock_names = thisObj.getStockDetails(nseidString)
-thisObj.module_Scrapper_Screener_India_Stocks.updateAll(stock_names)
-thisObj.finalRatingModule.updateAll(stock_names)
+all_good_stock_names = thisObj.module_Scrapper_Screener_India_Stocks.updateAll(stock_names)
+if(len(all_good_stock_names) > 0):
+    thisObj.finalRatingModule.updateAll(all_good_stock_names)
+else:
+    print " FinalRatingModule is not run since zero stocks in GOOD list"
+
 

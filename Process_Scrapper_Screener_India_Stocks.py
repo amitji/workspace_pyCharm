@@ -21,7 +21,12 @@ class Process_Scrapper_Screener_India_Stock:
         # select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and enable_for_vendor_data = 'z' "
         # select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and update_now='A' "
         #select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names_temp sn"
-        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in ('RBLBANK') "
+
+        #select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in ('JKCEMENT', 'KALINDEE', 'KSERASERA', 'NEYVELILIG', 'OMNITECH', 'PRICOL', 'SHRENUJ', 'SICAL',  'UBHOLDINGS', 'EQUITAS', 'UJJIVAN', 'TEAMLEASE', 'PRECAM', 'RBLBANK') "
+        select_sql ="select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names where exchange='NSE' and is_video_available='y' and enable_for_vendor_data='2' and id < 500 "
+
+        #run it for all Amit's portfolio stocks
+        #select_sql = "select sn.fullid, sn.nseid, sn.enable_for_vendor_data, sn.industry_vertical from stocksdb.stock_names sn, amit_portfolio ap where sn.nseid = ap.nseid"
 
         #run this sql to recalculate the ratings only. Comment module_Scrapper_Screener_India_Stocks.updateAll function below.
         #select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where fullid in (select fullid from stocksdb.final_rating ) "
@@ -43,6 +48,9 @@ class Process_Scrapper_Screener_India_Stock:
 
 thisObj = Process_Scrapper_Screener_India_Stock()
 stock_names= thisObj.getStockList()
-thisObj.module_Scrapper_Screener_India_Stocks.updateAll(stock_names)
-thisObj.finalRatingModule.updateAll(stock_names)
+all_good_stock_names = thisObj.module_Scrapper_Screener_India_Stocks.updateAll(stock_names)
+if(len(all_good_stock_names) > 0):
+    thisObj.finalRatingModule.updateAll(all_good_stock_names)
+else:
+    print " FinalRatingModule is not run since zero stocks in GOOD list"
 

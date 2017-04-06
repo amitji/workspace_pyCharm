@@ -55,13 +55,15 @@ class Module_Scrapper_Screener_India_Stocks:
 
         #self.browser = webdriver.Firefox()
         self.all_good_flag = True
+        self.all_good_stock_names = list()
 
         self.profitIndStr = ""
         self.revenueIndStr = ""
 
 
     def getXpaths(self):
-        select_sql = "select quater_sequence, revenue_xpath, profit_xpath, opm_xpath, ebit_xpath,date_xpath from stocksdb.xpaths where siteID = 'screener' order by quater_sequence "
+        select_sql = "select quater_sequence, revenue_xpath, profit_xpath, opm_xpath, ebit_xpath,date_xpath from stocksdb.xpaths "
+        select_sql += " where is_active='y' and siteID = 'screener' and quater_sequence >= '%s'  order by quater_sequence " %const.min_xpath_quarter_seq
 
         self.cur.execute(select_sql)
 
@@ -90,8 +92,12 @@ class Module_Scrapper_Screener_India_Stocks:
             #nseid = 'INFY'
             print fullid
 
+            #These indicators are now for 9 Quarter calculations
             self.revenueIndStr=""
             self.profitIndStr = ""
+            # 222 indicators are now old one for 4 Quarters.
+            self.revenueIndStr222=""
+            self.profitIndStr222 = ""
 
             table_name = qd_table_name
             # nseidModified = nseid.replace("&", "")
@@ -109,21 +115,24 @@ class Module_Scrapper_Screener_India_Stocks:
             #     cookies222[name] = val
             # request = requests.get(Constants.screenerBaseUrl + nseid, cookies=cookies222)
 
-
+            if(len(self.xpaths) < const.number_of_quarters_to_process):
+                number_of_quarters_to_process = len(self.xpaths)
+            else:
+                number_of_quarters_to_process = const.number_of_quarters_to_process
             #self.browser.get('https://www.screener.in')
             try:
                 self.browser.get(const.screenerBaseUrl + nseid+const.screenerBaseUrl_part2)
                 time.sleep(5)
 
                 #determine what is latest quarter data available. Based on that you use different dates sets.
-                temp_record = self.xpaths[4]
+                temp_record = self.xpaths[number_of_quarters_to_process-1]
                 temp_date = self.browser.find_element_by_xpath(temp_record["date_xpath"]).text
             except Exception, e3:
                 print "Exception in Consolidated , try STANDALONE"
                 self.browser.get(const.screenerBaseUrl + nseid)
                 time.sleep(5)
                 # determine what is latest quarter data available. Based on that you use different dates sets.
-                temp_record = self.xpaths[4]
+                temp_record = self.xpaths[number_of_quarters_to_process-1]
                 temp_date = self.browser.find_element_by_xpath(temp_record["date_xpath"]).text
 
             short_quarter_date = const.screener_quarter_dates[5]
@@ -140,11 +149,14 @@ class Module_Scrapper_Screener_India_Stocks:
                 print 'looks 2 quarter old data so try STANDALONE for this stock, last Q date was - ', temp_date
                 self.browser.get(const.screenerBaseUrl + nseid )
                 time.sleep(5)
-                temp_record = self.xpaths[4]
+                temp_record = self.xpaths[number_of_quarters_to_process-1]
                 temp_date = self.browser.find_element_by_xpath(temp_record["date_xpath"]).text
                 if short_quarter_date == temp_date:
                     print 'latest quarter STANDALONE results available', short_quarter_date, temp_date
                     quarter_version = 2
+                elif short_quarter_date_v1 == temp_date:
+                    print 'one quarter previous results available', short_quarter_date_v1, temp_date
+                    quarter_version = 1
                 else:
                     print 'looks 2 quarter old data so skipping this stock',  temp_date
                     quarter_version = 0
@@ -157,7 +169,11 @@ class Module_Scrapper_Screener_India_Stocks:
 
             records = []
             now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            count = 1
+            #count = 1
+            count = 5-len(self.xpaths)+1 ##if you are processing more than 5 quarters of data then you need to use how many xpath(quarters on screener)
+            #This variable is for those stocks where Quarter dates(Dec 16) does not match for two consequtive quarters. Need to handle
+            #these manually.
+            count_no_match_for_dates = 0
             for index,  row in enumerate(self.xpaths):
                 try:
                     #count = index+1
@@ -176,11 +192,17 @@ class Module_Scrapper_Screener_India_Stocks:
                         print "sholdn't reached here !!!!!!!!!!!!!!!! "
 
                     if short_quarter_date == date:
-                        print 'match'
+                        print 'date match'
                         count = count + 1
                     else:
                         # no increament to count so that we can check if data is available for previous quarter (latest results not yet announced)
-                        print 'no match'
+                        print 'no match for date'
+                        count_no_match_for_dates = count_no_match_for_dates+1
+                        if(count_no_match_for_dates > 1):  # if no match for 2 quaters, skip this stock.
+                            self.all_good_flag = False
+                            self.scrapper_exception_list.append(nseid)
+                            print "\n\n**** Amit Exception - Quarter dates(Dec 16) does not match for two consequtive quarters. Need to handle this manually."
+                            return
 
                         #if latest quster results not there then try the previous one
                         # previous = self.xpaths[index - 1]
@@ -208,7 +230,7 @@ class Module_Scrapper_Screener_India_Stocks:
                         previous = self.xpaths[index - 1]
                         prev_rev = float((self.browser.find_element_by_xpath(previous["revenue_xpath"]).text).replace(",", ""))
                         prev_profit = float((self.browser.find_element_by_xpath(previous["profit_xpath"]).text).replace(",", ""))
-                        print prev_rev, prev_profit
+                        #print prev_rev, prev_profit
 
                         rev_growth = rev-prev_rev
                         rev_growth_rate = (100*rev_growth)/abs(prev_rev) # abs() is used for negative denominator
@@ -216,6 +238,20 @@ class Module_Scrapper_Screener_India_Stocks:
                         profit_growth = profit - prev_profit
                         profit_growth_rate = (100 * profit_growth) / abs(prev_profit)
 
+                        # This block is for new Indicators for 8/9 quarters
+                        if quater_seq > const.min_quarter_seq_for_rev_profit_indicators:
+                            if rev > prev_rev:
+                                self.revenueIndStr222 += "1"
+                            else:
+                                self.revenueIndStr222 += "0"
+
+                            if profit > prev_profit:
+                                self.profitIndStr222 += "1"
+                            else:
+                                self.profitIndStr222 += "0"
+
+                        #This block is for old Indicators for 4 quarters
+                        #if quater_seq > const.min_quarter_seq_for_rev_profit_indicators:
                         if rev > prev_rev:
                             self.revenueIndStr += "1"
                         else:
@@ -229,7 +265,7 @@ class Module_Scrapper_Screener_India_Stocks:
                     # if index < (no_of_records - 1):
                     #     next_ = xpaths[index + 1]
                     #####
-                    print 'quater_seq - ',quater_seq,rev, profit, op, ebit, profitMargin, opMargin, ebitMargin
+                    print 'quater_seq - ',quater_seq,rev, profit, op, ebit, profitMargin, opMargin, ebitMargin, self.revenueIndStr, self.profitIndStr
 
 
                     records.append((nseid,fullid, quater_seq,quarter_date, quarter_name, rev, profit,op,ebit, rev_growth,rev_growth_rate, profit_growth, profit_growth_rate, \
@@ -259,13 +295,20 @@ class Module_Scrapper_Screener_India_Stocks:
                                               "VALUES (%s, %s, %s, %s, %s,%s, %s, %s,%s, %s,%s,%s, %s,%s,%s,%s, %s,%s )")
                 self.cur.executemany(insert_sql, records)
                 self.con.commit()
-                #reverse teh indicator string because Quarter Seq was from 1->5 instead 5->1
-                print self.profitIndStr
+                #reverse the indicator string because Quarter Seq was from 1->5 instead 5->1
+
                 self.profitIndStr = self.profitIndStr[::-1]
-                print self.profitIndStr
                 self.profitIndStr = int(self.profitIndStr,2)
                 self.revenueIndStr = self.revenueIndStr[::-1]
                 self.revenueIndStr = int(self.revenueIndStr,2)
+
+                self.profitIndStr222 = self.profitIndStr222[::-1]
+                self.profitIndStr222 = int(self.profitIndStr222,2)
+                self.revenueIndStr222 = self.revenueIndStr222[::-1]
+                self.revenueIndStr222 = int(self.revenueIndStr222,2)
+
+                print 'final profitIndStr - ', self.profitIndStr
+                print 'final revenueIndStr - ', self.revenueIndStr
                 print "\n******Inserted data in ", table_name, " for - " + fullid
 
         except Exception, e2:
@@ -377,10 +420,10 @@ class Module_Scrapper_Screener_India_Stocks:
 
             try:
                 insert_sql = ("INSERT INTO " + table_name + " (fullid, short_name,last_price, eps_ttm,pe,  pb, roe,52_week_high, 52_week_low," \
-                " last_price_vs_high52,profit_ind, revenue_ind, debt,interest, interest_cover, current_ratio,debt_equity_ratio, last_modified, created_on )" \
-                                              " VALUES (%s, %s, %s, %s,%s, %s, %s,%s, %s, %s, %s,%s,%s ,%s, %s, %s,%s, %s,%s)")
+                " last_price_vs_high52,profit_ind, revenue_ind,profit_ind222, revenue_ind222, debt,interest, interest_cover, current_ratio,debt_equity_ratio, last_modified, created_on )" \
+                                              " VALUES (%s, %s, %s, %s,%s, %s, %s,%s, %s, %s, %s, %s,%s,%s,%s ,%s, %s, %s,%s, %s,%s)")
 
-                data_quater = (fullid, short_name, last_price, eps, pe, pb, roe, high52, low52, last_price_vs_high52, self.profitIndStr,self.revenueIndStr, debt, interest, \
+                data_quater = (fullid, short_name, last_price, eps, pe, pb, roe, high52, low52, last_price_vs_high52, self.profitIndStr,self.revenueIndStr,self.profitIndStr222,self.revenueIndStr222, debt, interest, \
                                 interest_coverage, current_ratio, debt_equity_ratio, now, now)
                 self.cur.execute(insert_sql, data_quater)
                 print "eps-", eps, " | pe-", pe, " | pb-", pb, " | roe-", roe, " | low52-", low52
@@ -406,12 +449,13 @@ class Module_Scrapper_Screener_India_Stocks:
             self.quandlDataObject.setIsVideoAvailable(fullid)
             self.quandlDataObject.setVideoAsOldToRecreateNextTime(fullid)
             self.updated_stock_list.append(nseid)
+            self.all_good_stock_names.append(row)
 
     # def callFinalRatingModule(self,row,qd_table_name,fr_table_name):
     #     self.finalRatingModule.updateFinalRating(row,qd_table_name,fr_table_name)
 
     def updateAll(self, stock_names):
-        print stock_names
+        #print stock_names
         print "Number of Stocks processing - ", len(stock_names)
         start_time = time.time()
         totalCount = len(stock_names)
@@ -461,6 +505,7 @@ class Module_Scrapper_Screener_India_Stocks:
         # url = "http://localhost:8080/StockCircuitServer/spring/stockcircuit/calculateFADataPostPythonProcess"
         # print "Now run the URL ", url
         EmailUtil.send_email_as_text("Process_NSE_Based_ResultDates_Screener_ScrapNUpdate", self.scrapper_exception_list, "")
+        return self.all_good_stock_names
 
 
 

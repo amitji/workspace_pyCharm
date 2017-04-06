@@ -7,15 +7,23 @@ Vendor_Name = 'DEB'
 #quater_names = {'2016-06-30': 'Q116', '2016-03-31': 'Q415', '2015-12-31': 'Q315', '2015-09-30': 'Q215',
  #                    '2015-06-30': 'Q115', '2015-03-31': 'Q414', '2014-12-31': 'Q314'}
 
-quarter_dates_v1 = {5: '2016-12-31', 4: '2016-09-30', 3: '2016-06-30', 2: '2016-03-31', 1: '2015-12-31'}
-screener_quarter_dates_v1 = {5: 'Dec 2016', 4: 'Sep 2016', 3: 'June 2016', 2: 'Mar 2016', 1: 'Dec 2015'}
-quarter_names_v1 = {5: 'Q316', 4: 'Q216', 3: 'Q116', 2: 'Q415', 1: 'Q315'}
+quarter_dates_v1 = {5: '2016-12-31', 4: '2016-09-30', 3: '2016-06-30', 2: '2016-03-31', 1: '2015-12-31', 0: '2015-09-30', -1: '2015-06-30', -2: '2015-03-31', -3: '2014-12-31'}
+screener_quarter_dates_v1 = {5: 'Dec 2016', 4: 'Sep 2016', 3: 'June 2016', 2: 'Mar 2016', 1: 'Dec 2015', 0: 'Sep 2015', -1: 'June 2015', -2: 'Mar 2015', -3: 'Dec 2014'}
+quarter_names_v1 = {5: 'Q316', 4: 'Q216', 3: 'Q116', 2: 'Q415', 1: 'Q315', 0: 'Q215', -1: 'Q115', -2: 'Q414', -3: 'Q314'}
 
-quarter_dates = {5: '2017-03-31', 4: '2016-12-31', 3: '2016-09-30', 2: '2016-06-30', 1: '2016-03-31'}
-screener_quarter_dates = {5: 'Mar 2017', 4: 'Dec 2016', 3: 'Sep 2016', 2: 'June 2016', 1: 'Mar 2016'}
-quarter_names = {5: 'Q416', 4: 'Q316', 3: 'Q216', 2: 'Q116', 1: 'Q415'}
+quarter_dates = {5: '2017-03-31', 4: '2016-12-31', 3: '2016-09-30', 2: '2016-06-30', 1: '2016-03-31', 0: '2015-12-31', -1: '2015-09-30', -2: '2015-06-30', -3: '2015-03-31'}
+screener_quarter_dates = {5: 'Mar 2017', 4: 'Dec 2016', 3: 'Sep 2016', 2: 'June 2016', 1: 'Mar 2016' , 0: 'Dec 2015', -1: 'Sep 2015', -2: 'June 2015', -3: 'Mar 2015'}
+quarter_names = {5: 'Q416', 4: 'Q316', 3: 'Q216', 2: 'Q116', 1: 'Q415', 0: 'Q315', -1: 'Q215', -2: 'Q115', -3: 'Q414' }
 
-latest_period='2017-03-31'
+latest_period='2016-12-31' #change this when lots of results announcements starts
+#latest_period='2017-03-31'
+
+# How many quarters results needs to be processed. You need to have xpaths for those many Quarters in the xpaths table.
+number_of_quarters_to_process = 9
+min_xpath_quarter_seq = -3  # How many xpaths to pick ( 5 or 9)
+min_quarter_seq_for_rev_profit_indicators = 1 # This flag is to be used to only look at 5-1 Quarter Seq for calculating rev & profit Indicators
+
+
 #below is used in old scripts no longer used
 latest_quarter_date = '2016-06-30 00:00:00'
 #current_quarter = 'Q415'
