@@ -15,8 +15,8 @@ quarter_dates = {5: '2017-03-31', 4: '2016-12-31', 3: '2016-09-30', 2: '2016-06-
 screener_quarter_dates = {5: 'Mar 2017', 4: 'Dec 2016', 3: 'Sep 2016', 2: 'June 2016', 1: 'Mar 2016' , 0: 'Dec 2015', -1: 'Sep 2015', -2: 'June 2015', -3: 'Mar 2015'}
 quarter_names = {5: 'Q416', 4: 'Q316', 3: 'Q216', 2: 'Q116', 1: 'Q415', 0: 'Q315', -1: 'Q215', -2: 'Q115', -3: 'Q414' }
 
-latest_period='2016-12-31' #change this when lots of results announcements starts
-#latest_period='2017-03-31'
+#latest_period='2016-12-31' #change this when lots of results announcements starts
+latest_period='2017-03-31'
 
 # How many quarters results needs to be processed. You need to have xpaths for those many Quarters in the xpaths table.
 number_of_quarters_to_process = 9
