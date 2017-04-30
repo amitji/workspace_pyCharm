@@ -1,0 +1,16 @@
+2017-04-28 06:47:11,648:9796:custom_logging:INFO:run:main:8:Execeution Begins
+2017-04-28 06:47:11,648:9796:custom_logging:INFO:run:main:9:******************************
+2017-04-28 06:47:23,032:9796:custom_logging:DEBUG:scrapping:__enter__:38:Inside __enter__()
+2017-04-28 06:47:23,032:9796:custom_logging:INFO:scrapping:export_to_excel:49:******************************************************
+2017-04-28 06:47:23,048:9796:custom_logging:INFO:scrapping:export_to_excel:50:Clicking excel: https://www.screener.in/company/INFY/
+2017-04-28 06:47:26,114:9796:custom_logging:INFO:scrapping:export_to_excel:55:Registration Page: https://www.screener.in/register/
+2017-04-28 06:47:28,213:9796:custom_logging:INFO:scrapping:export_to_excel:59:Entering login credentials: https://www.screener.in/login/
+2017-04-28 06:47:28,322:9796:custom_logging:INFO:scrapping:export_to_excel:64:Logging in
+2017-04-28 06:47:31,131:9796:custom_logging:INFO:scrapping:export_to_excel:68:https://www.screener.in/dash/
+2017-04-28 06:47:31,132:9796:custom_logging:INFO:scrapping:export_to_excel:69:Clicking for excel
+2017-04-28 06:47:35,322:9796:custom_logging:INFO:scrapping:export_to_excel:78:https://www.screener.in/company/INFY/consolidated/
+2017-04-28 06:47:35,499:9796:custom_logging:INFO:scrapping:export_to_excel:81:[u'Market Cap.: \u20b9 2,12,524.81 Cr.', u'Current Price: \u20b9 925.25', u'Book Value: \u20b9 314.24', u'Stock P/E: 14.81', u'Dividend Yield: 2.62%', u'Face Value: \u20b9 5.00', u'Listed on BSE and NSE', u'Company Website', u'52 Week High/Low: \u20b9 1,279.30 / \u20b9 901.00', u'Quick Ratio Lookup:', u'Pros:', u'Cons:', u'Compounded Sales Growth:', u'Compounded Profit Growth:', u'Return on Equity:']
+2017-04-28 06:47:40,536:9796:custom_logging:INFO:scrapping:export_to_excel:85:https://www.screener.in/company/INFY/consolidated/
+2017-04-28 06:47:40,536:9796:custom_logging:INFO:scrapping:export_to_excel:86:CLicked...Check
+2017-04-28 06:47:40,536:9796:custom_logging:INFO:scrapping:export_to_excel:92:******************************************************
+2017-04-28 06:47:40,739:9796:custom_logging:INFO:scrapping:__exit__:43:Webdriver handler closed

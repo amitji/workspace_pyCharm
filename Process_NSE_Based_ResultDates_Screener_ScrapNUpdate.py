@@ -81,7 +81,8 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
         return data
 
     def getCSVDataFromNSE(self):
-        url = 'https://www.nseindia.com/corporates/datafiles/BM_Last_1_Month.csv'
+        #url = 'https://www.nseindia.com/corporates/datafiles/BM_Last_1_WeekResults.csv'
+        url = 'https://www.nseindia.com/corporates/datafiles/BM_Last_15_Days.csv'
         #Other urls - https://www.nseindia.com/corporates/datafiles/BM_Last_15_Days.csv
         ##  https://www.nseindia.com/corporates/datafiles/BM_Last_1_Month.csv
         ### https://www.nseindia.com/corporates/datafiles/BM_Last_1_WeekResults.csv

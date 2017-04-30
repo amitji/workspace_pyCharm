@@ -102,3 +102,8 @@ icW = 0.25  # Interest Coverage ratio
 deW = 0.25 #debt equity ratio
 opmANDebitW = 0.5
 genericW = 1.0
+
+#variable for Process_Screener_Excel_Data
+browser_path='C:/Program Files (x86)/Mozilla Firefox/firefox.exe'
+excel_download_dir='C:/xampp/htdocs/stockcircuitserver/fund_analysis/screener_excels'
+excel_output_excel='C:/xampp/htdocs/stockcircuitserver/fund_analysis/screener_excels/output.csv'
