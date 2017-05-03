@@ -48,4 +48,5 @@ class Process_Screener_Excel_Data:
 thisObj = Process_Screener_Excel_Data()
 stock_names = thisObj.getStockNames()
 thisObj.module_Screener_Excel_Data.getStockFundamentalData(stock_names)
+thisObj.module_Screener_Excel_Data.readAllFilesData()
 

@@ -4,6 +4,7 @@ import time
 from custom_logging import logger
 import env
 import dataProcessing
+import os
 
 print __name__
 
@@ -16,28 +17,33 @@ class Module_Screener_Excel_Data:
         self.profile = webdriver.FirefoxProfile()
 
         self.profile.set_preference('browser.download.folderList', 2)
-        self.profile.set_preference('browser.download.panel.shown', False)
-        self.profile.set_preference('browser.download.manager.showWhenStarting', False)
+        self.profile.set_preference('browser.download.panel.shown', True)
+        self.profile.set_preference('browser.download.manager.showWhenStarting', True)
         self.profile.set_preference('browser.download.dir', env.DOWNLOAD_DIR)
         self.profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         self.profile.set_preference('browser.helperApps.neverAsk.openFile', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+        self.profile.set_preference('browser.download.manager.showAlertOnComplete', False)
+        self.profile.set_preference('browser.download.manager.closeWhenDone', False)
+        self.profile.set_preference('browser.helperApps.alwaysAsk.force', False)
+
 
         #self.profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'application / xls;text / csv')
         #self.profile.set_preference('browser.helperApps.neverAsk.openFile','application / xls;text / csv')
 
 
 
+
+    def login(self):
+
+        ##############################################################
         try:
-            self.driver = webdriver.Firefox(executable_path=browser_path, firefox_profile=self.profile)
+            self.driver = webdriver.Firefox(executable_path=env.BROWSER_PATH, firefox_profile=self.profile)
             self.driver.get('https://www.screener.in/login/')
 
         except Exception as e:
             logger.exception(e)
             self.driver.quit()
-    def login(self):
-
-        ##############################################################
-
         #username = self.driver.find_element_by_name('username')
 
         time.sleep(2)
@@ -145,6 +151,11 @@ class Module_Screener_Excel_Data:
 
         for row in stock_names:
             self.export_to_excel(row['nseid'])
+            time.sleep(2)
+        return
 
+    def readAllFilesData(self):
 
-
+        for file in os.listdir(env.DOWNLOAD_DIR):
+            if file.endswith(".xlsx"):
+                print(os.path.join(env.DOWNLOAD_DIR, file))

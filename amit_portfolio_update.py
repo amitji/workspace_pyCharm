@@ -2,7 +2,9 @@ import urllib2
 import json
 import time
 import DBManager
-
+import pandas
+import datetime
+import EmailUtil
 
 class GoogleFinanceAPI:
     def __init__(self):
@@ -35,9 +37,41 @@ class GoogleFinanceAPI:
         obj = json.loads(content[3:])
         return obj[0]
 
-    def saveIntoDB(self, records):
+    def getAllQuotes(self, stock_names):
+        content2 = []
+        url = self.prefix
+        for row in stock_names:
+            url = url+ "%s" % ( row['fullid']) + ","
+
+        u = urllib2.urlopen(url)
+
+        content = u.read()
+        content = content.replace('\n', '')
+        content = content[2:]
+        #content = content[:-1]
+        #content2 = content.split("\n}\n,")
+        content = json.loads(content, "ISO-8859-1")
+
+        return content
+
+
+    def saveIntoDB(self, allQuotes):
 
         print "\n*** Amit saving qoutes to database"
+        records = []
+        for row in allQuotes:
+
+            try:
+                fullid = row['e']+":"+row['t']
+                #print "fullid - ", fullid
+                record = (( row['l_fix'], row['c_fix'],row['cp_fix'],row['pcls_fix'], fullid))
+                print record
+                records.append(record )
+
+            except Exception, e:
+                print "\n******Amit couldnt get Google quotes for  " + fullid
+                print str(e)
+                pass
 
         # for record in records:
         #     print record
@@ -46,7 +80,7 @@ class GoogleFinanceAPI:
         #     self.cur.execute(sql, tuple(record))
 
         #use batch execute rahter above  1by 1
-        sql = "update amit_portfolio set last_trade_price=%s,  price_change=%s, change_perct=%s, previous_close=%s where nseid=%s"
+        sql = "update amit_portfolio set last_trade_price=%s,  price_change=%s, change_perct=%s, previous_close=%s where fullid=%s"
         self.cur.executemany(sql, records)
         self.con.commit()
 
@@ -55,21 +89,14 @@ if __name__ == "__main__":
     stock_names = c.getStockList()
     records = [] ## LIST OF LISTS
     minutes_count = 0  # compare with 7 Hrs run daily from 9-4 pm (7*60=420)
+    EmailUtil.send_email_as_text(" amit_portfolio_update.py job started - ", "", "")
     print "\n*** Amit Started getting quotes"
+
     while minutes_count < 420:
-        for row in stock_names:
-
-            try:
-                #print "callin get for  - ", row['nseid']
-                quote = c.get(row['fullid'])
-                #print quote
-                records.append(( quote['l_fix'], quote['c_fix'],quote['cp_fix'],quote['pcls_fix'], row['nseid']) )
-            except Exception, e:
-                print "\n******Amit couldnt get Google quotes for  " + row['fullid']
-                print str(e)
-                pass
-
-        c.saveIntoDB(records)
+        allQuotes = c.getAllQuotes(stock_names)
+        c.saveIntoDB(allQuotes)
         minutes_count = minutes_count+1
-        print "\n*** Amit Sleeping for 1 minute"
+        print "\n*** Amit Sleeping for 1 minute, remaining loops (420-x)- ", 420- minutes_count, " | Time - ", datetime.datetime.now()
         time.sleep(60)
+
+    print "\n*** Amit Exiting the google quote process..."
