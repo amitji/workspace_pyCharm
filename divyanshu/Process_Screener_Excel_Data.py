@@ -5,6 +5,8 @@ import dataProcessing
 from collections import OrderedDict
 import DBManager
 import Module_Screener_Excel_Data
+import env
+import os
 
 class Process_Screener_Excel_Data:
 
@@ -15,7 +17,7 @@ class Process_Screener_Excel_Data:
         self.con = DBManager.connectDB()
         self.cur = self.con.cursor()
 
-        self.module_Screener_Excel_Data = Module_Screener_Excel_Data.Module_Screener_Excel_Data()
+        #self.module_Screener_Excel_Data = Module_Screener_Excel_Data.Module_Screener_Excel_Data()
 
         # with scraping() as sc:
         #     sc.export_to_excel(email='d.aggarwal07@yahoo.com', password='dishu@07')
@@ -25,7 +27,8 @@ class Process_Screener_Excel_Data:
 
 
     def getStockNames(self):
-        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names_temp sn "
+        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names_temp sn "  \
+                     " where enable_for_vendor_data = 1"
 
         self.cur.execute(select_sql)
 
@@ -42,11 +45,30 @@ class Process_Screener_Excel_Data:
         # print data
         return data
 
+    def getStockFundamentalData(self, stock_names):
+
+        # call module_Screener_Excel_Data for each stock
+        for row in stock_names:
+            nseid = row['nseid']
+            dir_name = env.DOWNLOAD_DIR + nseid
+
+            print dir_name
+            if not os.path.exists(dir_name):
+                os.makedirs(dir_name)
+
+            module_Screener_Excel_Data = Module_Screener_Excel_Data.Module_Screener_Excel_Data(dir_name)
+            #module_Screener_Excel_Data.getStockFundamentalData(row['nseid'])
+            module_Screener_Excel_Data.readAllFilesData(nseid, dir_name)
+            #module_Screener_Excel_Data.__exit__()
+
+
+
 # if __name__ == '__main__':
 #     main()
     
 thisObj = Process_Screener_Excel_Data()
 stock_names = thisObj.getStockNames()
-thisObj.module_Screener_Excel_Data.getStockFundamentalData(stock_names)
-thisObj.module_Screener_Excel_Data.readAllFilesData()
+thisObj.getStockFundamentalData(stock_names)
+#thisObj.module_Screener_Excel_Data.getStockFundamentalData(stock_names)
+#thisObj.module_Screener_Excel_Data.readAllFilesData()
 

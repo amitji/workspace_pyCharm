@@ -5,33 +5,37 @@ from custom_logging import logger
 import env
 import dataProcessing
 import os
+from collections import OrderedDict
+import win32com.client
+import datetime
+import DBManager
 
 print __name__
 
 class Module_Screener_Excel_Data:
 
-    def __init__(self, url=env.URL, browser_path=env.BROWSER_PATH):
+    def __init__(self, dir_name):
 
+        self.con = DBManager.connectDB()
+        self.cur = self.con.cursor()
+        self.date_map= {'03/31/13 00:00:00' : '2013-03-31', '03/31/14 00:00:00':'2014-03-31', '03/31/15 00:00:00':'2015-03-31', '03/31/16 00:00:00':'2016-03-31', '03/31/17 00:00:00':'2017-03-31'}
         """"Setting browser preferences to handle download pop-up"""
-
         self.profile = webdriver.FirefoxProfile()
 
         self.profile.set_preference('browser.download.folderList', 2)
         self.profile.set_preference('browser.download.panel.shown', True)
         self.profile.set_preference('browser.download.manager.showWhenStarting', True)
-        self.profile.set_preference('browser.download.dir', env.DOWNLOAD_DIR)
-        self.profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        self.profile.set_preference('browser.helperApps.neverAsk.openFile', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        self.profile.set_preference('browser.download.dir', dir_name)
+        self.profile.set_preference('browser.helperApps.neverAsk.saveToDisk',
+                                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        self.profile.set_preference('browser.helperApps.neverAsk.openFile',
+                                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
         self.profile.set_preference('browser.download.manager.showAlertOnComplete', False)
         self.profile.set_preference('browser.download.manager.closeWhenDone', False)
         self.profile.set_preference('browser.helperApps.alwaysAsk.force', False)
 
-
-        #self.profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'application / xls;text / csv')
-        #self.profile.set_preference('browser.helperApps.neverAsk.openFile','application / xls;text / csv')
-
-
+        self.xl = win32com.client.Dispatch('Excel.Application')
 
 
     def login(self):
@@ -64,71 +68,26 @@ class Module_Screener_Excel_Data:
         logger.debug('Inside __enter__()')
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self):
         self.driver.quit()
         logger.info('Webdriver handler closed')
 
-    def export_to_excel_OLD(self, email, password, security='INFY'):
-        self.email = email
-        self.password = password
-        self.security = security
-        self.driver.get(env.URL)
-        logger.info("******************************************************")
-        logger.info('Clicking excel: ' + self.driver.current_url)
-        try:
-            self.driver.find_element_by_link_text('Export to Excel').click()
-            time.sleep(3)
 
-            logger.info('Registration Page: ' + self.driver.current_url)
-            self.driver.find_element_by_link_text('Login here').click()
-            time.sleep(2)
-
-            logger.info('Entering login credentials: ' + self.driver.current_url)
-            uname = self.driver.find_element_by_id('id_username')
-            uname.send_keys(self.email)
-            pwd = self.driver.find_element_by_id('id_password')
-            pwd.send_keys(self.password)
-            logger.info('Logging in')
-            self.driver.find_element_by_tag_name('button').submit()
-            time.sleep(2)
-
-            logger.info(self.driver.current_url)
-            logger.info('Clicking for excel')
-            company = self.driver.find_element_by_tag_name('input')
-            company.send_keys(self.security)
-            time.sleep(2)
-            company_list = self.driver.find_element_by_class_name('dropdown-menu')
-            company_list.click()
-            self.driver.find_element_by_tag_name('button').click()
-            time.sleep(2)
-
-            logger.info(self.driver.current_url)
-            script_list = self.driver.find_elements_by_tag_name('h4')
-            script_data = map(lambda x: x.text, script_list)
-            logger.info(script_data)
-
-            self.driver.find_element_by_link_text('Export to Excel').click()
-            time.sleep(2)
-            logger.info(self.driver.current_url)
-            logger.info('CLicked...Check')
-
-        except Exception as e:
-            logger.exception(e)
-
-        finally:
-            logger.info("******************************************************")
-
-    def export_to_excel(self,stock_name):
+    def export_to_excel(self,nseid):
 
         logger.info("******************************************************")
         logger.info('Clicking excel: ' + self.driver.current_url)
         try:
-            company = self.driver.find_element_by_tag_name('input')
-            company.send_keys(stock_name)
-            time.sleep(2)
-            company_list = self.driver.find_element_by_class_name('dropdown-menu')
-            company_list.click()
-            self.driver.find_element_by_tag_name('button').click()
+            url = env.URL+nseid;
+            print "company url - ",url
+            self.driver.get(url)
+
+            # company = self.driver.find_element_by_tag_name('input')
+            # company.send_keys(stock_name)
+            # time.sleep(2)
+            # company_list = self.driver.find_element_by_class_name('dropdown-menu')
+            # company_list.click()
+            # self.driver.find_element_by_tag_name('button').click()
             time.sleep(2)
 
             self.driver.find_element_by_link_text('Export to Excel').click()
@@ -136,6 +95,7 @@ class Module_Screener_Excel_Data:
 
             #logger.info(self.driver.current_url)
             logger.info('CLicked...Check')
+            #self.__exit__()
 
         except Exception as e:
             logger.exception(e)
@@ -144,18 +104,71 @@ class Module_Screener_Excel_Data:
             logger.info("******************************************************")
 
 
-    def getStockFundamentalData(self, stock_names):
+    def getStockFundamentalData(self, nseid):
         self.login()
-        #self.export_to_excel_OLD("amitji@gmail.com","amit1973")
-
-
-        for row in stock_names:
-            self.export_to_excel(row['nseid'])
-            time.sleep(2)
+        self.export_to_excel(nseid)
+        time.sleep(2)
         return
 
-    def readAllFilesData(self):
+    def readAllFilesData(self, nseid,dir_name):
+        records= []
+        for file in os.listdir(dir_name):
+            if  not file.startswith("~"):
+                try:
+                    filename = os.path.join(dir_name, file)
+                    print filename
+                    #read from data sheet
+                    sheet='Data Sheet'
+                    wb = self.xl.Workbooks.Open(Filename=filename, ReadOnly=1, Editable=True)
+                    ws = wb.Worksheets(sheet)
+                    no_of_shares = ws.Range('B6').value #* 10000000  (data comes in Crore)
 
-        for file in os.listdir(env.DOWNLOAD_DIR):
-            if file.endswith(".xlsx"):
-                print(os.path.join(env.DOWNLOAD_DIR, file))
+                    #print no_of_shares
+
+                    sheet = 'Profit & Loss'
+                    #cell_range = OrderedDict([('A03', 'J03'), ('A12', 'J12'), ('A13', 'J13'), ('A14', 'J14'), ('A15', 'J15')])
+                    cell_range = OrderedDict([('H03', 'H15'),('I03', 'I15'),('J03', 'J15'),('K03', 'K15'),('L03', 'L15')])
+
+
+                    ws = wb.Worksheets(sheet)
+                    seq_no =0
+                    for k, val in cell_range.items():
+                        seq_no = seq_no+1
+                        #print (ws.Range(k + ':' + val).Value)
+                        one_record = [nseid ]
+                        temp_record = ws.Range(k + ':' + val).Value
+                        print 'date - ', temp_record[0][0]
+                        if temp_record[0][0] == 'Trailing':
+                            now_datetime = '2017-03-31 00:00:00'
+                        else:
+                            now_datetime = self.date_map.get(str(temp_record[0][0]))
+
+                        print 'now_datetime - ', now_datetime
+
+                        one_record.append(seq_no)
+                        one_record.append(now_datetime)
+                        one_record.append(temp_record[9][0])
+                        one_record.append(temp_record[10][0])
+                        one_record.append(temp_record[11][0])
+                        one_record.append(temp_record[12][0])
+                        one_record.append(no_of_shares)
+                        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                        one_record.append(now)
+                        one_record.append(now)
+                        print one_record
+                        records.append(one_record)
+
+                except Exception as e:
+                    logger.exception(e)
+
+                else:
+                    wb.Close(True)
+        self.saveToDB(records)
+        return
+
+    def saveToDB(self, records):
+
+        insert_sql = ("INSERT INTO stock_forecasting_pe_eps_past_years_data (nseid, seq_no, fin_year,pe,profit,eps, price,  no_of_shares ,last_modified, created_on ) VALUES (%s,%s,%s, %s, %s, %s,%s, %s, %s,%s)")
+
+        self.cur.executemany(insert_sql, records)
+        self.con.commit()
