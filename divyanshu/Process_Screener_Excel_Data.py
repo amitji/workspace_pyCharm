@@ -7,6 +7,7 @@ import DBManager
 import Module_Screener_Excel_Data
 import env
 import os
+import shutil
 
 class Process_Screener_Excel_Data:
 
@@ -27,9 +28,11 @@ class Process_Screener_Excel_Data:
 
 
     def getStockNames(self):
-        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names_temp sn "  \
-                     " where enable_for_vendor_data = 1"
+        #select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names_temp sn "  \
+         #            " where enable_for_vendor_data = 1"
 
+        #select_sql = "select fullid, nseid  from stocksdb.amit_portfolio where is_index='n' "
+        select_sql = "select fullid, nseid  from stocksdb.amit_portfolio where nseid='INDOWIND' "
         self.cur.execute(select_sql)
 
         rows = self.cur.fetchall()
@@ -39,8 +42,8 @@ class Process_Screener_Excel_Data:
             dd = dict()
             dd["fullid"] = row[0]
             dd["nseid"] = row[1]
-            dd["enable_for_vendor_data"] = row[2]
-            dd["industry_vertical"] = row[3]
+            #dd["enable_for_vendor_data"] = row[2]
+            #dd["industry_vertical"] = row[3]
             data.append(dd)
         # print data
         return data
@@ -53,13 +56,15 @@ class Process_Screener_Excel_Data:
             dir_name = env.DOWNLOAD_DIR + nseid
 
             print dir_name
-            if not os.path.exists(dir_name):
-                os.makedirs(dir_name)
+            if os.path.exists(dir_name):
+                shutil.rmtree(dir_name)
+                #os.removedirs(dir_name)
+            os.makedirs(dir_name)
 
             module_Screener_Excel_Data = Module_Screener_Excel_Data.Module_Screener_Excel_Data(dir_name)
-            #module_Screener_Excel_Data.getStockFundamentalData(row['nseid'])
-            module_Screener_Excel_Data.readAllFilesData(nseid, dir_name)
-            #module_Screener_Excel_Data.__exit__()
+            module_Screener_Excel_Data.getStockFundamentalData(row['nseid'])
+            module_Screener_Excel_Data.readAllFilesData(nseid,row['fullid'], dir_name)
+            module_Screener_Excel_Data.__exit__()
 
 
 

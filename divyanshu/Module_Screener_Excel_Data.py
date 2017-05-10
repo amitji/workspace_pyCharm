@@ -110,7 +110,7 @@ class Module_Screener_Excel_Data:
         time.sleep(2)
         return
 
-    def readAllFilesData(self, nseid,dir_name):
+    def readAllFilesData(self, nseid,fullid, dir_name):
         records= []
         for file in os.listdir(dir_name):
             if  not file.startswith("~"):
@@ -135,7 +135,7 @@ class Module_Screener_Excel_Data:
                     for k, val in cell_range.items():
                         seq_no = seq_no+1
                         #print (ws.Range(k + ':' + val).Value)
-                        one_record = [nseid ]
+                        one_record = [nseid,fullid ]
                         temp_record = ws.Range(k + ':' + val).Value
                         print 'date - ', temp_record[0][0]
                         if temp_record[0][0] == 'Trailing':
@@ -163,12 +163,16 @@ class Module_Screener_Excel_Data:
 
                 else:
                     wb.Close(True)
-        self.saveToDB(records)
+        self.saveToDB(records, fullid)
         return
 
-    def saveToDB(self, records):
+    def saveToDB(self, records, fullid):
 
-        insert_sql = ("INSERT INTO stock_forecasting_pe_eps_past_years_data (nseid, seq_no, fin_year,pe,profit,eps, price,  no_of_shares ,last_modified, created_on ) VALUES (%s,%s,%s, %s, %s, %s,%s, %s, %s,%s)")
+        delete_sql = "delete from stock_forecasting_pe_eps_past_years_data where fullid = '%s'" % fullid
+        self.cur.execute(delete_sql)
+        self.con.commit()
+
+        insert_sql = ("INSERT INTO stock_forecasting_pe_eps_past_years_data (nseid,fullid, seq_no, fin_year, profit,eps, pe, price,  no_of_shares ,last_modified, created_on ) VALUES (%s,%s,%s,%s, %s, %s, %s,%s, %s, %s,%s)")
 
         self.cur.executemany(insert_sql, records)
         self.con.commit()
