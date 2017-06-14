@@ -1,10 +1,10 @@
 import urllib2
 import json
-import time
 import DBManager
 import pandas
-import datetime
+from datetime import datetime, time
 import EmailUtil
+import time as t
 
 class GoogleFinanceAPI:
     def __init__(self):
@@ -38,19 +38,24 @@ class GoogleFinanceAPI:
         return obj[0]
 
     def getAllQuotes(self, stock_names):
-        content2 = []
-        url = self.prefix
-        for row in stock_names:
-            url = url+ "%s" % ( row['fullid']) + ","
+        try:
+            content = []
+            content2 = []
+            url = self.prefix
+            for row in stock_names:
+                url = url+ "%s" % ( row['fullid']) + ","
 
-        u = urllib2.urlopen(url)
+            u = urllib2.urlopen(url)
 
-        content = u.read()
-        content = content.replace('\n', '')
-        content = content[2:]
-        #content = content[:-1]
-        #content2 = content.split("\n}\n,")
-        content = json.loads(content, "ISO-8859-1")
+            content = u.read()
+            content = content.replace('\n', '')
+            content = content[2:]
+            #content = content[:-1]
+            #content2 = content.split("\n}\n,")
+            content = json.loads(content, "ISO-8859-1")
+        except Exception, e:
+            print "\n******Amit exception in getAllQuotes "
+            print str(e)
 
         return content
 
@@ -59,6 +64,7 @@ class GoogleFinanceAPI:
 
         print "\n*** Amit saving qoutes to database"
         records = []
+        fullid= ""
         for row in allQuotes:
 
             try:
@@ -84,6 +90,12 @@ class GoogleFinanceAPI:
         self.cur.executemany(sql, records)
         self.con.commit()
 
+    def in_between(self,now, start, end):
+        if start <= end:
+            return start <= now < end
+        else:  # over midnight e.g., 23:30-04:15
+            return start <= now or now < end
+
 if __name__ == "__main__":
     c = GoogleFinanceAPI()
     stock_names = c.getStockList()
@@ -92,11 +104,13 @@ if __name__ == "__main__":
     EmailUtil.send_email_as_text(" amit_portfolio_update.py job started - ", "", "")
     print "\n*** Amit Started getting quotes"
 
-    while minutes_count < 420:
+    #while minutes_count < 420:
+    #Run b/w morning 9 am to 4:00 pm IST
+    while (c.in_between(datetime.now().time(), time(9), time(16,00))):
         allQuotes = c.getAllQuotes(stock_names)
         c.saveIntoDB(allQuotes)
         minutes_count = minutes_count+1
-        print "\n*** Amit Sleeping for 1 minute, remaining loops (420-x)- ", 420- minutes_count, " | Time - ", datetime.datetime.now()
-        time.sleep(60)
+        print "\n*** Amit Sleeping for 1 minute, remaining loops (420-x)- ", 420- minutes_count, " | Time - ", datetime.now()
+        t.sleep(60)
 
-    print "\n*** Amit Exiting the google quote process..."
+    print "\n*** Amit Exiting the google quote process...TIME is  - ", datetime.now().time()

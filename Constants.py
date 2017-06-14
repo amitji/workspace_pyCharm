@@ -107,3 +107,10 @@ genericW = 1.0
 browser_path='C:/Program Files (x86)/Mozilla Firefox/firefox.exe'
 excel_download_dir='C:/xampp/htdocs/stockcircuitserver/fund_analysis/screener_excels'
 excel_output_excel='C:/xampp/htdocs/stockcircuitserver/fund_analysis/screener_excels/output.csv'
+
+# screener userid 7 pwd
+screener_userid = 'richasharma2099@gmail.com'
+screener_pwd = 'amit1973'
+
+#
+PHANTOMJS_PATH ='D:/workspace_pyCharm/phantomjs.exe'
