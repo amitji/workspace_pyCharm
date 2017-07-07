@@ -9,6 +9,7 @@ from collections import OrderedDict
 import win32com.client
 import datetime
 import DBManager
+import Constants
 
 print __name__
 
@@ -38,11 +39,15 @@ class Module_Screener_Excel_Data:
         self.xl = win32com.client.Dispatch('Excel.Application')
 
 
+
     def login(self):
 
         ##############################################################
         try:
             self.driver = webdriver.Firefox(executable_path=env.BROWSER_PATH, firefox_profile=self.profile)
+            #self.driver.set_window_size(0, 0)
+            #self.driver.set_window_position(1920,1080)
+            self.driver.set_window_position(-2000, 0)
             self.driver.get('https://www.screener.in/login/')
 
         except Exception as e:
@@ -55,8 +60,11 @@ class Module_Screener_Excel_Data:
 
         #password = self.driver.find_element_by_name('password')
         password = self.driver.find_element_by_id('id_password')
-        username.send_keys('amitji@gmail.com')
-        password.send_keys('amit1973')
+        # username.send_keys('amitji@gmail.com')
+        # password.send_keys('amit1973')
+        username.send_keys(Constants.screener_userid)
+        password.send_keys(Constants.screener_pwd)
+
         logger.info('Logging in')
         self.driver.find_element_by_tag_name('button').submit()
         time.sleep(2)
@@ -73,12 +81,16 @@ class Module_Screener_Excel_Data:
         logger.info('Webdriver handler closed')
 
 
-    def export_to_excel(self,nseid):
+    def export_to_excel(self,nseid, type):
 
         logger.info("******************************************************")
         logger.info('Clicking excel: ' + self.driver.current_url)
         try:
-            url = env.URL+nseid;
+            if type == 'C':
+                url = env.URL + nseid+"/consolidated"
+            else:
+                url = env.URL+nseid;
+
             print "company url - ",url
             self.driver.get(url)
 
@@ -104,13 +116,13 @@ class Module_Screener_Excel_Data:
             logger.info("******************************************************")
 
 
-    def getStockFundamentalData(self, nseid):
+    def getStockFundamentalData(self, nseid, type):
         self.login()
-        self.export_to_excel(nseid)
+        self.export_to_excel(nseid, type)
         time.sleep(2)
         return
 
-    def readAllFilesData(self, nseid,fullid, dir_name):
+    def readAllFilesData(self, nseid,fullid, dir_name, type):
         records= []
         for file in os.listdir(dir_name):
             if  not file.startswith("~"):
@@ -139,7 +151,8 @@ class Module_Screener_Excel_Data:
                         temp_record = ws.Range(k + ':' + val).Value
                         print 'date - ', temp_record[0][0]
                         if temp_record[0][0] == 'Trailing':
-                            now_datetime = '2017-03-31 00:00:00'
+                            #now_datetime = '2017-03-31 00:00:00'
+                            now_datetime = Constants.latest_period
                         else:
                             now_datetime = self.date_map.get(str(temp_record[0][0]))
 
@@ -147,12 +160,14 @@ class Module_Screener_Excel_Data:
 
                         one_record.append(seq_no)
                         one_record.append(now_datetime)
-                        one_record.append(temp_record[9][0])
-                        one_record.append(temp_record[10][0])
+                        one_record.append(temp_record[9][0]) #profit row
+                        one_record.append(temp_record[1][0]) # sales row
+                        one_record.append(temp_record[10][0]) # eps
                         one_record.append(temp_record[11][0])
                         one_record.append(temp_record[12][0])
                         one_record.append(no_of_shares)
                         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                        one_record.append(type)
                         one_record.append(now)
                         one_record.append(now)
                         print one_record
@@ -172,7 +187,14 @@ class Module_Screener_Excel_Data:
         self.cur.execute(delete_sql)
         self.con.commit()
 
-        insert_sql = ("INSERT INTO stock_forecasting_pe_eps_past_years_data (nseid,fullid, seq_no, fin_year, profit,eps, pe, price,  no_of_shares ,last_modified, created_on ) VALUES (%s,%s,%s,%s, %s, %s, %s,%s, %s, %s,%s)")
+        insert_sql = ("INSERT INTO stock_forecasting_pe_eps_past_years_data (nseid,fullid, seq_no, fin_year, profit,revenue, eps, pe, price,  no_of_shares ,type, last_modified, created_on ) VALUES (%s,%s,%s,%s,%s, %s, %s, %s,%s, %s, %s,%s, %s)")
 
         self.cur.executemany(insert_sql, records)
+        self.con.commit()
+
+    def updateFlag(self, fullid):
+        updateSql = "update stock_names_for_forecasting set update_now = '%s' where fullid = '%s' " % (
+            'n', fullid)
+        # print updateSql
+        self.cur.execute(updateSql)
         self.con.commit()

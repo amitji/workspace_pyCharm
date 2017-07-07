@@ -5,9 +5,12 @@ import dataProcessing
 from collections import OrderedDict
 import DBManager
 import Module_Screener_Excel_Data
+import Module_Choose_Consolidated_Or_Standalone
 import env
 import os
 import shutil
+import datetime
+import time
 
 class Process_Screener_Excel_Data:
 
@@ -18,6 +21,7 @@ class Process_Screener_Excel_Data:
         self.con = DBManager.connectDB()
         self.cur = self.con.cursor()
 
+        self.module_Choose_Consolidated_Or_Standalone = Module_Choose_Consolidated_Or_Standalone.Module_Choose_Consolidated_Or_Standalone()
         #self.module_Screener_Excel_Data = Module_Screener_Excel_Data.Module_Screener_Excel_Data()
 
         # with scraping() as sc:
@@ -32,7 +36,8 @@ class Process_Screener_Excel_Data:
          #            " where enable_for_vendor_data = 1"
 
         #select_sql = "select fullid, nseid  from stocksdb.amit_portfolio where is_index='n' "
-        select_sql = "select fullid, nseid  from stocksdb.amit_portfolio where nseid='INDOWIND' "
+        #select_sql = "select fullid, nseid  from stocksdb.stock_names_for_forecasting where nseid='INFY' "
+        select_sql = "select fullid, nseid from stocksdb.stock_names_for_forecasting where update_now='y' "
         self.cur.execute(select_sql)
 
         rows = self.cur.fetchall()
@@ -51,21 +56,39 @@ class Process_Screener_Excel_Data:
     def getStockFundamentalData(self, stock_names):
 
         # call module_Screener_Excel_Data for each stock
+        count = 1;
+        size = stock_names.__len__();
         for row in stock_names:
             nseid = row['nseid']
-            dir_name = env.DOWNLOAD_DIR + nseid
+            try:
 
-            print dir_name
-            if os.path.exists(dir_name):
-                shutil.rmtree(dir_name)
-                #os.removedirs(dir_name)
-            os.makedirs(dir_name)
+                now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                print "\n****************************************************************************************"
+                print"Starting for ",nseid," , processing  - ",count, " /",size, "  Time - ", now
+                count = count+1
 
-            module_Screener_Excel_Data = Module_Screener_Excel_Data.Module_Screener_Excel_Data(dir_name)
-            module_Screener_Excel_Data.getStockFundamentalData(row['nseid'])
-            module_Screener_Excel_Data.readAllFilesData(nseid,row['fullid'], dir_name)
-            module_Screener_Excel_Data.__exit__()
+                dir_name = env.DOWNLOAD_DIR + nseid
 
+                print dir_name
+                if os.path.exists(dir_name):
+                    shutil.rmtree(dir_name)
+                    #os.removedirs(dir_name)
+                os.makedirs(dir_name)
+
+                #first decide if you can pikc consolidated numbers or standalone
+
+                type = self.module_Choose_Consolidated_Or_Standalone.chooseConsolidatedOrStandalone(nseid)
+                print "Type if C or S  - ", type
+                module_Screener_Excel_Data = Module_Screener_Excel_Data.Module_Screener_Excel_Data(dir_name)
+                module_Screener_Excel_Data.getStockFundamentalData(row['nseid'], type)
+                module_Screener_Excel_Data.readAllFilesData(nseid,row['fullid'], dir_name, type)
+                module_Screener_Excel_Data.__exit__()
+                module_Screener_Excel_Data.updateFlag(row['fullid'])
+            except  Exception, e:
+                print "error e - ", str(e)
+                print "\n******Amit - some excetion executing " + nseid
+                time.sleep(120) #if there is a DB connection or Internet Access issues , wait for 2 minutes
+                pass
 
 
 # if __name__ == '__main__':

@@ -22,8 +22,8 @@ class Process_Scrapper_Screener_India_Stock:
         # select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and update_now='A' "
         #select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names_temp sn"
 
-        #select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in ('JKCEMENT', 'KALINDEE', 'KSERASERA', 'NEYVELILIG', 'OMNITECH', 'PRICOL', 'SHRENUJ', 'SICAL',  'UBHOLDINGS', 'EQUITAS', 'UJJIVAN', 'TEAMLEASE', 'PRECAM', 'RBLBANK') "
-        select_sql ="select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names where exchange='NSE' and is_video_available='y' and enable_for_vendor_data='2' and id < 500 "
+        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in ('FEDERALBNK') "
+        #select_sql ="select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names where exchange='NSE' and is_video_available='y' and enable_for_vendor_data='2' and id < 500 "
 
         #run it for all Amit's portfolio stocks
         #select_sql = "select sn.fullid, sn.nseid, sn.enable_for_vendor_data, sn.industry_vertical from stocksdb.stock_names sn, amit_portfolio ap where sn.nseid = ap.nseid"
