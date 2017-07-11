@@ -121,6 +121,7 @@ nseidString = thisObj.getCSVDataFromNSE()
 #     nseidString = thisObj.csv_reader(f_obj)
 
 stock_names = thisObj.getStockDetails(nseidString)
+print "Stocks to be processed  ", stock_names.__len__(), " -  ", stock_names
 all_good_stock_names = thisObj.module_Scrapper_Screener_India_Stocks.updateAll(stock_names)
 if(len(all_good_stock_names) > 0):
     thisObj.finalRatingModule.updateAll(all_good_stock_names)

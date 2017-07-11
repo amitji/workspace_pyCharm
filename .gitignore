@@ -52,3 +52,7 @@ env/
 *.exe
 ghostdriver.log
 *.csv
+divyanshu/scrappy.log
+divyanshu/geckodriver.log
+divyanshu/geckodriver.log
+*.log
