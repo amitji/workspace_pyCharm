@@ -11,6 +11,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 
 import datetime
+import sys, os
 
 # import FinalRatingModule
 import QuandlDataModule
@@ -42,6 +43,7 @@ class Module_Scrapper_Screener_India_Stocks:
             self.PHANTOMJS_PATH = '/home/shopbindaas/python-workspace/phantomjs'
 
         self.browser = webdriver.PhantomJS(self.PHANTOMJS_PATH)
+
 
         ##############################################################
         self.browser.get('https://www.screener.in/login/')
@@ -120,6 +122,10 @@ class Module_Scrapper_Screener_India_Stocks:
             else:
                 number_of_quarters_to_process = const.number_of_quarters_to_process
             #self.browser.get('https://www.screener.in')
+
+            short_quarter_date = const.screener_quarter_dates[5]
+            short_quarter_date_v1 = const.screener_quarter_dates_v1[5]
+
             try:
                 self.browser.get(const.screenerBaseUrl + nseid+const.screenerBaseUrl_part2)
                 time.sleep(5)
@@ -127,6 +133,18 @@ class Module_Scrapper_Screener_India_Stocks:
                 #determine what is latest quarter data available. Based on that you use different dates sets.
                 temp_record = self.xpaths[number_of_quarters_to_process-1]
                 temp_date = self.browser.find_element_by_xpath(temp_record["date_xpath"]).text
+                if short_quarter_date == temp_date:
+                    print 'Consolidated latest quarter results available', short_quarter_date, temp_date
+                    quarter_version = 2
+                else:
+                    print "Consolidated Results are NOT latest , try STANDALONE"
+                    self.browser.get(const.screenerBaseUrl + nseid)
+                    time.sleep(5)
+                    # determine what is latest quarter data available. Based on that you use different dates sets.
+                    temp_record = self.xpaths[number_of_quarters_to_process - 1]
+                    temp_date = self.browser.find_element_by_xpath(temp_record["date_xpath"]).text
+
+
             except Exception, e3:
                 print "Exception in Consolidated , try STANDALONE"
                 self.browser.get(const.screenerBaseUrl + nseid)
@@ -135,10 +153,6 @@ class Module_Scrapper_Screener_India_Stocks:
                 temp_record = self.xpaths[number_of_quarters_to_process-1]
                 temp_date = self.browser.find_element_by_xpath(temp_record["date_xpath"]).text
 
-            short_quarter_date = const.screener_quarter_dates[5]
-            short_quarter_date_v1 = const.screener_quarter_dates_v1[5]
-            #short_quarter_date_prev_prev = const.screener_quarter_dates[3]
-            quarter_version = 2
             if short_quarter_date == temp_date:
                 print 'latest quarter results available', short_quarter_date, temp_date
                 quarter_version = 2
@@ -170,7 +184,8 @@ class Module_Scrapper_Screener_India_Stocks:
             records = []
             now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             #count = 1
-            count = 5-len(self.xpaths)+1 ##if you are processing more than 5 quarters of data then you need to use how many xpath(quarters on screener)
+            total_xpaths = len(self.xpaths);
+            count = 5-total_xpaths+1 ##if you are processing more than 5 quarters of data then you need to use how many xpath(quarters on screener)
             #This variable is for those stocks where Quarter dates(Dec 16) does not match for two consequtive quarters. Need to handle
             #these manually.
             count_no_match_for_dates = 0
@@ -216,9 +231,14 @@ class Module_Scrapper_Screener_India_Stocks:
                     op = float((self.browser.find_element_by_xpath(row["opm_xpath"]).text).replace(",", ""))
                     ebit = float((self.browser.find_element_by_xpath(row["ebit_xpath"]).text).replace(",", ""))
 
-                    profitMargin = (profit/abs(rev))*100  # abs() is used for negative denominator
-                    opMargin = (op/abs(rev))*100
-                    ebitMargin = (ebit / abs(rev)) * 100
+                    if rev == 0:
+                        profitMargin = 0
+                        opMargin = 0
+                        ebitMargin = 0
+                    else:
+                        profitMargin = (profit/abs(rev))*100  # abs() is used for negative denominator
+                        opMargin = (op/abs(rev))*100
+                        ebitMargin = (ebit / abs(rev)) * 100
 
                     #calculate growth rates
                     rev_growth = None
@@ -233,7 +253,10 @@ class Module_Scrapper_Screener_India_Stocks:
                         #print prev_rev, prev_profit
 
                         rev_growth = rev-prev_rev
-                        rev_growth_rate = (100*rev_growth)/abs(prev_rev) # abs() is used for negative denominator
+                        if prev_rev == 0:
+                            rev_growth_rate = 0
+                        else:
+                            rev_growth_rate = (100 * rev_growth) / abs(prev_rev)  # abs() is used for negative denominator
 
                         profit_growth = profit - prev_profit
                         profit_growth_rate = (100 * profit_growth) / abs(prev_profit)
@@ -279,6 +302,13 @@ class Module_Scrapper_Screener_India_Stocks:
                 except Exception, e:
                     print "\n******Amit 000 - Exception in inserting data in ", table_name, " for - " + fullid
                     print str(e)
+
+                    #This is to print line # for exception
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                    print(exc_type, fname, exc_tb.tb_lineno)
+
+
                     self.scrapper_exception_list.append(nseid)
                     self.all_good_flag = False
                     break
