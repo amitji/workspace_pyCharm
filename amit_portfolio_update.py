@@ -11,7 +11,7 @@ class GoogleFinanceAPI:
         self.con = DBManager.connectDB()
         self.cur = self.con.cursor()
 
-        self.prefix = "http://finance.google.com/finance/info?client=ig&q="
+        self.prefix = "https://finance.google.com/finance/info?client=ig&q="
 
     def getStockList(self):
         select_sql ="select fullid, nseid from stocksdb.amit_portfolio where display_seq is not null order by display_seq "
@@ -38,10 +38,11 @@ class GoogleFinanceAPI:
         return obj[0]
 
     def getAllQuotes(self, stock_names):
+        url = self.prefix
         try:
             content = []
             content2 = []
-            url = self.prefix
+
             for row in stock_names:
                 url = url+ "%s" % ( row['fullid']) + ","
 
@@ -54,8 +55,10 @@ class GoogleFinanceAPI:
             #content2 = content.split("\n}\n,")
             content = json.loads(content, "ISO-8859-1")
         except Exception, e:
-            print "\n******Amit exception in getAllQuotes "
+            print "\n******Amit exception in getAllQuotes, url is - \n ", url
             print str(e)
+            pass
+
 
         return content
 
@@ -108,7 +111,11 @@ if __name__ == "__main__":
     #Run b/w morning 9 am to 4:00 pm IST
     while (c.in_between(datetime.now().time(), time(9), time(16,00))):
         allQuotes = c.getAllQuotes(stock_names)
-        c.saveIntoDB(allQuotes)
+        if allQuotes:
+            c.saveIntoDB(allQuotes)
+        else:
+            print "\n*** Amit All Quotes from Google were empy(due to exception i guess) so not saving in DB"
+
         minutes_count = minutes_count+1
         print "\n*** Amit Sleeping for 1 minute, remaining loops (420-x)- ", 420- minutes_count, " | Time - ", datetime.now()
         t.sleep(60)

@@ -154,6 +154,7 @@ class Module_Screener_Excel_Data:
                             #now_datetime = '2017-03-31 00:00:00'
                             now_datetime = Constants.latest_period
                         else:
+                            #Amit TODO: excel sheet has differet dates as headers so below code partially works..
                             now_datetime = self.date_map.get(str(temp_record[0][0]))
 
                         print 'now_datetime - ', now_datetime
@@ -191,6 +192,9 @@ class Module_Screener_Excel_Data:
 
         self.cur.executemany(insert_sql, records)
         self.con.commit()
+        #Now set the update_now flag to 'n' so that its not processed again for the same quarter
+        self.updateFlag(fullid)
+
 
     def updateFlag(self, fullid):
         updateSql = "update stock_names_for_forecasting set update_now = '%s' where fullid = '%s' " % (

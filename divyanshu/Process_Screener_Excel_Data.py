@@ -11,6 +11,8 @@ import os
 import shutil
 import datetime
 import time
+import EmailUtil
+
 
 class Process_Screener_Excel_Data:
 
@@ -36,8 +38,8 @@ class Process_Screener_Excel_Data:
          #            " where enable_for_vendor_data = 1"
 
         #select_sql = "select fullid, nseid  from stocksdb.amit_portfolio where is_index='n' "
-        #select_sql = "select fullid, nseid  from stocksdb.stock_names_for_forecasting where nseid='INFY' "
-        select_sql = "select fullid, nseid from stocksdb.stock_names_for_forecasting where update_now='y' "
+        select_sql = "select fullid, nseid  from stocksdb.stock_names_for_forecasting where nseid='ABB' "
+        #select_sql = "select fullid, nseid from stocksdb.stock_names_for_forecasting where update_now='y' "
         self.cur.execute(select_sql)
 
         rows = self.cur.fetchall()
@@ -97,6 +99,15 @@ class Process_Screener_Excel_Data:
 thisObj = Process_Screener_Excel_Data()
 stock_names = thisObj.getStockNames()
 thisObj.getStockFundamentalData(stock_names)
+# Run the Java process from eclipse , hit url -  http://localhost:8080/StockCircuitServer/spring/stockcircuit/getStockForecastData
+msg = "Now Run the Java process from eclipse , hit url -  http://localhost:8080/StockCircuitServer/spring/stockcircuit/getStockForecastData"
+print("\n\n", msg)
+EmailUtil.send_email_as_text("Process Screener Excel Data Done", msg, "")
+
+
+
+
+
 #thisObj.module_Screener_Excel_Data.getStockFundamentalData(stock_names)
 #thisObj.module_Screener_Excel_Data.readAllFilesData()
 
