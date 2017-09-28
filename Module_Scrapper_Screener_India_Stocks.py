@@ -414,6 +414,8 @@ class Module_Scrapper_Screener_India_Stocks:
             if 'Cr.' in debt:
                 debt = debt.replace(" Cr.", "")
                 debt = float(debt[(debt.rfind(' ') + 1):].replace(",", ""))
+            elif '--' in debt:
+                debt = 0
             else:
                 debt = float(debt[(debt.rfind(' ') + 1):].replace(",", ""))
 
@@ -438,7 +440,10 @@ class Module_Scrapper_Screener_India_Stocks:
 
             current_ratio = ""
             debt_equity_ratio = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[6]').text
-            debt_equity_ratio = float(debt_equity_ratio[(debt_equity_ratio.rfind(' ') + 1):])
+            if '--' in debt_equity_ratio:
+                debt_equity_ratio = 0
+            else:
+                debt_equity_ratio = float(debt_equity_ratio[(debt_equity_ratio.rfind(' ') + 1):])
 
             last_price_vs_high52 = (last_price / high52) * 100
 
@@ -494,9 +499,9 @@ class Module_Scrapper_Screener_India_Stocks:
         for row in stock_names:
             count = count + 1
             print "\n\n****************************************************************************"
-            print "\n\ncalling updateQuaterlyData for - ", row['nseid'], "(", count, "/", totalCount, ")"
+            print "calling updateQuaterlyData for - ", row['nseid'], "(", count, "/", totalCount, ")"
             enable_for_vendor_data = row['enable_for_vendor_data']
-            if enable_for_vendor_data == '1':
+            if enable_for_vendor_data == '1' or enable_for_vendor_data == 'e' or enable_for_vendor_data == 'z' :
                 qd_table_name = "fa_quaterly_data"
                 fr_table_name = "fa_financial_ratio"
                 self.updateQuaterlyData(row, qd_table_name, fr_table_name)
