@@ -42,7 +42,7 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
 
     def getStockDetails(self,nseidString ):
 
-        ###expalin sql - following sql will only take those nseid where latest quater data is NOT laread scrapped.
+        ###expalin sql - following sql will only take those nseid where latest quater data is NOT alread scrapped.
         ###This is to avoid scrapping ones alreay have latest data.
 
         select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in "

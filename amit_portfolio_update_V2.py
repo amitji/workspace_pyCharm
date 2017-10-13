@@ -150,7 +150,7 @@ if __name__ == "__main__":
 
     #while minutes_count < 420:
     #Run b/w morning 9 am to 4:00 pm IST
-    while (c.in_between(datetime.now().time(), time(9), time(16,00))):
+    while (c.in_between(datetime.now().time(), time(8,40), time(16,00))):
         allQuotes = c.getAllQuotes(stock_names)
 
         if allQuotes:
