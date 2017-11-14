@@ -1,8 +1,8 @@
 
 from custom_logging import logger
-from dbHandler import DBHandler
-import dataProcessing
-from collections import OrderedDict
+#from dbHandler import DBHandler
+#import dataProcessing
+#from collections import OrderedDict
 import DBManager
 import Module_Screener_Excel_Data
 import Module_Choose_Consolidated_Or_Standalone
@@ -17,8 +17,8 @@ import EmailUtil
 class Process_Screener_Excel_Data:
 
     def __init__(self):
-        logger.info("Execeution Begins")
-        logger.info("******************************")
+        #logger.info("Execeution Begins")
+        #logger.info("******************************")
 
         self.con = DBManager.connectDB()
         self.cur = self.con.cursor()
@@ -38,7 +38,7 @@ class Process_Screener_Excel_Data:
          #            " where enable_for_vendor_data = 1"
 
         #select_sql = "select fullid, nseid  from stocksdb.amit_portfolio where is_index='n' "
-        select_sql = "select fullid, nseid  from stocksdb.stock_names_for_forecasting where nseid='ABB' "
+        select_sql = "select fullid, nseid  from stocksdb.stock_names_for_forecasting where nseid='FEDERALBNK' "
         #select_sql = "select fullid, nseid from stocksdb.stock_names_for_forecasting where update_now='y' "
         self.cur.execute(select_sql)
 

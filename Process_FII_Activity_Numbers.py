@@ -4,6 +4,7 @@
 import urllib2
 from bs4 import BeautifulSoup
 import EmailUtil
+import requests
 
 
 class Process_FII_Activity_Numbers:
@@ -28,8 +29,9 @@ table1 = div.find("table")
 ### SGX Nifty
 url = "http://sgxnifty.org/"
 
-page = urllib2.urlopen(url).read()
-soup = BeautifulSoup(page)
+#page = urllib2.urlopen(url).read()
+soup = BeautifulSoup(requests.get(url).content)
+#soup = BeautifulSoup(page)
 
 
 sgx_table = soup.find("table",{"class":"indexes"})

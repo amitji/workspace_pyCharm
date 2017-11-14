@@ -4,6 +4,7 @@ import csv
 import DBManager
 import datetime
 import requests
+import EmailUtil
 
 
 
@@ -52,6 +53,7 @@ class NSE_Result_Calendar_Update_Process:
 
         print "Total records in CSV files Inserted/replaced into DB - ", count
         #print nseidString
+        EmailUtil.send_email_as_text("Process_NSE_Result_Calendar_Download_n_UpdateDB", nseidString, "")
 
 
 
@@ -59,5 +61,6 @@ class NSE_Result_Calendar_Update_Process:
 # ----------------------------------------------------------------------
 thisObj = NSE_Result_Calendar_Update_Process()
 thisObj.csv_reader()
+
 
 

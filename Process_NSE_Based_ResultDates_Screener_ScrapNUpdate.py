@@ -101,11 +101,10 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
             count +=1
             #call the Sc
         print "Total records in CSV files to be processed- ", count
-        print "Stocks names from BM_Last_1_WeekResults.csv file to be processed - "
+        print "Stocks names from BM_Last_15_Days.csv file to be processed - "
         #print nseidString
         nseidString = nseidString[:-1]
         nseidString = '('+nseidString+')'
-        print nseidString
         return nseidString
 
 
@@ -114,7 +113,7 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
 
 thisObj = Process_NSE_Based_ResultDates_Screener_ScrapNUpdate()
 nseidString = thisObj.getCSVDataFromNSE()
-
+print nseidString
 #csv_path = "BM_Last_15_DaysResults.csv"
 # csv_path = "BM_Last_1_WeekResults.csv"
 # with open(csv_path, "rb") as f_obj:

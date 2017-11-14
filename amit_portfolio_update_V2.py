@@ -145,7 +145,7 @@ if __name__ == "__main__":
     stock_names = c.getStockList()
     records = [] ## LIST OF LISTS
     minutes_count = 0  # compare with 7 Hrs run daily from 9-4 pm (7*60=420)
-    EmailUtil.send_email_as_text(" amit_portfolio_update.py job started - ", "", "")
+    #EmailUtil.send_email_as_text(" amit_portfolio_update.py job started - ", "", "")
     print "\n*** Amit Started getting quotes"
 
     #while minutes_count < 420:
@@ -157,7 +157,8 @@ if __name__ == "__main__":
             c.saveIntoDB(allQuotes)
         else:
             print "\n*** Amit All Quotes from Google were empy(due to exception i guess) so not saving in DB"
-
+        if minutes_count == 0:
+            EmailUtil.send_email_as_text(" amit_portfolio_update.py job started - ", "", "")
         minutes_count = minutes_count+1
         print "\n*** Amit Sleeping for 2 minute, remaining loops (420-x)- ", 420- minutes_count, " | Time - ", datetime.now()
         t.sleep(60)
