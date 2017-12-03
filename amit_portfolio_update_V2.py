@@ -30,6 +30,24 @@ class GoogleFinanceAPI:
             data.append(dd)
         # print data
         return data
+
+    def getFOStockList(self):
+        print "\n\n***************  Running it for only FO stocks\n\n"
+        select_sql ="select fullid, nseid from stocksdb.amit_portfolio where display_seq is not null and is_fo = 'y' and is_inactive != 'y'  order by display_seq "
+
+        self.cur.execute(select_sql)
+
+        rows = self.cur.fetchall()
+        data = list()
+        for row in rows:
+            # print row[0], row[1]
+            dd = dict()
+            dd["fullid"] = row[0]
+            dd["nseid"] = row[1]
+            data.append(dd)
+        # print data
+        return data
+
     '''
     def get(self, symbol):
         url = self.prefix + "%s" % ( symbol)
@@ -47,7 +65,10 @@ class GoogleFinanceAPI:
 
             for row in stock_names:
                 try:
-                    url = self.url_prefix+ "%s" % ( row['fullid'])+self.url_suffix
+                    fullid = row['fullid']
+                    if '&' in fullid:
+                        fullid = fullid.replace('&','%26')
+                    url = self.url_prefix+ "%s" % ( fullid)+self.url_suffix
                     #print "\nurl - ", url
                     rsp = requests.get(url)
                     content2 = {}
@@ -72,7 +93,7 @@ class GoogleFinanceAPI:
                         # content2.append('{}'.format(fin_data['e']));
                         # content2.append('{}'.format(fin_data['t']));
 
-                        content2['fullid'] = row['fullid'];
+                        content2['fullid'] = fullid;
                         lp = float(('{}'.format(fin_data['l'])).replace(",", ""));
                         change = float(('{}'.format(fin_data['c'])).replace(",", ""));
 
@@ -86,7 +107,7 @@ class GoogleFinanceAPI:
                         content2['e'] = '{}'.format(fin_data['e']);
                         content2['t'] = '{}'.format(fin_data['t']);
                 except Exception, e1:
-                    print "\n******Amit exception in getAllQuotes for fullid - \n ", row['fullid']
+                    print "\n******Amit exception in getAllQuotes for fullid - \n ", fullid
                     print str(e1)
                     pass
 
@@ -120,7 +141,7 @@ class GoogleFinanceAPI:
 
             except Exception, e:
                 print "\n******Amit saveIntoDB, some issue with quotes, row data - ", row
-                print str(e)
+                print str(e.message)
                 pass
 
         # for record in records:
@@ -142,7 +163,11 @@ class GoogleFinanceAPI:
 
 if __name__ == "__main__":
     c = GoogleFinanceAPI()
+
     stock_names = c.getStockList()
+    #Get only FO when Google is slow...
+    #stock_names = c.getFOStockList()
+
     records = [] ## LIST OF LISTS
     minutes_count = 0  # compare with 7 Hrs run daily from 9-4 pm (7*60=420)
     #EmailUtil.send_email_as_text(" amit_portfolio_update.py job started - ", "", "")
@@ -150,7 +175,7 @@ if __name__ == "__main__":
 
     #while minutes_count < 420:
     #Run b/w morning 9 am to 4:00 pm IST
-    while (c.in_between(datetime.now().time(), time(8,40), time(16,00))):
+    while (c.in_between(datetime.now().time(), time(7,40), time(16,00))):
         allQuotes = c.getAllQuotes(stock_names)
 
         if allQuotes:
