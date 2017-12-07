@@ -136,8 +136,8 @@ def test_google():
     X = X[:-forecast_out]
 
 
-    # print(len(X))
-    # print(len(X_lately))
+    print(len(X))
+    print(len(X_lately))
 
     df.dropna(inplace=True)
     y = np.array(df['label'])
