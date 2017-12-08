@@ -4,7 +4,7 @@ import pandas
 import operator
 
 def __init__(self):
-    print "Calling GetNSELiveData constructor"
+    print ("Calling GetNSELiveData constructor")
 
 
 
@@ -25,16 +25,16 @@ def getNSELiveData( nseid):
     # print max(ddd, key=ddd.get)
     maxKey = max(ddd.iteritems(), key=operator.itemgetter(1))[0]
     maxVal = ddd.get(maxKey)
-    print "High52 - ", maxVal
+    print ("High52 - ", maxVal)
 
     # print min(ddd, key=ddd.get)
     minKey = min(ddd.iteritems(), key=operator.itemgetter(1))[0]
     minVal = ddd.get(minKey)
-    print "Low52 - ", minVal
+    print( "Low52 - ", minVal)
 
     last_price = df['Close'][0]
 
-    print "Last Price - ", last_price
+    print( "Last Price - ", last_price)
 
     nsedata = dict()
     nsedata["high52"] = maxVal

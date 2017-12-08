@@ -56,3 +56,8 @@ divyanshu/scrappy.log
 divyanshu/geckodriver.log
 divyanshu/geckodriver.log
 *.log
+*.ini
+*.log
+*.h
+venv/
+venv1/

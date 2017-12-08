@@ -76,7 +76,7 @@ class QuandlDataModule:
 
         fullid = "NSE:"+nseid
 
-        print fullid
+        print( fullid)
         # print str(fullid)
 
         nseidModified = nseid.replace("&", "")
@@ -146,7 +146,7 @@ class QuandlDataModule:
                     ebidtdataC = ebidtdata['STANDALONE']
                     ebidtmdataC = ebidtmdata['STANDALONE']
 
-                    print "\nAmit, changing type for this stock to Standalone\n"
+                    print( "\nAmit, changing type for this stock to Standalone\n")
                     updateSql = "update stock_names set data_type = 'S' where fullid = '%s' " % fullid
                     self.cur.execute(updateSql)
                     self.con.commit()
@@ -166,7 +166,7 @@ class QuandlDataModule:
             rSize = len(rdataC)
             pSize = len(pdataC)
             if(rSize != pSize):
-                print 'Revenue and Profit data not same size'
+                print( 'Revenue and Profit data not same size')
 
             count = rSize;
 
@@ -193,19 +193,19 @@ class QuandlDataModule:
 
                     data_quater = (nseid, fullid, count, date,quarter, rev, profit,profitMargin, operatingProfit, operatingProfitMargin, ebidt, ebidtm,  now, now)
                     self.cur.execute(insert_sql, data_quater)
-                    print "Insert executed for table " + table_name + ", date -  ", date
+                    print( "Insert executed for table " + table_name + ", date -  ", date)
                     count = count - 1;
-            except  Exception, e:
-                print "error e - ",str(e)
-                print "\n******Amit - some excetion executing " + table_name + " insert sql 111 for  - "+nseid
+            except  Exception as e:
+                print ("error e - ",str(e))
+                print( "\n******Amit - some excetion executing " + table_name + " insert sql 111 for  - "+nseid)
                 self.qd_exception_list.append(nseid)
                 self.all_good_flag = False
                 pass
 
             self.con.commit()
-        except  Exception, e2:
-            print "error e2 - ",str(e2)
-            print "\n******Amit - some excetion executing " + table_name + " insert sql 222 for  - " + nseid
+        except  Exception as e2:
+            print( "error e2 - ",str(e2))
+            print( "\n******Amit - some excetion executing " + table_name + " insert sql 222 for  - " + nseid)
             self.qd_exception_list.append(nseid)
             self.all_good_flag = False
             pass
@@ -241,15 +241,15 @@ class QuandlDataModule:
             #nse = Nse()
             #q = nse.get_quote(str(nseid))
             nseDict = NSELiveDataModule.getNSELiveData(nseidModified)
-            # print q
+            # q
             high52 = nseDict['high52']
             low52 = nseDict['low52']
             #companyName = q['companyName']
             last_price = nseDict['last_price']
-            print nseid, " high 52 -",  high52
-        except Exception, e3:
-            print str(e3)
-            print "\n******Amit - Exception in getting NSE data for - " + nseid
+            print( nseid, " high 52 -",  high52)
+        except Exception as e3:
+            print (str(e3))
+            print( "\n******Amit - Exception in getting NSE data for - " + nseid)
             self.fr_exception_list.append(nseid)
             return
 
@@ -409,28 +409,28 @@ class QuandlDataModule:
                     last_price = float("{0:.2f}".format(last_price))
                     last_price_vs_high52 = (last_price / high52) * 100
                     last_price_vs_high52 = float("{0:.2f}".format(last_price_vs_high52))
-                    print "last_price_vs_high52 - ", last_price_vs_high52
+                    print( "last_price_vs_high52 - ", last_price_vs_high52)
 
                     # data_quater = (fullid, "", eps, high52, low52,now, now)
                     data_quater = (fullid, short_name,last_price, eps, pe, pb, roe, high52, low52, last_price_vs_high52,debt, int, ic, de, now, now)
                     self.cur.execute(insert_sql, data_quater)
-                    print "eps-",eps," | pe-",pe," | pb-",pb," | roe-",roe," | low52-",low52
-                    print "Insert executed for table " + table_name + ", key -  ", key
+                    print( "eps-",eps," | pe-",pe," | pb-",pb," | roe-",roe," | low52-",low52)
+                    print( "Insert executed for table " + table_name + ", key -  ", key)
 
 
 
-            except Exception, e:
-                print "error e - ", str(e)
-                print "\n******Amit - some excetion executing " + table_name + " insert sql 111 for  - "+nseid+" and type - "+type
+            except Exception as e:
+                print ("error e - ", str(e))
+                print( "\n******Amit - some excetion executing " + table_name + " insert sql 111 for  - "+nseid+" and type - "+type)
                 self.fr_exception_list.append(nseid)
                 self.all_good_flag = False
                 pass
 
 
 
-        except  Exception, e2:
-            print "error e2 - ", str(e2)
-            print "\n******Amit - some excetion executing " + table_name + " insert sql 222 for  - " + nseid
+        except  Exception as  e2:
+            print( "error e2 - ", str(e2))
+            print( "\n******Amit - some excetion executing " + table_name + " insert sql 222 for  - " + nseid)
             self.fr_exception_list.append(nseid)
             self.all_good_flag = False
             pass
@@ -439,11 +439,6 @@ class QuandlDataModule:
         if(self.all_good_flag):
             self.setUpdateNowFlag(fullid,table_name, 'c' )
 
-#        else:
-            #updateSql = "update stock_names set update_now = 'e' where fullid = '%s' " % fullid
-            #self.cur.execute(updateSql)
-            #self.con.commit()
-            #print "updated the update_now column to e (ERROR)"
 
 
 
@@ -460,7 +455,7 @@ class QuandlDataModule:
             short_name = row[0]
             if(short_name == ""):
                 short_name = row[1]
-            print "short_name - ",short_name
+            print( "short_name - ",short_name)
 
         return short_name
 
@@ -469,7 +464,7 @@ class QuandlDataModule:
         deleteSql = "delete from " + table_name + " where fullid = '%s' " % fullid
         self.cur.execute(deleteSql)
         self.con.commit()
-        print "Number of rows delete: %d" % self.cur.rowcount
+        print( "Number of rows delete: %d" % self.cur.rowcount)
         return self.cur.rowcount
 
     def setUpdateNowFlag(self, fullid,table_name, update_flag ):
@@ -483,27 +478,27 @@ class QuandlDataModule:
             vendor_data_flag = "1"
         updateSql = "update stock_names set update_now = '%s', enable_for_vendor_data='%s', last_modified='%s' where fullid = '%s' " % (
             update_flag, vendor_data_flag, now, fullid)
-        #print updateSql
+        
         self.cur.execute(updateSql)
         self.con.commit()
         #self.updated_stock_list.append(fullid)
-        print "updated the update_now column to ", update_flag
+        print( "updated the update_now column to ", update_flag)
 
     def setIsVideoAvailable(self, fullid ):
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         updateSql = "update stock_names set is_video_available = 'y', last_modified='%s' where fullid = '%s' " % ( now, fullid)
-        #print updateSql
+        
         self.cur.execute(updateSql)
         self.con.commit()
-        print "updated the is_video_available column to y"
+        print( "updated the is_video_available column to y")
 
     def setVideoAsOldToRecreateNextTime(self, fullid ):
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         updateSql = "update stock_recommended_videos set last_modified = '2000-01-01 00:00:00'  where fullid = '%s' " % ( fullid)
-        #print updateSql
+        
         self.cur.execute(updateSql)
         self.con.commit()
-        print "updated the stock_recommended_videos:last_updated column to old date"
+        print( "updated the stock_recommended_videos:last_updated column to old date")
 
 
     def __del__(self):

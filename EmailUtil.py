@@ -5,7 +5,7 @@ from email.mime.text import MIMEText
 
 
 def __init__(self):
-    print "Calling GetNSELiveData constructor"
+    print ("Calling GetNSELiveData constructor")
 
 def send_email( subject,updated_stock_list, url):
     # me == my email address
@@ -45,10 +45,10 @@ def send_email( subject,updated_stock_list, url):
         #print "msg as string", msg.as_string()
         server.sendmail(me, you, msg.as_string())
         server.close()
-        print 'successfully sent the mail'
-    except  Exception, e2:
-        print "error e2 - ", str(e2)
-        print "\n******Amit - failed to send mail, some exception sending email"
+        print ('successfully sent the mail')
+    except  (Exception, e2):
+        print ("error e2 - ", str(e2))
+        print ("\n******Amit - failed to send mail, some exception sending email")
 
 
 def send_email_as_text(process_name, updated_stock_list, url):
@@ -73,7 +73,7 @@ def send_email_as_text(process_name, updated_stock_list, url):
         server.login(gmail_user, gmail_pwd)
         server.sendmail(FROM, TO, message)
         server.close()
-        print 'successfully sent the mail'
-    except  Exception, e2:
-        print "error e2 - ", str(e2)
-        print "\n******Amit - failed to send mail, some exception sending email"
+        print ('successfully sent the mail')
+    except  (Exception, e2):
+        print ("error e2 - ", str(e2))
+        print ("\n******Amit - failed to send mail, some exception sending email")

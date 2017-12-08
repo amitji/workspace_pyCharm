@@ -11,7 +11,7 @@ import EmailUtil
 class NSE_High_Low_Last_Price_Update_Secondary:
 
     def __init__(self):
-        print "Calling NSE_High_Low_Last_Price_Update_Secondary constructor"
+        print ("Calling NSE_High_Low_Last_Price_Update_Secondary constructor")
         self.con = DBManager.connectDB()
         self.cur = self.con.cursor()
         self.nseHighLowModule = NSE_High_Low_Last_Price_Module.NSE_High_Low_Last_Price_Update()
@@ -20,28 +20,28 @@ class NSE_High_Low_Last_Price_Update_Secondary:
         #obj = NSE_High_Low_Last_Price_Update()
         start_time = time.time()
         stock_names =  self.nseHighLowModule.getStocksMarkedForUpdates(table_name)
-        print stock_names
-        print "Number of Stocks processing - ", len(stock_names)
+        print (stock_names)
+        print( "Number of Stocks processing - ", len(stock_names))
         totalCount = len(stock_names)
         count = 0
 
         for row in stock_names:
             # print row
             count = count + 1
-            print "\n\ncalling MSE_Hogh_Low for - ", row['fullid'], "(", count, "/", totalCount, ")"
+            print ("\n\ncalling MSE_Hogh_Low for - ", row['fullid'], "(", count, "/", totalCount, ")")
 
             self.nseHighLowModule.updateLiveData(row, table_name)
 
-        print "\n\n Quarterly Data Exception list - "
-        print  self.nseHighLowModule.qd_exception_list
-        print "\nFinancial Ratio Exception list - "
-        print  self.nseHighLowModule.fr_exception_list
+        print( "\n\n Quarterly Data Exception list - ")
+        print(  self.nseHighLowModule.qd_exception_list)
+        print( "\nFinancial Ratio Exception list - ")
+        print(  self.nseHighLowModule.fr_exception_list)
 
         print("\n\nTime Taken --- in minutes ---", int((time.time() - start_time)) / 60)
 
 
 # run for secondary stocks
-print "\n\n\n run for secondary stocks"
+print( "\n\n\n run for secondary stocks")
 thisObj = NSE_High_Low_Last_Price_Update_Secondary()
 thisObj.run('fa_financial_ratio_secondary')
 

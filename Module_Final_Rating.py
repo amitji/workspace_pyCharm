@@ -107,7 +107,7 @@ class Module_Final_Rating:
             industry_vertical = row["industry_vertical"]
             # fullid = 'NSE:INFY'
             # nseid = 'INFY'
-            print fullid
+            print (fullid)
 
 
             qData = self.getQuartetlyData(fullid, qd_table_name)
@@ -116,7 +116,7 @@ class Module_Final_Rating:
             if len(qData) == 0:
                 self.all_good_flag = False
                 self.qData_missing_stock_list.append(nseid)
-                print "*** Amit - qData is zero, check the table why qData missing. For - ",nseid
+                print( "*** Amit - qData is zero, check the table why qData missing. For - ",nseid)
                 return
 
             #records = []
@@ -139,9 +139,9 @@ class Module_Final_Rating:
 
 
 
-        except Exception, e2:
-            print str(e2)
-            print "\n******Amit - Exception in inserting final_rating_temp data for - " + fullid
+        except Exception as e2:
+            print( str(e2))
+            print( "\n******Amit - Exception in inserting final_rating_temp data for - " + fullid)
             self.sql_exception_list.append(nseid)
             self.all_good_flag = False
             pass
@@ -154,7 +154,7 @@ class Module_Final_Rating:
 
         records=[]
         # print qData
-        print frData
+        print( frData)
         icI = deI = roeI = 0
         for list_item in frData:
             ic = list_item['interest_cover']
@@ -265,7 +265,7 @@ class Module_Final_Rating:
 
         records=[]
         # print qData
-        print frData
+        print( frData)
         icI = deI = roeI = 0
         for list_item in frData:
             ic = list_item['interest_cover']
@@ -432,12 +432,12 @@ class Module_Final_Rating:
             for row in rows:
                 latest_quarter = row[0]
 
-            print "latest_quarter- ",latest_quarter
+            print( "latest_quarter- ",latest_quarter)
             #total = Decimal(revT+profitT+opmT+pmT+ebitT+roeT+icT+deT)
             total = Decimal(revT + profitT + pmT + (opmT +ebitT)*Decimal(C.opmANDebitW) + roeT*Decimal(C.roeW) + icT*Decimal(C.icW) + deT*Decimal(C.deW))
             percentage_rating = '{0:.2f}'.format((total/self.rating_total)*10)
 
-            print " Final Rating", percentage_rating
+            print( " Final Rating", percentage_rating)
             self.ratingDict[fullid+"["+latest_quarter+"]"] = percentage_rating
             data = (fullid, percentage_rating,latest_quarter, revT, profitT, opmT, pmT, ebitT, roeT, icT, deT,total, now, now )
             insert_sql = "insert into final_rating (fullid, percentage_rating, latest_quarter, revenue,profit,op_profit,ebit, profit_margin,roe, interest_cover,debt_equity_ratio, total, last_modified, created_on)" \
@@ -445,9 +445,9 @@ class Module_Final_Rating:
             self.cur.execute(insert_sql, data)
             self.con.commit()
 
-        except Exception, e2:
-            print str(e2)
-            print "\n******Amit - Exception in inserting final_rating data for - " + fullid
+        except Exception as e2:
+            print( str(e2))
+            print( "\n******Amit - Exception in inserting final_rating data for - " + fullid)
             self.sql_exception_list.append(nseid)
             self.all_good_flag = False
             pass
@@ -465,7 +465,7 @@ class Module_Final_Rating:
         if (self.all_good_flag):
             self.updateFinalRatingData(row,qd_table_name,fr_table_name)
         else:
-            print "*** Amit -  Since updateFinalRatingTempData FAILED , not calling updateFinalRatingData.Move to next one "
+            print( "*** Amit -  Since updateFinalRatingTempData FAILED , not calling updateFinalRatingData.Move to next one ")
 
 
     def calibrateAllRatings(self, stock_names = None):
@@ -482,7 +482,7 @@ class Module_Final_Rating:
 
             fullidList = fullidList[:-1]
             fullidList += " )"
-            print fullidList
+            print( fullidList)
             select_sql = "select fullid, percentage_rating from stocksdb.final_rating " + fullidList
             self.cur.execute(select_sql)
             rows = self.cur.fetchall()
@@ -491,7 +491,7 @@ class Module_Final_Rating:
             fullid = row[0]
 
             percentage_rating = Decimal(row[1])
-            print "Before Calibration Rating for ",fullid," - ", percentage_rating, ",  max rating - ", self.max_final_rating
+            print( "Before Calibration Rating for ",fullid," - ", percentage_rating, ",  max rating - ", self.max_final_rating)
             # if percentage_rating > self.max_final_rating:
             #     self.max_final_rating = percentage_rating
 
@@ -502,20 +502,20 @@ class Module_Final_Rating:
             updateSql = "update final_rating set percentage_rating = '%s', last_modified='%s' where fullid = '%s' " % (
                 percentage_rating,now, fullid)
             self.cur.execute(updateSql)
-            print "updated Calibrated Final Rating to - ", percentage_rating
+            print( "updated Calibrated Final Rating to - ", percentage_rating)
 
         self.con.commit()
 
     def updateAll(self,stock_names ):
         start_time = time.time()
-        print stock_names
-        print "Number of Stocks processing - " , len(stock_names)
+        print( stock_names)
+        print( "Number of Stocks processing - " , len(stock_names))
         totalCount = len(stock_names)
         count = 0
         for row in stock_names:
             # print row
             count = count + 1
-            print "\n\ncalling updateFinalRatingData for - ", row['nseid'], "(", count, "/", totalCount, ")"
+            print( "\n\ncalling updateFinalRatingData for - ", row['nseid'], "(", count, "/", totalCount, ")")
             enable_for_vendor_data = row['enable_for_vendor_data']
             if enable_for_vendor_data == '1':
                 qd_table_name = "fa_quaterly_data"
@@ -530,17 +530,17 @@ class Module_Final_Rating:
         #commented because each stock becomes depended on other stocks rating and if few stock rating changes then you have tp calculate all stocsk again
         #self.calibrateAllRatings(stock_names)
 
-        print "\n\n sql_exception_list  - "
-        print self.sql_exception_list
+        print( "\n\n sql_exception_list  - ")
+        print( self.sql_exception_list)
 
-        print "\n Updated Stock list for - ", len(self.updated_stock_list), " Stocks"
-        print self.updated_stock_list
+        print( "\n Updated Stock list for - ", len(self.updated_stock_list), " Stocks")
+        print( self.updated_stock_list)
 
-        print "\n qData_missing_stock_list list for - ", len(self.qData_missing_stock_list), " Stocks"
-        print self.qData_missing_stock_list
+        print( "\n qData_missing_stock_list list for - ", len(self.qData_missing_stock_list), " Stocks")
+        print( self.qData_missing_stock_list)
 
         self.ratingDict = sorted(self.ratingDict.items(), key=operator.itemgetter(1))
-        print "\n Final rating Dictionary - ", self.ratingDict
+        print( "\n Final rating Dictionary - ", self.ratingDict)
 
         print("\n\nTime Taken --- in minutes ---" , int((time.time() - start_time))/60 )
         EmailUtil.send_email_as_text("Final rating Dictionary - ",self.ratingDict,  "")

@@ -11,7 +11,7 @@ import NSELiveDataModule
 class NSE_High_Low_Last_Price_Update:
 
     def __init__(self):
-        print "Calling parent constructor"
+        print ("Calling parent constructor")
 
         self.con = DBManager.connectDB()
         self.cur = self.con.cursor()
@@ -56,9 +56,9 @@ class NSE_High_Low_Last_Price_Update:
             #companyName = q['companyName']
             last_price = nseDict['last_price']
             #print nseid, " high 52 -",  high52
-        except Exception, e3:
-            print str(e3)
-            print "\n******Amit - Exception in getting NSE data for - " + nseid
+        except Exception as e3:
+            print ("OS error: {0}".format(e3))
+            print ("\n******Amit - Exception in getting NSE data for - " + nseid)
             self.fr_exception_list.append(nseid)
             return
 
@@ -69,18 +69,18 @@ class NSE_High_Low_Last_Price_Update:
             #last_price_vs_high52 = (2 - (high52/last_price) ) * 100
             last_price_vs_high52 = (last_price/high52)*100
             last_price_vs_high52 = float("{0:.2f}".format(last_price_vs_high52))
-            print "last_price_vs_high52 - ",last_price_vs_high52
+            print ( "last_price_vs_high52 - ",last_price_vs_high52)
 
             now = datetime.date.today();
             update_now = 'n'
             update_sql = "update "+table_name+" set last_price='%s', 52_week_high = '%s' , 52_week_low = '%s', last_price_vs_high52='%s', update_now='%s', last_modified='%s'  where fullid = '%s'  " % (last_price,high52,low52,last_price_vs_high52, update_now, now, fullid);
 
             self.cur.execute(update_sql)
-            print "Update executed for table  "+table_name
+            print ( "Update executed for table  "+table_name)
 
-        except  Exception, e:
-            print str(e)
-            print "\n******Amit - some excetion executing upadte sql for  - " + nseid
+        except  (Exception, e):
+            print (str(e))
+            print ("\n******Amit - some excetion executing upadte sql for  - " + nseid)
             self.qd_exception_list.append(nseid)
             pass
 

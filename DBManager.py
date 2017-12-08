@@ -16,7 +16,7 @@ def connectDB():
     return db
 
 def disconnectDB():
-    print "Empty disconnect"
+    print ("Empty disconnect")
 # execute SQL select statement
 
 # commit your changes

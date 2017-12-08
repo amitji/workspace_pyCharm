@@ -1,4 +1,6 @@
-import urllib2
+
+#import urllib2
+from urllib.request import urlopen
 import json
 import DBManager
 import pandas
@@ -32,7 +34,7 @@ class GoogleFinanceAPI:
         return data
 
     def getFOStockList(self):
-        print "\n\n***************  Running it for only FO stocks\n\n"
+        print ("\n\n***************  Running it for only FO stocks\n\n")
         select_sql ="select fullid, nseid from stocksdb.amit_portfolio where display_seq is not null and is_fo = 'y' and is_inactive != 'y'  order by display_seq "
 
         self.cur.execute(select_sql)
@@ -106,9 +108,9 @@ class GoogleFinanceAPI:
 
                         content2['e'] = '{}'.format(fin_data['e']);
                         content2['t'] = '{}'.format(fin_data['t']);
-                except Exception, e1:
-                    print "\n******Amit exception in getAllQuotes for fullid - \n ", fullid
-                    print str(e1)
+                except (Exception, e1):
+                    print ("\n******Amit exception in getAllQuotes for fullid - \n ", fullid)
+                    print (str(e1))
                     pass
 
                 #print content2
@@ -116,9 +118,9 @@ class GoogleFinanceAPI:
 
             #print content
 
-        except Exception, e:
-            print "\n******Amit exception in getAllQuotes \n "
-            print str(e)
+        except Exception as e:
+            print ("\n******Amit exception in getAllQuotes \n ")
+            print (str(e))
             pass
 
 
@@ -127,7 +129,7 @@ class GoogleFinanceAPI:
 
     def saveIntoDB(self, allQuotes):
 
-        print "\n*** Amit saving following qoutes to database"
+        print ("\n*** Amit saving following qoutes to database")
         records = []
         fullid= ""
         for row in allQuotes:
@@ -136,12 +138,12 @@ class GoogleFinanceAPI:
                 fullid = row['e']+":"+row['t']
                 #print "fullid - ", fullid
                 record = (( row['l'], row['c'],row['cp'],row['pcls'], fullid))
-                print record
+                print (record)
                 records.append(record )
 
-            except Exception, e:
-                print "\n******Amit saveIntoDB, some issue with quotes, row data - ", row
-                print str(e.message)
+            except Exception as e:
+                print ("\n******Amit saveIntoDB, some issue with quotes, row data - ", row)
+                print (str(e))
                 pass
 
         # for record in records:
@@ -171,21 +173,21 @@ if __name__ == "__main__":
     records = [] ## LIST OF LISTS
     minutes_count = 0  # compare with 7 Hrs run daily from 9-4 pm (7*60=420)
     #EmailUtil.send_email_as_text(" amit_portfolio_update.py job started - ", "", "")
-    print "\n*** Amit Started getting quotes"
+    print ("\n*** Amit Started getting quotes")
 
     #while minutes_count < 420:
     #Run b/w morning 9 am to 4:00 pm IST
-    while (c.in_between(datetime.now().time(), time(7,40), time(16,00))):
+    while (c.in_between(datetime.now().time(), time(5,40), time(22,00))):
         allQuotes = c.getAllQuotes(stock_names)
 
         if allQuotes:
             c.saveIntoDB(allQuotes)
         else:
-            print "\n*** Amit All Quotes from Google were empy(due to exception i guess) so not saving in DB"
+            print ("\n*** Amit All Quotes from Google were empy(due to exception i guess) so not saving in DB")
         if minutes_count == 0:
             EmailUtil.send_email_as_text(" amit_portfolio_update.py job started - ", "", "")
         minutes_count = minutes_count+1
-        print "\n*** Amit Sleeping for 2 minute, remaining loops (420-x)- ", 420- minutes_count, " | Time - ", datetime.now()
+        print ("\n*** Amit Sleeping for 2 minute, remaining loops (420-x)- ", 420- minutes_count, " | Time - ", datetime.now())
         t.sleep(60)
 
-    print "\n*** Amit Exiting the google quote process...TIME is  - ", datetime.now().time()
+    print ("\n*** Amit Exiting the google quote process...TIME is  - ", datetime.now().time())

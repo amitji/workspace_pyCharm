@@ -5,7 +5,8 @@ import DBManager
 import datetime
 import requests
 import EmailUtil
-
+import urllib.request
+from io import TextIOWrapper
 
 
 
@@ -19,26 +20,33 @@ class NSE_Result_Calendar_Update_Process:
     def csv_reader(self):
         url = 'https://www.nseindia.com/corporates/datafiles/BM_All_ForthcomingResults.csv'
         r = requests.get(url)
-        text = r.iter_lines()
-        reader = csv.DictReader(text, delimiter=',')
+        decoded_content = r.content.decode('utf-8')
 
-        #reader = csv.DictReader(file_obj, delimiter=',')
+        cr = csv.reader(decoded_content.splitlines(), delimiter=',')
+        reader = list(cr)
+    
+#        text = r.iter_lines()
+#        reader = csv.DictReader(text, delimiter=',')
+
+#        ftpstream = urllib.request.urlopen(url)
+#        reader = csv.reader(ftpstream)  # with the appropriate encoding 
+#        data = [row for row in csvfile]
 
         nseidString= ''
         count = 0
         records = []
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        for line in reader:
-            #print line
-            #print(line["Symbol"]),
-            #print(line["BoardMeetingDate"])
-            nseidString+=  "'%s'," % line["Symbol"]
+        #skil line one with titles
+        for line in reader[1:]:
             count +=1
-            nseid = line["Symbol"]
-            name = line["Company"]
-            industry = line["Industry"]
-            purpose = line["Purpose"]
-            result_date = line["BoardMeetingDate"]
+            #['Symbol', 'Company', 'Industry', 'Purpose', 'BoardMeetingDate']    
+            nseidString+=  " , "+line[0]
+            
+            nseid = line[0]
+            name = line[1]
+            industry = line[2]
+            purpose = line[3]
+            result_date = line[4]
             result_date = datetime.datetime.strptime(result_date, '%d-%b-%Y').strftime('%Y-%m-%d %H:%M:%S')
 
 
@@ -51,8 +59,7 @@ class NSE_Result_Calendar_Update_Process:
         self.cur.executemany(insert_sql, records)
         self.con.commit()
 
-        print "Total records in CSV files Inserted/replaced into DB - ", count
-        #print nseidString
+        print( "Total records in CSV files Inserted/replaced into DB - ", count)
         EmailUtil.send_email_as_text("Process_NSE_Result_Calendar_Download_n_UpdateDB", nseidString, "")
 
 

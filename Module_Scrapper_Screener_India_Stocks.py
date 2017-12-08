@@ -92,7 +92,7 @@ class Module_Scrapper_Screener_India_Stocks:
             fullid = row["fullid"]
             #fullid = 'NSE:INFY'
             #nseid = 'INFY'
-            print fullid
+            print( fullid)
 
             #These indicators are now for 9 Quarter calculations
             self.revenueIndStr=""
@@ -134,10 +134,10 @@ class Module_Scrapper_Screener_India_Stocks:
                 temp_record = self.xpaths[number_of_quarters_to_process-1]
                 temp_date = self.browser.find_element_by_xpath(temp_record["date_xpath"]).text
                 if short_quarter_date == temp_date:
-                    print 'Consolidated latest quarter results available', short_quarter_date, temp_date
+                    print( 'Consolidated latest quarter results available', short_quarter_date, temp_date)
                     quarter_version = 2
                 else:
-                    print "Consolidated Results are NOT latest , try STANDALONE"
+                    print( "Consolidated Results are NOT latest , try STANDALONE")
                     self.browser.get(const.screenerBaseUrl + nseid)
                     time.sleep(5)
                     # determine what is latest quarter data available. Based on that you use different dates sets.
@@ -145,8 +145,8 @@ class Module_Scrapper_Screener_India_Stocks:
                     temp_date = self.browser.find_element_by_xpath(temp_record["date_xpath"]).text
 
 
-            except Exception, e3:
-                print "Exception in Consolidated , try STANDALONE"
+            except Exception as e3:
+                print( "Exception in Consolidated , try STANDALONE")
                 self.browser.get(const.screenerBaseUrl + nseid)
                 time.sleep(5)
                 # determine what is latest quarter data available. Based on that you use different dates sets.
@@ -154,25 +154,25 @@ class Module_Scrapper_Screener_India_Stocks:
                 temp_date = self.browser.find_element_by_xpath(temp_record["date_xpath"]).text
 
             if short_quarter_date == temp_date:
-                print 'latest quarter results available', short_quarter_date, temp_date
+                print( 'latest quarter results available', short_quarter_date, temp_date)
                 quarter_version = 2
             elif short_quarter_date_v1 == temp_date:
-                print 'one quarter previous results available', short_quarter_date_v1, temp_date
+                print( 'one quarter previous results available', short_quarter_date_v1, temp_date)
                 quarter_version = 1
             else:
-                print 'looks 2 quarter old data so try STANDALONE for this stock, last Q date was - ', temp_date
+                print( 'looks 2 quarter old data so try STANDALONE for this stock, last Q date was - ', temp_date)
                 self.browser.get(const.screenerBaseUrl + nseid )
                 time.sleep(5)
                 temp_record = self.xpaths[number_of_quarters_to_process-1]
                 temp_date = self.browser.find_element_by_xpath(temp_record["date_xpath"]).text
                 if short_quarter_date == temp_date:
-                    print 'latest quarter STANDALONE results available', short_quarter_date, temp_date
+                    print( 'latest quarter STANDALONE results available', short_quarter_date, temp_date)
                     quarter_version = 2
                 elif short_quarter_date_v1 == temp_date:
-                    print 'one quarter previous results available', short_quarter_date_v1, temp_date
+                    print( 'one quarter previous results available', short_quarter_date_v1, temp_date)
                     quarter_version = 1
                 else:
-                    print 'looks 2 quarter old data so skipping this stock',  temp_date
+                    print( 'looks 2 quarter old data so skipping this stock',  temp_date)
                     quarter_version = 0
                     self.scrapper_exception_list.append(nseid)
                     self.all_good_flag = False
@@ -204,19 +204,19 @@ class Module_Scrapper_Screener_India_Stocks:
                         quarter_date = const.quarter_dates_v1[count]
                         short_quarter_date = const.screener_quarter_dates_v1[count]
                     else:
-                        print "sholdn't reached here !!!!!!!!!!!!!!!! "
+                        print( "sholdn't reached here !!!!!!!!!!!!!!!! ")
 
                     if short_quarter_date == date:
-                        print 'date match'
+                        print( 'date match')
                         count = count + 1
                     else:
                         # no increament to count so that we can check if data is available for previous quarter (latest results not yet announced)
-                        print 'no match for date'
+                        print( 'no match for date')
                         count_no_match_for_dates = count_no_match_for_dates+1
                         if(count_no_match_for_dates > 1):  # if no match for 2 quaters, skip this stock.
                             self.all_good_flag = False
                             self.scrapper_exception_list.append(nseid)
-                            print "\n\n**** Amit Exception - Quarter dates(Dec 16) does not match for two consequtive quarters. Need to handle this manually."
+                            print( "\n\n**** Amit Exception - Quarter dates(Dec 16) does not match for two consequtive quarters. Need to handle this manually.")
                             return
 
                         #if latest quster results not there then try the previous one
@@ -288,7 +288,7 @@ class Module_Scrapper_Screener_India_Stocks:
                     # if index < (no_of_records - 1):
                     #     next_ = xpaths[index + 1]
                     #####
-                    print 'quater_seq - ',quater_seq,rev, profit, op, ebit, profitMargin, opMargin, ebitMargin, self.revenueIndStr, self.profitIndStr
+                    print( 'quater_seq - ',quater_seq,rev, profit, op, ebit, profitMargin, opMargin, ebitMargin, self.revenueIndStr, self.profitIndStr)
 
 
                     records.append((nseid,fullid, quater_seq,quarter_date, quarter_name, rev, profit,op,ebit, rev_growth,rev_growth_rate, profit_growth, profit_growth_rate, \
@@ -299,9 +299,9 @@ class Module_Scrapper_Screener_India_Stocks:
                     # self.cur.execute(insert_sql, data_quater)
                     #count = count-1
 
-                except Exception, e:
-                    print "\n******Amit 000 - Exception in inserting data in ", table_name, " for - " + fullid
-                    print str(e)
+                except Exception as e:
+                    print( "\n******Amit 000 - Exception in inserting data in ", table_name, " for - " + fullid)
+                    print( str(e))
 
                     #This is to print line # for exception
                     exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -337,13 +337,13 @@ class Module_Scrapper_Screener_India_Stocks:
                 self.revenueIndStr222 = self.revenueIndStr222[::-1]
                 self.revenueIndStr222 = int(self.revenueIndStr222,2)
 
-                print 'final profitIndStr - ', self.profitIndStr
-                print 'final revenueIndStr - ', self.revenueIndStr
-                print "\n******Inserted data in ", table_name, " for - " + fullid
+                print ('final profitIndStr - ', self.profitIndStr)
+                print( 'final revenueIndStr - ', self.revenueIndStr)
+                print( "\n******Inserted data in ", table_name, " for - " + fullid)
 
-        except Exception, e2:
-            print "\n******Amit 111 - Exception in Scrapping data for - " + fullid
-            print str(e2)
+        except Exception as e2:
+            print ("\n******Amit 111 - Exception in Scrapping data for - " + fullid)
+            print (str(e2))
             self.scrapper_exception_list.append(nseid)
             self.all_good_flag = False
             pass
@@ -353,12 +353,11 @@ class Module_Scrapper_Screener_India_Stocks:
         try:
             nseid = row["nseid"]
             fullid = row["fullid"]
-            print fullid
+            print( fullid)
 
             table_name = fr_table_name
 
             #html = self.browser.page_source
-            #print html
 
 
             last_price = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[1]/h4[2]/b').text
@@ -373,7 +372,6 @@ class Module_Scrapper_Screener_India_Stocks:
             else:
                 eps = None
 
-            #print last_price, eps
 
             pe = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[1]/h4[4]/b').text
             if '--' not in pe:
@@ -419,7 +417,7 @@ class Module_Scrapper_Screener_India_Stocks:
             else:
                 debt = float(debt[(debt.rfind(' ') + 1):].replace(",", ""))
 
-            print 'debt - ', debt
+            print( 'debt - ', debt)
 
             interest = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[4]').text
 
@@ -461,19 +459,19 @@ class Module_Scrapper_Screener_India_Stocks:
                 data_quater = (fullid, short_name, last_price, eps, pe, pb, roe, high52, low52, last_price_vs_high52, self.profitIndStr,self.revenueIndStr,self.profitIndStr222,self.revenueIndStr222, debt, interest, \
                                 interest_coverage, current_ratio, debt_equity_ratio, now, now)
                 self.cur.execute(insert_sql, data_quater)
-                print "eps-", eps, " | pe-", pe, " | pb-", pb, " | roe-", roe, " | low52-", low52
-                print "Insert executed for table  ", table_name
+                print( "eps-", eps, " | pe-", pe, " | pb-", pb, " | roe-", roe, " | low52-", low52)
+                print( "Insert executed for table  ", table_name)
 
-            except Exception, e:
-                print "\n******Amit 222 - some excetion executing fa_financial_ratio_us_stocks insert sql 111 for  - " + nseid
-                print "error e - ", str(e)
+            except Exception as e:
+                print( "\n******Amit 222 - some excetion executing fa_financial_ratio_us_stocks insert sql 111 for  - " + nseid)
+                print( "error e - ", str(e))
                 self.sql_exception_list.append(nseid)
                 self.all_good_flag = False
                 pass
 
-        except Exception, e2:
-            print "\n******Amit 333- Exception in Scrapping data for - " + fullid
-            print str(e2)
+        except Exception as e2:
+            print( "\n******Amit 333- Exception in Scrapping data for - " + fullid)
+            print( str(e2))
             self.scrapper_exception_list.append(nseid)
             self.all_good_flag = False
             pass
@@ -491,52 +489,52 @@ class Module_Scrapper_Screener_India_Stocks:
 
     def updateAll(self, stock_names):
         #print stock_names
-        print "Number of Stocks processing - ", len(stock_names)
+        print( "Number of Stocks processing - ", len(stock_names))
         start_time = time.time()
         totalCount = len(stock_names)
         count = 0
 
         for row in stock_names:
             count = count + 1
-            print "\n\n****************************************************************************"
-            print "calling updateQuaterlyData for - ", row['nseid'], "(", count, "/", totalCount, ")"
+            print( "\n\n****************************************************************************")
+            print( "calling updateQuaterlyData for - ", row['nseid'], "(", count, "/", totalCount, ")")
             enable_for_vendor_data = row['enable_for_vendor_data']
             if enable_for_vendor_data == '1' or enable_for_vendor_data == 'e' or enable_for_vendor_data == 'z' :
                 qd_table_name = "fa_quaterly_data"
                 fr_table_name = "fa_financial_ratio"
                 self.updateQuaterlyData(row, qd_table_name, fr_table_name)
                 if (self.all_good_flag):
-                    print "\n\ncalling updateFinancialRatios for - ", row['nseid'], "(", count, "/", totalCount, ")"
+                    print( "\n\ncalling updateFinancialRatios for - ", row['nseid'], "(", count, "/", totalCount, ")")
                     self.updateFinancialRatios(row, qd_table_name, fr_table_name)
                     # self.finalRatingModule.updateFinalRating(row, qd_table_name, fr_table_name)
                 else:
-                    print "*** Amit -  Since updateQuaterlyData FAILED , not calling updateFinancialRatios.Move to next one "
+                    print( "*** Amit -  Since updateQuaterlyData FAILED , not calling updateFinancialRatios.Move to next one ")
             elif enable_for_vendor_data == '2':
                 qd_table_name = "fa_quaterly_data_secondary"
                 fr_table_name = "fa_financial_ratio_secondary"
                 self.updateQuaterlyData(row, qd_table_name, fr_table_name)
                 if (self.all_good_flag):
-                    print "\n\ncalling updateFinancialRatios for - ", row['nseid'], "(", count, "/", totalCount, ")"
+                    print( "\n\ncalling updateFinancialRatios for - ", row['nseid'], "(", count, "/", totalCount, ")")
                     self.updateFinancialRatios(row, qd_table_name, fr_table_name)
                     # self.finalRatingModule.updateFinalRating(row, qd_table_name, fr_table_name)
                 else:
-                    print "*** Amit -  Since updateQuaterlyData FAILED , not calling updateFinancialRatios.Move to next one "
+                    print( "*** Amit -  Since updateQuaterlyData FAILED , not calling updateFinancialRatios.Move to next one ")
 
         self.browser.quit();
-        print "\n\n scrapper_exception_list  - "
-        print self.scrapper_exception_list
+        print( "\n\n scrapper_exception_list  - ")
+        print( self.scrapper_exception_list)
 
-        print "\n\n sql_exception_list  - "
-        print self.sql_exception_list
+        print( "\n\n sql_exception_list  - ")
+        print( self.sql_exception_list)
 
-        print "\n Updated Stock list for - ", len(self.updated_stock_list), " Stocks"
-        print self.updated_stock_list
+        print( "\n Updated Stock list for - ", len(self.updated_stock_list), " Stocks")
+        print( self.updated_stock_list)
 
         print("\n\nTime Taken --- in minutes ---", int((time.time() - start_time)) / 60)
 
-        print "\n\n ************************************************************************"
-        print "NOW RUN THE FINAL RATING PROCESS FOR THE SAME SET OF STOCKS"
-        print "************************************************************************"
+        print( "\n\n ************************************************************************")
+        print( "NOW RUN THE FINAL RATING PROCESS FOR THE SAME SET OF STOCKS")
+        print( "************************************************************************")
         # url = "http://localhost:8080/StockCircuitServer/spring/stockcircuit/calculateFADataPostPythonProcess"
         # print "Now run the URL ", url
         EmailUtil.send_email_as_text("Process_NSE_Based_ResultDates_Screener_ScrapNUpdate", self.scrapper_exception_list, "")

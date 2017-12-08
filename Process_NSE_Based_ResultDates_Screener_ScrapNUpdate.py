@@ -32,11 +32,11 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
             nseidString+=  "'%s'," % line["Symbol"]
             count +=1
             #call the Sc
-        print "Total records in CSV files to be processed- ", count
-        print nseidString
+        print ("Total records in CSV files to be processed- ", count)
+        print( nseidString)
         nseidString = nseidString[:-1]
         nseidString = '('+nseidString+')'
-        print nseidString
+        print( nseidString)
         return nseidString
 
 
@@ -87,21 +87,28 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
         ##  https://www.nseindia.com/corporates/datafiles/BM_Last_1_Month.csv
         ### https://www.nseindia.com/corporates/datafiles/BM_Last_1_WeekResults.csv
         r = requests.get(url)
-        text = r.iter_lines()
-        reader = csv.DictReader(text, delimiter=',')
+#        text = r.iter_lines()
+#        reader = csv.DictReader(text, delimiter=',')
+        decoded_content = r.content.decode('utf-8')
 
+        cr = csv.reader(decoded_content.splitlines(), delimiter=',')
+        reader = list(cr)
+        
         nseidString= ''
         count = 0
 
-        for line in reader:
+        for line in reader[1:]:
             #print line
             #print(line["Symbol"]),
             #print(line["BoardMeetingDate"])
-            nseidString+=  "'%s'," % line["Symbol"]
+#            nseidString+=  " , " % line[0]
+            nseidString+=   "'"+line[0]+"'"
+            nseidString+=","
+            
             count +=1
             #call the Sc
-        print "Total records in CSV files to be processed- ", count
-        print "Stocks names from BM_Last_15_Days.csv file to be processed - "
+        print( "Total records in CSV files to be processed- ", count)
+        print( "Stocks names from BM_Last_15_Days.csv file to be processed - ")
         #print nseidString
         nseidString = nseidString[:-1]
         nseidString = '('+nseidString+')'
@@ -113,18 +120,18 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
 
 thisObj = Process_NSE_Based_ResultDates_Screener_ScrapNUpdate()
 nseidString = thisObj.getCSVDataFromNSE()
-print nseidString
+print( nseidString)
 #csv_path = "BM_Last_15_DaysResults.csv"
 # csv_path = "BM_Last_1_WeekResults.csv"
 # with open(csv_path, "rb") as f_obj:
 #     nseidString = thisObj.csv_reader(f_obj)
 
 stock_names = thisObj.getStockDetails(nseidString)
-print "Stocks to be processed  ", stock_names.__len__(), " -  ", stock_names
+print( "Stocks to be processed  ", stock_names.__len__(), " -  ", stock_names)
 all_good_stock_names = thisObj.module_Scrapper_Screener_India_Stocks.updateAll(stock_names)
 if(len(all_good_stock_names) > 0):
     thisObj.finalRatingModule.updateAll(all_good_stock_names)
 else:
-    print " FinalRatingModule is not run since zero stocks in GOOD list"
+    print( " FinalRatingModule is not run since zero stocks in GOOD list")
 
 
