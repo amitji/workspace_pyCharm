@@ -176,6 +176,7 @@ def test_google():
         df.loc[next_date] = [np.nan for _ in range(len(df.columns)-1)] + [i]
     print (df.head())
     print (df.tail(10))
+    print df.columns
     df['Adj. Close'].plot()
     df['Forecast'].plot()
     plt.legend(loc=4)

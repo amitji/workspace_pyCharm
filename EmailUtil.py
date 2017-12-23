@@ -74,6 +74,6 @@ def send_email_as_text(process_name, updated_stock_list, url):
         server.sendmail(FROM, TO, message)
         server.close()
         print ('successfully sent the mail')
-    except  (Exception, e2):
+    except  Exception as e2:
         print ("error e2 - ", str(e2))
         print ("\n******Amit - failed to send mail, some exception sending email")

@@ -61,3 +61,6 @@ divyanshu/geckodriver.log
 *.h
 venv/
 venv1/
+*.log
+divyanshu/geckodriver.log
+*.log
