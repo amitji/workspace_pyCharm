@@ -12,26 +12,26 @@ from sklearn import linear_model
 #print(check_output(["ls", "../input"]).decode("utf8"))
 
 df = pd.read_csv("D:\\workspace_pyCharm\\Machine Learning\\datasets\\Titanic\\train.csv")
-print df.head()
+print (df.head())
 #df.drop(label)
-print (df['survived'].mean())
+print (df['Survived'].mean())
 
 X = np.array(df.drop(['Survived'],1))
 Y = np.array(df['Survived'])
-print X
-print Y
+print (X)
+print (Y)
 clf = linear_model.LogisticRegression(C=1.0)
 clf.fit(X,Y)
 
 df = pd.read_csv("D:\\workspace_pyCharm\\Machine Learning\\datasets\\Titanic\\test.csv")
-print df
+print (df)
 X_test = np.array(df)
 Y_test = np.array()
-print X_test
-print Y_test
+print (X_test)
+print (Y_test)
 
 accuracy = clf.score(X_test, Y_test)
-print accuracy
+print (accuracy)
 
 
 # Any results you write to the current directory are saved as output.

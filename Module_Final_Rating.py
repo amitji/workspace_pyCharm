@@ -3,7 +3,7 @@ from decimal import Decimal
 import DBManager
 import time
 import EmailUtil
-import itertools
+#import itertools
 import datetime
 import QuandlDataModule
 import Constants as C
@@ -81,7 +81,7 @@ class Module_Final_Rating:
 
         desc = self.cur.description
         column_names = [col[0] for col in desc]
-        data = [dict(itertools.izip(column_names, row))
+        data = [dict(zip(column_names, row))
                 for row in self.cur.fetchall()]
         return data
 
@@ -94,7 +94,7 @@ class Module_Final_Rating:
         #rows = self.cur.fetchall()
         desc = self.cur.description
         column_names = [col[0] for col in desc]
-        data = [dict(itertools.izip(column_names, row))
+        data = [dict(zip(column_names, row))
                 for row in self.cur.fetchall()]
         return data
 
@@ -385,7 +385,7 @@ class Module_Final_Rating:
 
             desc = self.cur.description
             column_names = [col[0] for col in desc]
-            frData = [dict(itertools.izip(column_names, row))
+            frData = [dict(zip(column_names, row))
                     for row in self.cur.fetchall()]
 
             now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')

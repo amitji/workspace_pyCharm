@@ -53,9 +53,10 @@ class Process_Scrapper_Screener_India_Stock:
 
 thisObj = Process_Scrapper_Screener_India_Stock()
 stock_names= thisObj.getStockList()
+print ("stock_names - \n", stock_names)
 all_good_stock_names = thisObj.module_Scrapper_Screener_India_Stocks.updateAll(stock_names)
 if(len(all_good_stock_names) > 0):
     thisObj.finalRatingModule.updateAll(all_good_stock_names)
 else:
-    print " FinalRatingModule is not run since zero stocks in GOOD list"
+    print (" FinalRatingModule is not run since zero stocks in GOOD list")
 
