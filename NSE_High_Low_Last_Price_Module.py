@@ -14,6 +14,7 @@ class NSE_High_Low_Last_Price_Update:
         print ("Calling parent constructor")
 
         self.con = DBManager.connectDB()
+        self.engine = DBManager.createEngine()
         self.cur = self.con.cursor()
         self.qd_exception_list = []
         self.fr_exception_list = []
@@ -50,7 +51,14 @@ class NSE_High_Low_Last_Price_Update:
             #nse = Nse()
             #q = nse.get_quote(str(nseid))
 
-            nseDict = NSELiveDataModule.getNSELiveData(nseidModified)
+            mydata = NSELiveDataModule.getNSELiveData(nseidModified)
+            nseDict = NSELiveDataModule.getHighLowClose(mydata)
+            
+            #Amit- save data as needed
+            self.saveAllInDB(mydata,nseidModified)
+#            self.saveLastRecordInDB(mydata,nseidModified)
+            
+    
             high52 = nseDict['high52']
             low52 = nseDict['low52']
             #companyName = q['companyName']
@@ -86,6 +94,26 @@ class NSE_High_Low_Last_Price_Update:
 
 
 
+    def saveAllInDB(self,df,nseid):
+    
+        df.columns = ['open', 'high', 'low','last', 'close', 'volume', 'turnover']
+        df['nseid'] = nseid
+        df['my_date'] = df.index
+        #Amit - save all 250 records in database...but first delete else it will duplicate
+        delete_sql = "delete from stock_market_data where nseid='%s' " % (nseid);    
+        self.cur.execute(delete_sql)
+        self.con.commit()       
+        df.to_sql('stock_market_data', self.engine, if_exists='append', index=False)    
+        
+    def saveLastRecordInDB(self,df,nseid):
+        
+        df.columns = ['open', 'high', 'low','last', 'close', 'volume', 'turnover']
+        df['nseid'] = nseid
+        df['my_date'] = df.index
+        #Amit - save only last record in database...
+#        df_latest = df.iloc[0]   
+        df_latest = df[:1]   
+        df_latest.to_sql('stock_market_data', self.engine, if_exists='append', index=False) 
 
     def __del__(self):
         self.cur.close()

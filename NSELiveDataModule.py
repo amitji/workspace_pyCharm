@@ -2,6 +2,7 @@
 import quandl
 import pandas
 import operator
+import DBManager
 
 def __init__(self):
     print ("Calling GetNSELiveData constructor")
@@ -12,8 +13,12 @@ def getNSELiveData( nseid):
     Authkey = '5_pRK9pKefuvZzHe-MkSy'
 
     nse_dataset = "NSE" + "/" + nseid
-    mydata = quandl.get(nse_dataset, authtoken=Authkey, rows=250, sort_order="desc")
+    mydata = quandl.get(nse_dataset, authtoken=Authkey, rows=252, sort_order="desc")
+    return mydata
 
+
+
+def getHighLowClose(mydata):
     # print mydata
     df = pandas.DataFrame(mydata)
     dd = df.to_dict(orient='dict')
@@ -23,12 +28,12 @@ def getNSELiveData( nseid):
     # print dd
     # print ddd
     # print max(ddd, key=ddd.get)
-    maxKey = max(ddd.iteritems(), key=operator.itemgetter(1))[0]
+    maxKey = max(ddd.items(), key=operator.itemgetter(1))[0]
     maxVal = ddd.get(maxKey)
     print ("High52 - ", maxVal)
 
     # print min(ddd, key=ddd.get)
-    minKey = min(ddd.iteritems(), key=operator.itemgetter(1))[0]
+    minKey = min(ddd.items(), key=operator.itemgetter(1))[0]
     minVal = ddd.get(minKey)
     print( "Low52 - ", minVal)
 
@@ -41,3 +46,8 @@ def getNSELiveData( nseid):
     nsedata["low52"] = minVal
     nsedata["last_price"] = last_price
     return nsedata
+    
+    
+    
+
+    

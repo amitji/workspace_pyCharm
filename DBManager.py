@@ -6,6 +6,10 @@ Created on Nov 30, 2015
 #!/usr/bin/python
 import mysql.connector
 from nsetools import Nse
+from sqlalchemy import create_engine
+
+def createEngine():
+    return create_engine('mysql+mysqlconnector://shop_dba:shop2015@103.35.123.14:3306/stocksdb', echo=False)
     
 def connectDB():
     # connect
@@ -29,3 +33,5 @@ def disconnectDB():
 #for x in range(0,numrows):
  #   row = cursor.fetchone()
   #  print row[0], "-->", row[1]
+
+    
