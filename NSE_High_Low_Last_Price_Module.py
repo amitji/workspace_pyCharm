@@ -55,8 +55,8 @@ class NSE_High_Low_Last_Price_Update:
             nseDict = NSELiveDataModule.getHighLowClose(mydata)
             
             #Amit- save data as needed
-            self.saveAllInDB(mydata,nseidModified)
-#            self.saveLastRecordInDB(mydata,nseidModified)
+#            self.saveAllInDB(mydata,nseidModified)
+            self.saveLastRecordInDB(mydata,nseidModified)
             
     
             high52 = nseDict['high52']
@@ -104,6 +104,7 @@ class NSE_High_Low_Last_Price_Update:
         self.cur.execute(delete_sql)
         self.con.commit()       
         df.to_sql('stock_market_data', self.engine, if_exists='append', index=False)    
+        print("saveAllInDB done for ", nseid)
         
     def saveLastRecordInDB(self,df,nseid):
         
@@ -114,6 +115,7 @@ class NSE_High_Low_Last_Price_Update:
 #        df_latest = df.iloc[0]   
         df_latest = df[:1]   
         df_latest.to_sql('stock_market_data', self.engine, if_exists='append', index=False) 
+        print("saveLastRecordInDB done for ", nseid)
 
     def __del__(self):
         self.cur.close()

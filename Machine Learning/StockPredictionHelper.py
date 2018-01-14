@@ -98,8 +98,8 @@ class StockPredictionHelper:
 #        df['3dma'] = df['close'].rolling(window=3).mean()
 #        df['4dma'] = df['close'].rolling(window=4).mean()
         df['5dma'] = df['close'].rolling(window=5).mean()
-        df['10dma'] = df['close'].rolling(window=20).mean()
-        df['15dma'] = df['close'].rolling(window=50).mean()
+        df['10dma'] = df['close'].rolling(window=10).mean()
+        df['15dma'] = df['close'].rolling(window=15).mean()
         df['20dma'] = df['close'].rolling(window=20).mean()
         df['50dma'] = df['close'].rolling(window=50).mean()
         #following two seems to be important as MSE drop using them

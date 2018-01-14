@@ -86,6 +86,19 @@ class GoogleFinanceAPI:
 
 
                         lp = fin_data['l'];
+                        volume = fin_data['vo'];
+
+                        if 'M' in volume:
+                            volume = volume.replace("M", "")
+                            volume = float((volume).replace(",", ""))
+                            volume = volume * 1000000  ## convert million into number
+                        elif 'B' in volume:    
+                            volume = volume.replace("B", "")
+                            volume = float((volume).replace(",", ""))
+                            volume = volume * 1000000000  ## convert million into number
+                            
+                        else:
+                            volume = float((volume).replace(",", ""))
 
                         # content2.append(row['fullid']);
                         # content2.append('{}'.format(fin_data['l']));
@@ -108,6 +121,7 @@ class GoogleFinanceAPI:
 
                         content2['e'] = '{}'.format(fin_data['e']);
                         content2['t'] = '{}'.format(fin_data['t']);
+                        content2['volume'] = '{}'.format(volume);
                 except (Exception, e1):
                     print ("\n******Amit exception in getAllQuotes for fullid - \n ", fullid)
                     print (str(e1))
@@ -137,7 +151,7 @@ class GoogleFinanceAPI:
             try:
                 fullid = row['e']+":"+row['t']
                 #print "fullid - ", fullid
-                record = (( row['l'], row['c'],row['cp'],row['pcls'], fullid))
+                record = (( row['l'], row['c'],row['cp'],row['pcls'],row['volume'], fullid))
                 print (record)
                 records.append(record )
 
@@ -153,7 +167,7 @@ class GoogleFinanceAPI:
         #     self.cur.execute(sql, tuple(record))
 
         #use batch execute rahter above  1by 1
-        sql = "update amit_portfolio set last_trade_price=%s,  price_change=%s, change_perct=%s, previous_close=%s where fullid=%s"
+        sql = "update amit_portfolio set last_trade_price=%s,  price_change=%s, change_perct=%s, previous_close=%s, volume=%s where fullid=%s"
         self.cur.executemany(sql, records)
         self.con.commit()
 
@@ -177,7 +191,7 @@ if __name__ == "__main__":
 
     #while minutes_count < 420:
     #Run b/w morning 9 am to 4:00 pm IST
-    while (c.in_between(datetime.now().time(), time(5,40), time(22,00))):
+    while (c.in_between(datetime.now().time(), time(5,00), time(16,00))):
         allQuotes = c.getAllQuotes(stock_names)
 
         if allQuotes:
@@ -190,4 +204,5 @@ if __name__ == "__main__":
         print ("\n*** Amit Sleeping for 2 minute, remaining loops (420-x)- ", 420- minutes_count, " | Time - ", datetime.now())
         t.sleep(60)
 
+    
     print ("\n*** Amit Exiting the google quote process...TIME is  - ", datetime.now().time())
