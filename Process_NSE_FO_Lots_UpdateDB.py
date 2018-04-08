@@ -28,9 +28,6 @@ class Process_NSE_FO_Lots_UpdateDB:
         records = []
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         for line in reader:
-            #print line
-            #print(line["Symbol"]),
-            #print(line["BoardMeetingDate"])
             nseidString+=  "'%s'," % line["Symbol"]
             count +=1
             nseid = line["Symbol"]
@@ -50,14 +47,14 @@ class Process_NSE_FO_Lots_UpdateDB:
         self.cur.executemany(insert_sql, records)
         self.con.commit()
 
-        print "Total records in CSV files Inserted/replaced into DB - ", count
+        print ("Total records in CSV files Inserted/replaced into DB - ", count)
         #print nseidString
 
 
 
 
 # ----------------------------------------------------------------------
-thisObj = NSE_Result_Calendar_Update_Process()
+thisObj = Process_NSE_FO_Lots_UpdateDB()
 thisObj.csv_reader()
 
 

@@ -32,71 +32,32 @@ class GetFOPrices:
         
     def getPrice(self):
         base_url = 'https://www.nseindia.com/live_market/dynaContent/live_watch/fomwatchsymbol.jsp?Fut_Opt=Futures&key='
+#        stocks = ['FEDERALBNK','GMRINFRA','JINDALSTEL','AUROPHARMA','ASHOKLEY','SUZLON']
+#        stocks = {'FEDERALBNK':5500,'GMRINFRA':45000,'JINDALSTEL':4500,'NCC':8000,'CADILAHC': 1600, \
+#                      'SREINF':5000, 'DCBBANK':4500, 'AUROPHARMA':900, 'ASHOKLEY':7000,'SUZLON':30000}
+        stocks = {'FEDERALBNK':5500,'GMRINFRA':45000,'JINDALSTEL':4500,'NCC':8000,'CADILAHC': 1600, \
+                      'SREINFRA':5000, 'DCBBANK':4500, 'NIFTY':75}
 
-        self.browser.get(base_url + 'GMRINFRA')
-        last_price = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[2]/td[10]').text)
-        last_price2 = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[3]/td[10]').text)
-        diff = "{0:.2f}".format(last_price2-last_price)
-        value =  int(45000) * float(diff)
-        print ('GMRINFRA - ',last_price, last_price2 ,'<>',diff, '<>', value)
-#        
-        self.browser.get(base_url + 'JINDALSTEL')
-        last_price = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[2]/td[10]').text)
-        last_price2 = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[3]/td[10]').text)
-        diff = "{0:.2f}".format(last_price2-last_price) 
-        value =  int(4500) * float(diff)
-        print ('JINDALSTEL  - ',last_price, last_price2, '<>',diff, '<>', value)
-
-#        self.browser.get(base_url + 'GLENMARK')
-#        last_price = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[2]/td[10]').text)
-#        last_price2 = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[3]/td[10]').text)
-#        diff = "{0:.2f}".format(last_price2-last_price) 
-#        value =  int(700) * float(diff)
-#        print ('GLENMARK  - ',last_price, last_price2, '<>',diff, '<>', value)
-#
-        self.browser.get(base_url + 'AUROPHARMA')
-        last_price = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[2]/td[10]').text)
-        last_price2 = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[3]/td[10]').text)
-        diff = "{0:.2f}".format(last_price2-last_price) 
-        value =  int(800) * float(diff)
-        print ('AUROPHARMA  - ',last_price, last_price2, '<>',diff, '<>', value)
-#
-#        self.browser.get(base_url + 'FEDERALBNK')
-#        last_price = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[2]/td[10]').text)
-#        last_price2 = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[3]/td[10]').text)
-#        diff = "{0:.2f}".format(last_price2-last_price) 
-#        value =  int(5500) * float(diff)
-#        print ('FEDERALBNK  - ',last_price, last_price2, '<>',diff, '<>', value)
-
-        self.browser.get(base_url + 'ASHOKLEY')
-        last_price = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[2]/td[10]').text)
-        last_price2 = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[3]/td[10]').text)
-        diff = "{0:.2f}".format(last_price2-last_price) 
-        value =  int(7000) * float(diff)
-        print ('ASHOKLEY  - ',last_price, last_price2, '<>',diff, '<>', value)
         
-#        self.browser.get(base_url + 'CADILAHC')
-#        last_price = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[2]/td[10]').text)
-#        last_price2 = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[3]/td[10]').text)
-#        diff = "{0:.2f}".format(last_price2-last_price) 
-#        value =  int(1600) * float(diff)
-#        print ('CADILAHC  - ',last_price, last_price2, '<>',diff, '<>', value)
-#        
-        self.browser.get(base_url + 'YESBANK')
-        last_price = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[2]/td[10]').text)
-        last_price2 = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[3]/td[10]').text)
-        diff = "{0:.2f}".format(last_price2-last_price) 
-        value =  int(1750) * float(diff)
-        print ('YESBANK  - ',last_price, last_price2, '<>',diff, '<>', value)
-  
-
-        self.browser.get(base_url + 'SUZLON')
-        last_price = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[2]/td[10]').text)
-        last_price2 = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[3]/td[10]').text)
-        diff = "{0:.2f}".format(last_price2-last_price) 
-        value =  int(30000) * float(diff)
-        print ('SUZLON  - ',last_price, last_price2, '<>',diff, '<>', value)
+        for stk in stocks:
+            try:
+#                print (stk, ' lot size - ', stocks[stk])
+                lot =  stocks[stk]
+                self.browser.get(base_url + stk)
+                last_price = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[2]/td[10]').text)
+                last_price2 = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[3]/td[10]').text)
+                diff = "{0:.2f}".format(last_price2-last_price)
+                value =  int(lot) * float(diff)
+                print ("\n",stk+' - ',last_price, last_price2 ,'<>',diff, '<>', value)
+#                print(base_url + stk)
+            except Exception as e:
+                print ("\n******Amit exception in getFOPrice for  - \n ", stk)
+                print (str(e))
+                pass
+                
         
+        
+   
         
 
     def in_between(self,now, start, end):
@@ -112,7 +73,7 @@ if __name__ == "__main__":
     
 #    obj.getPrice()
     
-    while (obj.in_between(datetime.now().time(), time(9,00), time(16,00))):
+    while (obj.in_between(datetime.now().time(), time(7,00), time(16,00))):
 
         obj.getPrice()
         minutes_count = minutes_count+1

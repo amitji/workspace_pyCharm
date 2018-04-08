@@ -1,4 +1,4 @@
-
+    
 from selenium import webdriver
 import time
 from custom_logging import logger
@@ -11,7 +11,7 @@ import datetime
 import DBManager
 import Constants
 
-print __name__
+print (__name__)
 
 class Module_Screener_Excel_Data:
 
@@ -19,7 +19,8 @@ class Module_Screener_Excel_Data:
 
         self.con = DBManager.connectDB()
         self.cur = self.con.cursor()
-        self.date_map= {'03/31/13 00:00:00' : '2013-03-31', '03/31/14 00:00:00':'2014-03-31', '03/31/15 00:00:00':'2015-03-31', '03/31/16 00:00:00':'2016-03-31', '03/31/17 00:00:00':'2017-03-31'}
+        self.date_map= {'03/31/13 00:00:00' : '2013-03-31', '03/31/14 00:00:00':'2014-03-31', '03/31/15 00:00:00':'2015-03-31', '03/31/16 00:00:00':'2016-03-31', '03/31/17 00:00:00':'2017-03-31','06/30/17 00:00:00':'2017-06-30', '09/30/17 00:00:00':'2017-09-30', '12/31/17 00:00:00':'2017-12-31'}
+#        self.date_map= {'2014-03-31 00:00:00+00:00':}
         """"Setting browser preferences to handle download pop-up"""
         self.profile = webdriver.FirefoxProfile()
 
@@ -80,7 +81,15 @@ class Module_Screener_Excel_Data:
         self.driver.quit()
         logger.info('Webdriver handler closed')
 
-
+    def testUrl(self, url):
+        self.driver = webdriver.Firefox(executable_path=env.BROWSER_PATH, firefox_profile=self.profile)
+            #self.driver.set_window_size(0, 0)
+            #self.driver.set_window_position(1920,1080)
+        self.driver.set_window_position(-2000, 0)
+            
+        data = self.driver.get(url)
+        print(data)
+        
     def export_to_excel(self,nseid, type):
 
         logger.info("******************************************************")
@@ -91,7 +100,7 @@ class Module_Screener_Excel_Data:
             else:
                 url = env.URL+nseid;
 
-            print "company url - ",url
+            print ("company url - ",url)
             self.driver.get(url)
 
             # company = self.driver.find_element_by_tag_name('input')
@@ -128,7 +137,7 @@ class Module_Screener_Excel_Data:
             if  not file.startswith("~"):
                 try:
                     filename = os.path.join(dir_name, file)
-                    print filename
+                    print (filename)
                     #read from data sheet
                     sheet='Data Sheet'
                     wb = self.xl.Workbooks.Open(Filename=filename, ReadOnly=1, Editable=True)
@@ -149,15 +158,17 @@ class Module_Screener_Excel_Data:
                         #print (ws.Range(k + ':' + val).Value)
                         one_record = [nseid,fullid ]
                         temp_record = ws.Range(k + ':' + val).Value
-                        print 'date - ', temp_record[0][0]
+                        print ('date - ', temp_record[0][0])
                         if temp_record[0][0] == 'Trailing':
                             #now_datetime = '2017-03-31 00:00:00'
                             now_datetime = Constants.latest_period
                         else:
                             #Amit TODO: excel sheet has differet dates as headers so below code partially works..
-                            now_datetime = self.date_map.get(str(temp_record[0][0]))
+                            print("Amit date to be added - ", str(temp_record[0][0]))
+#                            now_datetime = self.date_map.get(str(temp_record[0][0]))
+                            now_datetime = str(temp_record[0][0])
 
-                        print 'now_datetime - ', now_datetime
+                        print ('now_datetime - ', now_datetime)
 
                         one_record.append(seq_no)
                         one_record.append(now_datetime)
@@ -171,7 +182,7 @@ class Module_Screener_Excel_Data:
                         one_record.append(type)
                         one_record.append(now)
                         one_record.append(now)
-                        print one_record
+                        print (one_record)
                         records.append(one_record)
 
                 except Exception as e:

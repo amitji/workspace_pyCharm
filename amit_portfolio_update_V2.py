@@ -1,6 +1,7 @@
 
 #import urllib2
-from urllib.request import urlopen
+from urllib.request import urlopen,Request
+import urllib.request
 import json
 import DBManager
 import pandas
@@ -13,7 +14,7 @@ class GoogleFinanceAPI:
     def __init__(self):
         self.con = DBManager.connectDB()
         self.cur = self.con.cursor()
-
+        #https://finance.google.com/finance?q=NSE:NCC
         self.url_prefix = "https://finance.google.com/finance?q="
         self.url_suffix = "&output=json"
 
@@ -71,12 +72,19 @@ class GoogleFinanceAPI:
                     if '&' in fullid:
                         fullid = fullid.replace('&','%26')
                     url = self.url_prefix+ "%s" % ( fullid)+self.url_suffix
-                    #print "\nurl - ", url
-                    rsp = requests.get(url)
+                    
+#                    url = 'https://finance.google.com/finance?q=NASDAQ:AAPL&output=json'
+#                    url = 'https://finance.google.com/finance?q=NSE%3AINFY&output=json'
+#                    url= 'https://finance.google.com/finance/getprices?q=JINDALSTEL&x=NSE'
+                    
+                    rsp = requests.get(url,headers={'User-Agent': 'Mozilla/5.0'})
                     content2 = {}
                     if rsp.status_code in (200,):
                         temp = rsp.content
-                        #print temp
+                    
+#                        for line in temp.splitlines():
+#                            print(line)
+#                            
                         fin_data = json.loads(rsp.content[6:-2].decode('unicode_escape'))
                         #print fin_data
 
@@ -99,7 +107,8 @@ class GoogleFinanceAPI:
                             
                         else:
                             volume = float((volume).replace(",", ""))
-
+                         
+                        volume = round(volume)
                         # content2.append(row['fullid']);
                         # content2.append('{}'.format(fin_data['l']));
                         # content2.append('{}'.format(fin_data['c']));
@@ -122,7 +131,7 @@ class GoogleFinanceAPI:
                         content2['e'] = '{}'.format(fin_data['e']);
                         content2['t'] = '{}'.format(fin_data['t']);
                         content2['volume'] = '{}'.format(volume);
-                except (Exception, e1):
+                except Exception as e1:
                     print ("\n******Amit exception in getAllQuotes for fullid - \n ", fullid)
                     print (str(e1))
                     pass
@@ -180,9 +189,9 @@ class GoogleFinanceAPI:
 if __name__ == "__main__":
     c = GoogleFinanceAPI()
 
-    stock_names = c.getStockList()
+    #stock_names = c.getStockList()
     #Get only FO when Google is slow...
-    #stock_names = c.getFOStockList()
+    stock_names = c.getFOStockList()
 
     records = [] ## LIST OF LISTS
     minutes_count = 0  # compare with 7 Hrs run daily from 9-4 pm (7*60=420)
@@ -191,7 +200,7 @@ if __name__ == "__main__":
 
     #while minutes_count < 420:
     #Run b/w morning 9 am to 4:00 pm IST
-    while (c.in_between(datetime.now().time(), time(5,00), time(16,00))):
+    while (c.in_between(datetime.now().time(), time(5,00), time(22,00))):
         allQuotes = c.getAllQuotes(stock_names)
 
         if allQuotes:

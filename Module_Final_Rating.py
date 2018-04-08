@@ -543,7 +543,8 @@ class Module_Final_Rating:
         print( "\n Final rating Dictionary - ", self.ratingDict)
 
         print("\n\nTime Taken --- in minutes ---" , int((time.time() - start_time))/60 )
-        EmailUtil.send_email_as_text("Final rating Dictionary - ",self.ratingDict,  "")
+        url = "http://localhost/stockcircuitserver/php/report_two_quarters_compare.php"
+        EmailUtil.send_email_as_text("Final rating Dictionary - ",self.ratingDict, url)
 
 
 

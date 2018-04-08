@@ -81,10 +81,10 @@ class Module_Choose_Consolidated_Or_Standalone:
                 #determine what is latest quarter data available. Based on that you use different dates sets.
                 temp_record = self.xpaths[number_of_quarters_to_process-1]
                 temp_date = self.browser.find_element_by_xpath(temp_record["date_xpath"]).text
-                print temp_date
+                print (temp_date)
                 return 'C'
-            except Exception, e3:
+            except Exception as e3:
                 #This means consolidate data is not there
-                print "Exception in Consolidated so work with STANDALONE data"
+                print ("Exception in Consolidated so work with STANDALONE data")
                 return 'S'
 
