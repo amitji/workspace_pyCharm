@@ -38,5 +38,49 @@ def test_run():
     print a
 
 
+    #https://machinelearningmastery.com/index-slice-reshape-numpy-arrays-machine-learning-python/
+
+    # simple slicing
+    from numpy import array
+    # define array
+    data = array([11, 22, 33, 44, 55])
+    print(data[0:-1])
+
+    data = array([[11, 22, 33],
+    		[44, 55, 66],
+    		[77, 88, 99]])
+    # separate data
+    X, y = data[:, :-1], data[:, -1]
+    print(X)
+    print(y)
+
+    #Data Shape
+    data = array([11, 22, 33, 44, 55])
+    print(data.shape)
+
+    data = data.reshape((data.shape[0], 1))
+    print(data.shape)
+    print (data)
+
+    data = array([[11, 22, 33],
+    		[44, 55, 66],
+    		[77, 88, 99]])
+    print(data.shape)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 if __name__ == "__main__":
     test_run()

@@ -64,3 +64,14 @@ venv1/
 *.log
 divyanshu/geckodriver.log
 *.log
+*.zip
+*.log
+divyanshu/scrappy.log
+custom_logging.py
+divyanshu/geckodriver.log
+divyanshu/scrappy.log
+Machine Learning/Aashish/ann - Copy.py
+Machine Learning/Aashish/ann.py
+Machine Learning/Aashish/classificatio_new.py
+Machine Learning/Aashish/with_pcr.py
+Machine Learning/datasets/NYSE/GOOG.xlsx

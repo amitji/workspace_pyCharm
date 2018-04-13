@@ -43,7 +43,28 @@ class StockPredictionHelper:
 
         df = df.drop(['open','low','high','last', 'turnover','volume'],1)
         return df
-    
+ 
+    def getAnyDataFromQuandl(self, connection_string, ticker, start_date):
+            
+        Authkey = '5_pRK9pKefuvZzHe-MkSy'
+
+#        mydata = quandl.get(nse_dataset, authtoken=Authkey, rows=1000, sort_order="asc")
+        mydata = quandl.get(connection_string, authtoken=Authkey, start_date=start_date, sort_order="asc")
+        
+        
+        # print mydata
+        df = pd.DataFrame(mydata)
+#            print (ticker, " first record - \n", df[:1])
+        filename = 'datasets\\'+ticker+'.csv'
+        
+        df.to_csv(filename)
+#        df.columns = ['open', 'high','low','close','volume','turnover']
+        df.columns = ['open', 'high','low','last','close','volume','turnover']
+        print ('Got data from Quandl - ', ticker)
+
+        df = df.drop(['open','low','high','last', 'turnover','volume'],1)
+        return df
+   
     
     def getNiftyData(self,ticker, real_time_flag):
         
