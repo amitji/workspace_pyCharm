@@ -1,151 +1,52 @@
-1493342233930	geckodriver	INFO	Listening on 127.0.0.1:49465
-1493342235886	geckodriver::marionette	INFO	Starting browser \\?\C:\Program Files (x86)\Mozilla Firefox\firefox.exe with args ["-marionette"]
-1493342236142	addons.manager	ERROR	startup failed: [Exception... "Component returned failure code: 0x80070057 (NS_ERROR_ILLEGAL_VALUE) [nsIFile.create]"  nsresult: "0x80070057 (NS_ERROR_ILLEGAL_VALUE)"  location: "JS frame :: resource://gre/modules/FileUtils.jsm :: FileUtils_getDir :: line 70"  data: no] Stack trace: FileUtils_getDir()@resource://gre/modules/FileUtils.jsm:70 < FileUtils_getFile()@resource://gre/modules/FileUtils.jsm:42 < validateBlocklist()@resource://gre/modules/AddonManager.jsm:671 < startup()@resource://gre/modules/AddonManager.jsm:834 < startup()@resource://gre/modules/AddonManager.jsm:3129 < observe()@resource://gre/components/addonManager.js:65
+1503917479254	geckodriver	INFO	Listening on 127.0.0.1:56747
+1503917481310	geckodriver::marionette	INFO	Starting browser \\?\C:\Program Files (x86)\Mozilla Firefox\firefox.exe with args ["-marionette"]
+1503917481794	addons.manager	DEBUG	Application has been upgraded
+1503917481795	addons.manager	ERROR	startup failed: [Exception... "Component returned failure code: 0x80070057 (NS_ERROR_ILLEGAL_VALUE) [nsIFile.create]"  nsresult: "0x80070057 (NS_ERROR_ILLEGAL_VALUE)"  location: "JS frame :: resource://gre/modules/FileUtils.jsm :: FileUtils_getDir :: line 70"  data: no] Stack trace: FileUtils_getDir()@resource://gre/modules/FileUtils.jsm:70 < FileUtils_getFile()@resource://gre/modules/FileUtils.jsm:42 < validateBlocklist()@resource://gre/modules/AddonManager.jsm:674 < startup()@resource://gre/modules/AddonManager.jsm:837 < startup()@resource://gre/modules/AddonManager.jsm:3145 < observe()@resource://gre/components/addonManager.js:65
+1503917481796	addons.manager	DEBUG	Completed startup sequence
 JavaScript error: resource://gre/modules/AddonManager.jsm, line 1657: NS_ERROR_NOT_INITIALIZED: AddonManager is not initialized
-1493342240310	Marionette	INFO	Listening on port 49471
-JavaScript error: resource://gre/modules/AddonManager.jsm, line 2570: NS_ERROR_NOT_INITIALIZED: AddonManager is not initialized
-1493342260538	Marionette	INFO	New connections will no longer be accepted
-Program Files (x86)\Mozilla Firefox\browser\features\aushelper@mozilla.org.xpi
-1493338214898	addons.xpi	INFO	Mapping e10srollout@mozilla.org to C:\Program Files (x86)\Mozilla Firefox\browser\features\e10srollout@mozilla.org.xpi
-1493338214898	addons.xpi	INFO	Mapping firefox@getpocket.com to C:\Program Files (x86)\Mozilla Firefox\browser\features\firefox@getpocket.com.xpi
-1493338214898	addons.xpi	INFO	Mapping webcompat@mozilla.org to C:\Program Files (x86)\Mozilla Firefox\browser\features\webcompat@mozilla.org.xpi
-1493338214899	addons.xpi	INFO	Mapping {972ce4c6-7e08-4474-a285-3208198ce6fd} to C:\Program Files (x86)\Mozilla Firefox\browser\extensions\{972ce4c6-7e08-4474-a285-3208198ce6fd}.xpi
-1493338214900	addons.xpi	DEBUG	checkForChanges
-1493338214900	addons.xpi	INFO	SystemAddonInstallLocation directory is missing
-1493338214900	addons.xpi	DEBUG	Loaded add-on state from prefs: {}
-1493338214901	addons.xpi	DEBUG	New add-on aushelper@mozilla.org in app-system-defaults
-1493338214902	addons.xpi	DEBUG	getModTime: Recursive scan of aushelper@mozilla.org
-1493338214902	addons.xpi	DEBUG	New add-on e10srollout@mozilla.org in app-system-defaults
-1493338214903	addons.xpi	DEBUG	getModTime: Recursive scan of e10srollout@mozilla.org
-1493338214904	addons.xpi	DEBUG	New add-on firefox@getpocket.com in app-system-defaults
-1493338214904	addons.xpi	DEBUG	getModTime: Recursive scan of firefox@getpocket.com
-1493338214904	addons.xpi	DEBUG	New add-on webcompat@mozilla.org in app-system-defaults
-1493338214905	addons.xpi	DEBUG	getModTime: Recursive scan of webcompat@mozilla.org
-1493338214905	addons.xpi	DEBUG	New add-on {972ce4c6-7e08-4474-a285-3208198ce6fd} in app-global
-1493338214906	addons.xpi	DEBUG	getModTime: Recursive scan of {972ce4c6-7e08-4474-a285-3208198ce6fd}
-1493338214906	addons.xpi	DEBUG	getInstallState changed: true, state: {"app-system-defaults":{"aushelper@mozilla.org":{"d":"C:\\Program Files (x86)\\Mozilla Firefox\\browser\\features\\aushelper@mozilla.org.xpi","st":1493293285643},"e10srollout@mozilla.org":{"d":"C:\\Program Files (x86)\\Mozilla Firefox\\browser\\features\\e10srollout@mozilla.org.xpi","st":1493293285641},"firefox@getpocket.com":{"d":"C:\\Program Files (x86)\\Mozilla Firefox\\browser\\features\\firefox@getpocket.com.xpi","st":1493293285639},"webcompat@mozilla.org":{"d":"C:\\Program Files (x86)\\Mozilla Firefox\\browser\\features\\webcompat@mozilla.org.xpi","st":1493293285634}},"app-global":{"{972ce4c6-7e08-4474-a285-3208198ce6fd}":{"d":"C:\\Program Files (x86)\\Mozilla Firefox\\browser\\extensions\\{972ce4c6-7e08-4474-a285-3208198ce6fd}.xpi","st":1493293286084}}}
-1493338214915	addons.xpi-utils	DEBUG	Opening XPI database C:\Users\amahe6\AppData\Local\Temp\rust_mozprofile.oqesoAi42WPi\extensions.json
-1493338214916	addons.xpi-utils	DEBUG	New add-on aushelper@mozilla.org installed in app-system-defaults
-*** Blocklist::_loadBlocklistFromFile: blocklist is disabled
-1493338214925	DeferredSave.extensions.json	DEBUG	Save changes
-1493338214926	addons.xpi-utils	DEBUG	New add-on e10srollout@mozilla.org installed in app-system-defaults
-1493338214928	DeferredSave.extensions.json	DEBUG	Starting timer
-1493338214929	DeferredSave.extensions.json	DEBUG	Save changes
-1493338214929	addons.xpi-utils	DEBUG	New add-on firefox@getpocket.com installed in app-system-defaults
-1493338214934	DeferredSave.extensions.json	DEBUG	Save changes
-1493338214934	addons.xpi-utils	DEBUG	New add-on webcompat@mozilla.org installed in app-system-defaults
-1493338214937	DeferredSave.extensions.json	DEBUG	Save changes
-1493338214938	addons.xpi-utils	DEBUG	New add-on {972ce4c6-7e08-4474-a285-3208198ce6fd} installed in app-global
-1493338214941	DeferredSave.extensions.json	DEBUG	Save changes
-1493338214941	addons.manager	DEBUG	Registering startup change 'installed' for aushelper@mozilla.org
-1493338214947	addons.xpi	DEBUG	Loading bootstrap scope from C:\Program Files (x86)\Mozilla Firefox\browser\features\aushelper@mozilla.org.xpi
-1493338214951	addons.xpi	DEBUG	Calling bootstrap method install on aushelper@mozilla.org version 2.0
-1493338214951	addons.xpi-utils	DEBUG	Make addon app-system-defaults:aushelper@mozilla.org visible
-1493338214951	DeferredSave.extensions.json	DEBUG	Save changes
-1493338214952	addons.manager	DEBUG	Registering startup change 'installed' for e10srollout@mozilla.org
-1493338214952	addons.xpi	DEBUG	Loading bootstrap scope from C:\Program Files (x86)\Mozilla Firefox\browser\features\e10srollout@mozilla.org.xpi
-1493338214954	addons.xpi	DEBUG	Calling bootstrap method install on e10srollout@mozilla.org version 1.14
-1493338214954	addons.xpi-utils	DEBUG	Make addon app-system-defaults:e10srollout@mozilla.org visible
-1493338214955	DeferredSave.extensions.json	DEBUG	Save changes
-1493338214955	addons.manager	DEBUG	Registering startup change 'installed' for firefox@getpocket.com
-1493338214956	addons.xpi	DEBUG	Loading bootstrap scope from C:\Program Files (x86)\Mozilla Firefox\browser\features\firefox@getpocket.com.xpi
-1493338214958	addons.xpi	DEBUG	Calling bootstrap method install on firefox@getpocket.com version 1.0.5
-1493338214958	addons.xpi-utils	DEBUG	Make addon app-system-defaults:firefox@getpocket.com visible
-1493338214959	DeferredSave.extensions.json	DEBUG	Save changes
-1493338214959	addons.manager	DEBUG	Registering startup change 'installed' for webcompat@mozilla.org
-1493338214959	addons.xpi	DEBUG	Loading bootstrap scope from C:\Program Files (x86)\Mozilla Firefox\browser\features\webcompat@mozilla.org.xpi
-1493338214961	addons.xpi	DEBUG	Calling bootstrap method install on webcompat@mozilla.org version 1.0
-1493338214961	addons.xpi-utils	DEBUG	Make addon app-system-defaults:webcompat@mozilla.org visible
-1493338214961	DeferredSave.extensions.json	DEBUG	Save changes
-1493338214961	addons.xpi-utils	DEBUG	Make addon app-global:{972ce4c6-7e08-4474-a285-3208198ce6fd} visible
-1493338214961	DeferredSave.extensions.json	DEBUG	Save changes
-1493338214962	addons.xpi	DEBUG	Updating XPIState for {"id":"aushelper@mozilla.org","syncGUID":"{ba12426c-f4cc-40eb-8e21-43bb62d20a45}","location":"app-system-defaults","version":"2.0","type":"extension","internalName":null,"updateURL":null,"updateKey":null,"optionsURL":null,"optionsType":null,"aboutURL":null,"icons":{},"iconURL":null,"icon64URL":null,"defaultLocale":{"name":"Application Update Service Helper","description":"Sets value(s) in the update url based on custom checks.","creator":null,"homepageURL":null},"visible":true,"active":true,"userDisabled":false,"appDisabled":false,"descriptor":"C:\\Program Files (x86)\\Mozilla Firefox\\browser\\features\\aushelper@mozilla.org.xpi","installDate":1493293285643,"updateDate":1493293285643,"applyBackgroundUpdates":1,"bootstrap":true,"skinnable":false,"size":8486,"sourceURI":null,"releaseNotesURI":null,"softDisabled":false,"foreignInstall":false,"hasBinaryComponents":false,"strictCompatibility":false,"locales":[],"targetApplications":[{"id":"{ec8030f7-c20a-464f-9b0e-13a3a9e97384}","minVersion":"53.0","maxVersion":"53.*"}],"targetPlatforms":[],"multiprocessCompatible":true,"seen":true,"dependencies":[],"hasEmbeddedWebExtension":false,"mpcOptedOut":false,"userPermissions":null}
-1493338214962	addons.xpi	DEBUG	getModTime: Recursive scan of aushelper@mozilla.org
-1493338214962	addons.xpi	DEBUG	Updating XPIState for {"id":"e10srollout@mozilla.org","syncGUID":"{b9a90841-4046-49f9-a307-2905dcfa356b}","location":"app-system-defaults","version":"1.14","type":"extension","internalName":null,"updateURL":null,"updateKey":null,"optionsURL":null,"optionsType":null,"aboutURL":null,"icons":{},"iconURL":null,"icon64URL":null,"defaultLocale":{"name":"Multi-process staged rollout","description":"Staged rollout of Firefox multi-process feature.","creator":null,"homepageURL":null},"visible":true,"active":true,"userDisabled":false,"appDisabled":false,"descriptor":"C:\\Program Files (x86)\\Mozilla Firefox\\browser\\features\\e10srollout@mozilla.org.xpi","installDate":1493293285641,"updateDate":1493293285641,"applyBackgroundUpdates":1,"bootstrap":true,"skinnable":false,"size":8476,"sourceURI":null,"releaseNotesURI":null,"softDisabled":false,"foreignInstall":false,"hasBinaryComponents":false,"strictCompatibility":false,"locales":[],"targetApplications":[{"id":"{ec8030f7-c20a-464f-9b0e-13a3a9e97384}","minVersion":"53.0","maxVersion":"53.*"}],"targetPlatforms":[],"multiprocessCompatible":true,"seen":true,"dependencies":[],"hasEmbeddedWebExtension":false,"mpcOptedOut":false,"userPermissions":null}
-1493338214962	addons.xpi	DEBUG	getModTime: Recursive scan of e10srollout@mozilla.org
-1493338214962	addons.xpi	DEBUG	Updating XPIState for {"id":"firefox@getpocket.com","syncGUID":"{9e2394a1-6b21-4db2-be62-69a77dcf8d21}","location":"app-system-defaults","version":"1.0.5","type":"extension","internalName":null,"updateURL":null,"updateKey":null,"optionsURL":null,"optionsType":null,"aboutURL":null,"icons":{},"iconURL":null,"icon64URL":null,"defaultLocale":{"name":"Pocket","description":"When you find something you want to view later, put it in Pocket.","creator":null,"homepageURL":null},"visible":true,"active":true,"userDisabled":false,"appDisabled":false,"descriptor":"C:\\Program Files (x86)\\Mozilla Firefox\\browser\\features\\firefox@getpocket.com.xpi","installDate":1493293285639,"updateDate":1493293285639,"applyBackgroundUpdates":1,"bootstrap":true,"skinnable":false,"size":913563,"sourceURI":null,"releaseNotesURI":null,"softDisabled":false,"foreignInstall":false,"hasBinaryComponents":false,"strictCompatibility":false,"locales":[],"targetApplications":[{"id":"{ec8030f7-c20a-464f-9b0e-13a3a9e97384}","minVersion":"53.0","maxVersion":"53.*"}],"targetPlatforms":[],"multiprocessCompatible":true,"seen":true,"dependencies":[],"hasEmbeddedWebExtension":false,"mpcOptedOut":false,"userPermissions":null}
-1493338214962	addons.xpi	DEBUG	getModTime: Recursive scan of firefox@getpocket.com
-1493338214963	addons.xpi	DEBUG	Updating XPIState for {"id":"webcompat@mozilla.org","syncGUID":"{048b5b72-14c7-47c2-b650-2223ac28a322}","location":"app-system-defaults","version":"1.0","type":"extension","internalName":null,"updateURL":null,"updateKey":null,"optionsURL":null,"optionsType":null,"aboutURL":null,"icons":{},"iconURL":null,"icon64URL":null,"defaultLocale":{"name":"Web Compat","description":"Urgent post-release fixes for web compatibility.","creator":null,"homepageURL":null},"visible":true,"active":true,"userDisabled":false,"appDisabled":false,"descriptor":"C:\\Program Files (x86)\\Mozilla Firefox\\browser\\features\\webcompat@mozilla.org.xpi","installDate":1493293285634,"updateDate":1493293285634,"applyBackgroundUpdates":1,"bootstrap":true,"skinnable":false,"size":1454,"sourceURI":null,"releaseNotesURI":null,"softDisabled":false,"foreignInstall":false,"hasBinaryComponents":false,"strictCompatibility":false,"locales":[],"targetApplications":[{"id":"{ec8030f7-c20a-464f-9b0e-13a3a9e97384}","minVersion":"53.0","maxVersion":"53.*"}],"targetPlatforms":[],"multiprocessCompatible":true,"seen":true,"dependencies":[],"hasEmbeddedWebExtension":false,"mpcOptedOut":false,"userPermissions":null}
-1493338214963	addons.xpi	DEBUG	getModTime: Recursive scan of webcompat@mozilla.org
-1493338214963	addons.xpi	DEBUG	Updating XPIState for {"id":"{972ce4c6-7e08-4474-a285-3208198ce6fd}","syncGUID":"{ea9b37de-b563-4e44-a920-b9f090dacbc5}","location":"app-global","version":"53.0","type":"theme","internalName":"classic/1.0","updateURL":null,"updateKey":null,"optionsURL":null,"optionsType":null,"aboutURL":null,"icons":{},"iconURL":"chrome://browser/content/default-theme-icon.svg","icon64URL":null,"defaultLocale":{"name":"Default","description":"The default theme.","creator":"Mozilla","homepageURL":null,"contributors":["Mozilla Contributors"]},"visible":true,"active":true,"userDisabled":false,"appDisabled":false,"descriptor":"C:\\Program Files (x86)\\Mozilla Firefox\\browser\\extensions\\{972ce4c6-7e08-4474-a285-3208198ce6fd}.xpi","installDate":1493293286084,"updateDate":1493293286084,"applyBackgroundUpdates":1,"skinnable":true,"size":8201,"sourceURI":null,"releaseNotesURI":null,"softDisabled":false,"foreignInstall":false,"hasBinaryComponents":false,"strictCompatibility":true,"locales":[],"targetApplications":[{"id":"{ec8030f7-c20a-464f-9b0e-13a3a9e97384}","minVersion":"53.0","maxVersion":"53.0"}],"targetPlatforms":[],"seen":true,"dependencies":[],"hasEmbeddedWebExtension":false,"userPermissions":null}
-1493338214963	addons.xpi	DEBUG	getModTime: Recursive scan of {972ce4c6-7e08-4474-a285-3208198ce6fd}
-1493338214964	DeferredSave.extensions.json	DEBUG	Save changes
-1493338214964	addons.xpi	DEBUG	Updating database with changes to installed add-ons
-1493338214964	addons.xpi-utils	DEBUG	Updating add-on states
-1493338214965	addons.xpi-utils	DEBUG	Writing add-ons list
-1493338214968	addons.xpi	DEBUG	Registering manifest for C:\Program Files (x86)\Mozilla Firefox\browser\features\aushelper@mozilla.org.xpi
-1493338214968	addons.xpi	DEBUG	Calling bootstrap method startup on aushelper@mozilla.org version 2.0
-1493338214969	addons.xpi	DEBUG	Registering manifest for C:\Program Files (x86)\Mozilla Firefox\browser\features\e10srollout@mozilla.org.xpi
-1493338214970	addons.xpi	DEBUG	Calling bootstrap method startup on e10srollout@mozilla.org version 1.14
-1493338214970	addons.xpi	DEBUG	Registering manifest for C:\Program Files (x86)\Mozilla Firefox\browser\features\firefox@getpocket.com.xpi
-1493338214971	addons.xpi	DEBUG	Calling bootstrap method startup on firefox@getpocket.com version 1.0.5
-1493338214977	addons.xpi	DEBUG	Registering manifest for C:\Program Files (x86)\Mozilla Firefox\browser\features\webcompat@mozilla.org.xpi
-1493338214977	addons.xpi	DEBUG	Calling bootstrap method startup on webcompat@mozilla.org version 1.0
-1493338214979	addons.manager	DEBUG	Registering shutdown blocker for XPIProvider
-1493338214980	addons.manager	DEBUG	Provider finished startup: XPIProvider
-1493338214980	addons.manager	DEBUG	Starting provider: LightweightThemeManager
-1493338214980	addons.manager	DEBUG	Registering shutdown blocker for LightweightThemeManager
-1493338214981	addons.manager	DEBUG	Provider finished startup: LightweightThemeManager
-1493338214981	addons.manager	DEBUG	Starting provider: GMPProvider
-1493338214986	addons.manager	DEBUG	Registering shutdown blocker for GMPProvider
-1493338214986	addons.manager	DEBUG	Provider finished startup: GMPProvider
-1493338214986	addons.manager	DEBUG	Starting provider: PluginProvider
-1493338214986	addons.manager	DEBUG	Registering shutdown blocker for PluginProvider
-1493338214987	addons.manager	DEBUG	Provider finished startup: PluginProvider
-1493338214987	addons.manager	DEBUG	Completed startup sequence
-1493338217072	addons.manager	DEBUG	Starting provider: <unnamed-provider>
-1493338217072	addons.manager	DEBUG	Registering shutdown blocker for <unnamed-provider>
-1493338217072	addons.manager	DEBUG	Provider finished startup: <unnamed-provider>
-1493338217093	addons.manager	DEBUG	Starting provider: PreviousExperimentProvider
-1493338217093	addons.manager	DEBUG	Registering shutdown blocker for PreviousExperimentProvider
-1493338217093	addons.manager	DEBUG	Provider finished startup: PreviousExperimentProvider
-1493338217095	DeferredSave.extensions.json	DEBUG	Starting write
-1493338217289	DeferredSave.extensions.json	DEBUG	Write succeeded
-1493338217290	addons.xpi-utils	DEBUG	XPI Database saved, setting schema version preference to 19
-1493338219330	Marionette	INFO	Listening on port 63506
-[GPU 9100] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
-1493338219710	Marionette	WARN	TLS certificate errors will be ignored for this session
-1493338226778	Marionette	INFO	New connections will no longer be accepted
-1493338226786	addons.xpi	DEBUG	Calling bootstrap method shutdown on webcompat@mozilla.org version 1.0
-1493338226787	addons.xpi	DEBUG	Calling bootstrap method shutdown on firefox@getpocket.com version 1.0.5
-tdown on aushelper@mozilla.org version 2.0
-strap method shutdown on e10srollout@mozilla.org version 1.14
-1493337069565	addons.xpi	DEBUG	Calling bootstrap method shutdown on aushelper@mozilla.org version 2.0
-0361
-1493294738408	addons.productaddons	INFO	downloadXHR File download. status=200
-1493294738413	addons.productaddons	INFO	Downloaded file will be saved to C:\Users\amahe6\AppData\Local\Temp\tmpaddon-ef2a19
-1493294762864	addons.xpi	DEBUG	Calling bootstrap method shutdown on webcompat@mozilla.org version 1.0
-1493294762864	addons.xpi	DEBUG	Calling bootstrap method shutdown on firefox@getpocket.com version 1.0.5
-1493294762864	addons.xpi	DEBUG	Calling bootstrap method shutdown on e10srollout@mozilla.org version 1.14
-1493294762865	addons.xpi	DEBUG	Calling bootstrap method shutdown on aushelper@mozilla.org version 2.0
-[GPU 3600] WARNING: pipe error: 109: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
-rovider
-1493049135770	addons.manager	DEBUG	Starting provider: PluginProvider
-1493049135771	addons.manager	DEBUG	Registering shutdown blocker for PluginProvider
-1493049135771	addons.manager	DEBUG	Provider finished startup: PluginProvider
-1493049135771	addons.manager	DEBUG	Completed startup sequence
-1493049136202	Marionette	INFO	Listening on port 57744
-1493049137636	addons.manager	DEBUG	Starting provider: <unnamed-provider>
-1493049137636	addons.manager	DEBUG	Registering shutdown blocker for <unnamed-provider>
-1493049137636	addons.manager	DEBUG	Provider finished startup: <unnamed-provider>
-1493049137658	addons.manager	DEBUG	Starting provider: PreviousExperimentProvider
-1493049137658	addons.manager	DEBUG	Registering shutdown blocker for PreviousExperimentProvider
-1493049137658	addons.manager	DEBUG	Provider finished startup: PreviousExperimentProvider
-1493049137660	DeferredSave.extensions.json	DEBUG	Starting write
-1493049137723	Marionette	WARN	TLS certificate errors will be ignored for this session
-1493049137895	DeferredSave.extensions.json	DEBUG	Write succeeded
-1493049137896	addons.xpi-utils	DEBUG	XPI Database saved, setting schema version preference to 19
-1493049156615	Marionette	INFO	New connections will no longer be accepted
-[Child 16296] ###!!! ABORT: Aborting on channel error.: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/glue/MessageChannel.cpp, line 2143
-	addons.productaddons	INFO	Completed downloading document
-1493049013243	addons.productaddons	INFO	downloadXHR File download. status=200
-1493049013247	addons.productaddons	INFO	Downloaded file will be saved to C:\Users\amahe6\AppData\Local\Temp\tmpaddon-b06bd6
-1493049015154	addons.productaddons	INFO	downloadXHR File download. status=200
-1493049015157	addons.productaddons	INFO	Downloaded file will be saved to C:\Users\amahe6\AppData\Local\Temp\tmpaddon-d4e5e4
-1493049019687	Marionette	INFO	New connections will no longer be accepted
-1493049019702	addons.xpi	DEBUG	Calling bootstrap method shutdown on webcompat@mozilla.org version 1.0
-1493049019703	addons.xpi	DEBUG	Calling bootstrap method shutdown on firefox@getpocket.com version 1.0.5
-1493049019703	addons.xpi	DEBUG	Calling bootstrap method shutdown on e10srollout@mozilla.org version 1.9
-1493049019704	addons.xpi	DEBUG	Calling bootstrap method shutdown on deployment-checker@mozilla.org version 1.0
-1493049019704	addons.xpi	DEBUG	Calling bootstrap method shutdown on aushelper@mozilla.org version 2.0
-[Child 4468] ###!!! ABORT: Aborting on channel error.: file c:/builds/moz2_slave/m-rel-w32-00000000000000000000/build/src/ipc/glue/MessageChannel.cpp, line 2143
+*** Blocklist::_preloadBlocklistFile: blocklist is disabled
+1503917485739	Marionette	INFO	Listening on port 56753
+JavaScript error: resource://gre/modules/AddonManager.jsm, line 2572: NS_ERROR_NOT_INITIALIZED: AddonManager is not initialized
+1503917486556	Marionette	WARN	TLS certificate errors will be ignored for this session
+1503917545358	addons.productaddons	INFO	sending request to: https://aus5.mozilla.org/update/3/GMP/54.0.1/20170628075643/WINNT_x86-msvc-x64/en-US/release/Windows_NT%206.1.1.0%20(x64)/default/default/update.xml
+1503917546588	addons.productaddons	INFO	Completed downloading document
+1503917547319	addons.productaddons	INFO	downloadXHR File download. status=200
+1503917547326	addons.productaddons	INFO	Downloaded file will be saved to C:\Users\amahe6\AppData\Local\Temp\tmpaddon-a18222
+1503917550510	addons.productaddons	INFO	downloadXHR File download. status=200
+1503917550516	addons.productaddons	INFO	Downloaded file will be saved to C:\Users\amahe6\AppData\Local\Temp\tmpaddon-3aff89
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://gre/modules/AddonManager.jsm, line 1416: NS_ERROR_NOT_INITIALIZED: AddonManager is not initialized
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+avaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+rce://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]
+JavaScript error: resource://app/modules/WindowsJumpLists.jsm, line 403: NS_ERROR_FILE_NOT_FOUND: Component returned failure code: 0x80520012 (NS_ERROR_FILE_NOT_FOUND) [nsIJumpListShortcut.app]

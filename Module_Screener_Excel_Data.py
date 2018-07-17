@@ -1,7 +1,6 @@
     
 from selenium import webdriver
 import time
-from custom_logging import logger
 import env
 #import dataProcessing
 import os
@@ -15,11 +14,11 @@ print (__name__)
 
 class Module_Screener_Excel_Data:
 
-    def __init__(self, dir_name):
+    def __init__(self,dir_name):
 
         self.con = DBManager.connectDB()
         self.cur = self.con.cursor()
-        self.date_map= {'03/31/13 00:00:00' : '2013-03-31', '03/31/14 00:00:00':'2014-03-31', '03/31/15 00:00:00':'2015-03-31', '03/31/16 00:00:00':'2016-03-31', '03/31/17 00:00:00':'2017-03-31','06/30/17 00:00:00':'2017-06-30', '09/30/17 00:00:00':'2017-09-30', '12/31/17 00:00:00':'2017-12-31'}
+#        self.date_map= {'03/31/13 00:00:00' : '2013-03-31', '03/31/14 00:00:00':'2014-03-31', '03/31/15 00:00:00':'2015-03-31', '03/31/16 00:00:00':'2016-03-31', '03/31/17 00:00:00':'2017-03-31','06/30/17 00:00:00':'2017-06-30', '09/30/17 00:00:00':'2017-09-30', '12/31/17 00:00:00':'2017-12-31'}
 #        self.date_map= {'2014-03-31 00:00:00+00:00':}
         """"Setting browser preferences to handle download pop-up"""
         self.profile = webdriver.FirefoxProfile()
@@ -40,19 +39,21 @@ class Module_Screener_Excel_Data:
         self.xl = win32com.client.Dispatch('Excel.Application')
 
 
-
+    def setDirName(self,dir_name):
+        self.profile.set_preference('browser.download.dir', dir_name)
+        
     def login(self):
 
         ##############################################################
         try:
             self.driver = webdriver.Firefox(executable_path=env.BROWSER_PATH, firefox_profile=self.profile)
             #self.driver.set_window_size(0, 0)
-            #self.driver.set_window_position(1920,1080)
-            self.driver.set_window_position(-2000, 0)
+            self.driver.set_window_position(1920,1080)
+#            self.driver.set_window_position(-2000, 0)
             self.driver.get('https://www.screener.in/login/')
 
         except Exception as e:
-            logger.exception(e)
+            print( str(e))
             self.driver.quit()
         #username = self.driver.find_element_by_name('username')
 
@@ -66,20 +67,19 @@ class Module_Screener_Excel_Data:
         username.send_keys(Constants.screener_userid)
         password.send_keys(Constants.screener_pwd)
 
-        logger.info('Logging in')
-        self.driver.find_element_by_tag_name('button').submit()
-        time.sleep(2)
+        login_attempt = self.driver.find_element_by_class_name("button-primary")
+        login_attempt.click()
+#        self.driver.find_element_by_tag_name('button-primary').submit()
+#        time.sleep(2)
 
         # login_attempt = self.driver.find_element_by_class_name("btn-primary")
         # login_attempt.click()
 
     def __enter__(self):
-        logger.debug('Inside __enter__()')
         return self
 
     def __exit__(self):
         self.driver.quit()
-        logger.info('Webdriver handler closed')
 
     def testUrl(self, url):
         self.driver = webdriver.Firefox(executable_path=env.BROWSER_PATH, firefox_profile=self.profile)
@@ -92,8 +92,8 @@ class Module_Screener_Excel_Data:
         
     def export_to_excel(self,nseid, type):
 
-        logger.info("******************************************************")
-        logger.info('Clicking excel: ' + self.driver.current_url)
+        print('Clicking excel: ' , self.driver.current_url)
+        
         try:
             if type == 'C':
                 url = env.URL + nseid+"/consolidated"
@@ -111,19 +111,19 @@ class Module_Screener_Excel_Data:
             # self.driver.find_element_by_tag_name('button').click()
             time.sleep(2)
 
-            self.driver.find_element_by_link_text('Export to Excel').click()
+#            self.driver.find_element_by_link_text('Export to Excel').click()
+            login_attempt = self.driver.find_element_by_class_name("hide-on-mobile")
+            login_attempt.click()
             time.sleep(3)
 
-            #logger.info(self.driver.current_url)
-            logger.info('CLicked...Check')
+            print('CLicked...Check')
             #self.__exit__()
 
         except Exception as e:
-            logger.exception(e)
+            print( str(e), e)
 
         finally:
-            logger.info("******************************************************")
-
+            print( "In Try Finally")
 
     def getStockFundamentalData(self, nseid, type):
         self.login()
@@ -148,7 +148,8 @@ class Module_Screener_Excel_Data:
 
                     sheet = 'Profit & Loss'
                     #cell_range = OrderedDict([('A03', 'J03'), ('A12', 'J12'), ('A13', 'J13'), ('A14', 'J14'), ('A15', 'J15')])
-                    cell_range = OrderedDict([('H03', 'H15'),('I03', 'I15'),('J03', 'J15'),('K03', 'K15'),('L03', 'L15')])
+#                    cell_range = OrderedDict([('H03', 'H15'),('I03', 'I15'),('J03', 'J15'),('K03', 'K15'),('L03', 'L15')])
+                    cell_range = OrderedDict([('C03', 'C15'),('D03', 'D15'),('E03', 'E15'),('F03', 'F15'),('G03', 'G15'),('H03', 'H15'),('I03', 'I15'),('J03', 'J15'),('K03', 'K15'),('L03', 'L15')])
 
 
                     ws = wb.Worksheets(sheet)
@@ -186,11 +187,15 @@ class Module_Screener_Excel_Data:
                         records.append(one_record)
 
                 except Exception as e:
-                    logger.exception(e)
+                    print( str(e))
 
                 else:
                     wb.Close(True)
-        self.saveToDB(records, fullid)
+        if not records:            
+            print("No data found in Excel for - ", nseid)
+        else:
+            self.saveToDB(records, fullid)
+            
         return
 
     def saveToDB(self, records, fullid):

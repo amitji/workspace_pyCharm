@@ -32,7 +32,7 @@ class Module_Choose_Consolidated_Or_Standalone:
         password = self.browser.find_element_by_name('password')
         username.send_keys(const.screener_userid)
         password.send_keys(const.screener_pwd)
-        login_attempt = self.browser.find_element_by_class_name("btn-primary")
+        login_attempt = self.browser.find_element_by_class_name("button-primary")
         login_attempt.click()
 
 
@@ -88,3 +88,8 @@ class Module_Choose_Consolidated_Or_Standalone:
                 print ("Exception in Consolidated so work with STANDALONE data")
                 return 'S'
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self):
+        self.browser.quit()

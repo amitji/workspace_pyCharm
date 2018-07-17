@@ -23,11 +23,11 @@ class Process_Scrapper_Screener_India_Stock:
         #select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names_temp sn"
 
         ### This SQL will get all the stcoks in stock_names table which does not have any data in Fin Ratio / Quaterly tables..
-        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where exchange='NSE' and fullid not in "
-        select_sql += " (select fullid from  stocksdb.fa_financial_ratio union all select fullid from  stocksdb.fa_financial_ratio_secondary )"
+#        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where exchange='NSE' and fullid not in "
+#        select_sql += " (select fullid from  stocksdb.fa_financial_ratio union all select fullid from  stocksdb.fa_financial_ratio_secondary )"
 
 
-        #select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in ('FEDERALBNK') "
+        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in ('HCIL') "
         #select_sql ="select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names where exchange='NSE' and is_video_available='y' and enable_for_vendor_data='2' and id < 500 "
 
         #run it for all Amit's portfolio stocks

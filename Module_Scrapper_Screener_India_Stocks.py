@@ -9,6 +9,8 @@ import platform
 import time
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 import datetime
 import sys, os
@@ -51,7 +53,7 @@ class Module_Scrapper_Screener_India_Stocks:
         password = self.browser.find_element_by_name('password')
         username.send_keys('amitji@gmail.com')
         password.send_keys('amit1973')
-        login_attempt = self.browser.find_element_by_class_name("btn-primary")
+        login_attempt = self.browser.find_element_by_class_name("button-primary")
         login_attempt.click()
 
 
@@ -129,7 +131,13 @@ class Module_Scrapper_Screener_India_Stocks:
             try:
                 self.browser.get(const.screenerBaseUrl + nseid+const.screenerBaseUrl_part2)
                 time.sleep(5)
-
+                
+#                delay=10
+#                element_present = EC.presence_of_element_located((By.ID, 'quarters'))
+#                WebDriverWait(self.browser, delay).until(element_present)
+#                temp_record = self.xpaths[number_of_quarters_to_process-1]
+#                temp_date = self.browser.find_element_by_xpath(temp_record["date_xpath"]).text   
+                 
                 #determine what is latest quarter data available. Based on that you use different dates sets.
                 temp_record = self.xpaths[number_of_quarters_to_process-1]
                 temp_date = self.browser.find_element_by_xpath(temp_record["date_xpath"]).text
@@ -360,55 +368,63 @@ class Module_Scrapper_Screener_India_Stocks:
             #html = self.browser.page_source
 
 
-            last_price = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[1]/h4[2]/b').text
+#            last_price = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[1]/h4[2]/b').text
+            last_price = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[2]/b').text
             if '--' not in last_price:
                 last_price = float(last_price[(last_price.rfind(' ') + 1):])
             else:
                 last_price = None
 
-            eps = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[1]').text
+#            eps = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[1]').text
+            eps = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[13]/b').text
             if '--' not in eps:
                 eps = float(eps[(eps.rfind(' ') + 1):])
             else:
                 eps = None
 
 
-            pe = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[1]/h4[4]/b').text
+#            pe = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[1]/h4[4]/b').text
+            pe = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[5]/b').text
             if '--' not in pe:
                 pe = float(pe[(pe.rfind(' ') + 1):])
             else:
                 pe = None
 
 
-            pb = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[8]').text
+#            pb = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[8]').text
+            pb = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[19]/b').text
             if '--' not in pb:
                 pb = float(pb[(pb.rfind(' ') + 1):])
             else:
                 pb = None
 
 
-            roe = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[7]').text
+#            roe = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[7]').text
+            roe = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[8]/b').text
             if '--' not in roe:
                 roe = float(roe[(roe.rfind(' ') + 1):].replace("%", ""))
             else:
                 roe = None
 
 
-            high52 = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[9]').text
+#            high52 = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[9]').text
+            high52 = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[3]/b[1]').text
             if '--' not in high52:
                 high52 = float(high52[(high52.rfind(' ') + 1):])
             else:
                 high52 = None
 
 
-            low52 = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[10]').text
+#            low52 = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[10]').text
+            low52 = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[3]/b[2]').text
             if '--' not in low52:
                 low52 = float(low52[(low52.rfind(' ') + 1):])
             else:
                 low52 = None
 
 
-            debt = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[3]').text
+#            debt = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[3]').text
+            debt = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[14]/b').text
             if 'Cr.' in debt:
                 debt = debt.replace(" Cr.", "")
                 debt = float(debt[(debt.rfind(' ') + 1):].replace(",", ""))
@@ -419,14 +435,16 @@ class Module_Scrapper_Screener_India_Stocks:
 
             print( 'debt - ', debt)
 
-            interest = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[4]').text
+#            interest = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[4]').text
+            interest = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[15]/b').text
 
             if 'Cr.' in interest:
                 interest = interest.replace(" Cr.", "")
                 interest = float(interest[(interest.rfind(' ') + 1):].replace(",", ""))
                 #interest = interest * 10000000
 
-            interest_coverage = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[5]').text
+#            interest_coverage = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[5]').text
+            interest_coverage = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[16]/b').text
             if 'Cr.' in interest_coverage:
                 interest_coverage = interest_coverage.replace(" Cr.", "")
                 interest_coverage = float(interest_coverage[(interest_coverage.rfind(' ') + 1):].replace(",", ""))
@@ -437,7 +455,8 @@ class Module_Scrapper_Screener_India_Stocks:
                 interest_coverage = float(interest_coverage[(interest_coverage.rfind(' ') + 1):].replace(",", ""))
 
             current_ratio = ""
-            debt_equity_ratio = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[6]').text
+#            debt_equity_ratio = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[6]').text
+            debt_equity_ratio = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[17]/b').text
             if '--' in debt_equity_ratio:
                 debt_equity_ratio = 0
             else:

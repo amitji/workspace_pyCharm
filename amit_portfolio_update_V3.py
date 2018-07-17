@@ -139,7 +139,7 @@ if __name__ == "__main__":
         print('quandlData  - \n',quandlData )
         #while minutes_count < 420:
         #Run b/w morning 9 am to 4:00 pm IST
-        while (c.in_between(datetime.now().time(), time(8,40), time(23,00))):
+        while (c.in_between(datetime.now().time(), time(8,40), time(16,00))):
             allQuotes = c.module_Get_Live_Data_From_Google.getLiveQuotesForMultipleStock(stock_names,quandlData)
 #            allQuotes = c.getAllQuotesFromQuandl(stock_names)
             

@@ -35,17 +35,18 @@ class GetFOPrices:
 #        stocks = ['FEDERALBNK','GMRINFRA','JINDALSTEL','AUROPHARMA','ASHOKLEY','SUZLON']
 #        stocks = {'FEDERALBNK':5500,'GMRINFRA':45000,'JINDALSTEL':4500,'NCC':8000,'CADILAHC': 1600, \
 #                      'SREINF':5000, 'DCBBANK':4500, 'AUROPHARMA':900, 'ASHOKLEY':7000,'SUZLON':30000}
-        stocks = {'FEDERALBNK':5500,'GMRINFRA':45000,'JINDALSTEL':4500,'NCC':8000,'CADILAHC': 1600, \
-                      'SREINFRA':5000, 'DCBBANK':4500, 'NIFTY':75}
-
+#        stocks = {'FEDERALBNK':5500,'GMRINFRA':45000,'JINDALSTEL':4500,'NCC':8000,'CADILAHC': 1600, \
+#                      'SREINFRA':5000, 'DCBBANK':4500, 'NIFTY':75}
+        stocks = {'NCC':8000}
+                        
         
         for stk in stocks:
             try:
 #                print (stk, ' lot size - ', stocks[stk])
                 lot =  stocks[stk]
                 self.browser.get(base_url + stk)
-                last_price = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[2]/td[10]').text)
-                last_price2 = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[3]/td[10]').text)
+                last_price = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[2]/td[10]').text.replace(',',''))
+                last_price2 = float(self.browser.find_element_by_xpath('//*[@id="tab26Content"]/table/tbody/tr[3]/td[10]').text.replace(',',''))
                 diff = "{0:.2f}".format(last_price2-last_price)
                 value =  int(lot) * float(diff)
                 print ("\n",stk+' - ',last_price, last_price2 ,'<>',diff, '<>', value)
@@ -73,12 +74,12 @@ if __name__ == "__main__":
     
 #    obj.getPrice()
     
-    while (obj.in_between(datetime.now().time(), time(7,00), time(16,00))):
+    while (obj.in_between(datetime.now().time(), time(9,30), time(15,40))):
 
         obj.getPrice()
         minutes_count = minutes_count+1
-        print ("\n*** Amit Sleeping for 2 minute, remaining loops (420-x)- ", 420- minutes_count, " | Time - ", datetime.now())
-        t.sleep(300)
+        print ("\n*** Amit Sleeping for 1.5 minute, remaining loops (420-x)- ", 420- minutes_count, " | Time - ", datetime.now())
+        t.sleep(30)
     
     print ("\n*** Amit Exiting the NSE Get FO process...TIME is  - ", datetime.now().time())        
       

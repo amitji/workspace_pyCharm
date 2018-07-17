@@ -52,6 +52,9 @@ class NSE_Result_Calendar_Update_Process:
 
             records.append((nseid,name,result_date,industry,purpose,now))
 
+        
+        
+        self.updateAmitPortfolioTable(records)
         #update the result_calendar table
         insert_sql = (
             "REPLACE INTO result_calendar  (  nseid, name, result_date, Industry, purpose, last_modified )" \
@@ -59,10 +62,41 @@ class NSE_Result_Calendar_Update_Process:
         self.cur.executemany(insert_sql, records)
         self.con.commit()
 
+        #Amit  =  update amit_portfolio table with resul dates
+
+        
+        
         print( "Total records in CSV files Inserted/replaced into DB - ", count)
         EmailUtil.send_email_as_text("Process_NSE_Result_Calendar_Download_n_UpdateDB", nseidString, "")
 
+    def updateAmitPortfolioTable(self, records):
+        
+        sql = "SELECT ap.nseid, rc.result_date FROM stocksdb.amit_portfolio ap, result_calendar rc where ap.nseid = rc.nseid order by ap.nseid, rc.result_date "
+        #sql = "SELECT distinct fullid FROM " + table_name + " where fullid like '%-%'  order by fullid "
 
+        self.cur.execute(sql)
+        rows = self.cur.fetchall()
+        data = list()
+        for row in rows:
+            # print row[0], row[1]
+            dd = dict()
+            #dd["fullid"] = row[0]
+            dd["nseid"] = row[0]
+            #dd["result_date"] = row[1].strftime('%d-%m-%Y')
+            dd["result_date"] = row[1].strftime('%Y-%m-%d %H:%M:%S')
+            #dd["data_type"] = row[1]
+            data.append(dd)
+        # print data
+        
+
+        for rec in data[:]:
+            print (rec)
+            nseid = rec['nseid']
+            rdate = rec['result_date']
+            update_sql = "update amit_portfolio set result_date = '%s' where nseid = '%s' " % (rdate,nseid);
+            self.cur.execute(update_sql)
+            self.con.commit()
+        
 
 
 # ----------------------------------------------------------------------

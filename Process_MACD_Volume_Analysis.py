@@ -25,7 +25,7 @@ class Process_MACD_Volume_Analysis:
         select_sql += " union select nseid, 'y' owned from stocksdb.amit_portfolio sn where sn.is_inactive='n' order by nseid desc "
         
         #testing
-#        select_sql = "select symbol nseid, 'y' owned from stocksdb.fo_mktlots sn where symbol in ('NCC', 'HCC')"
+#        select_sql = "select symbol nseid, 'y' owned from stocksdb.fo_mktlots sn where symbol in ('NCC', 'HCC', 'AJANTPHARM', 'ALBK', 'EDUCOMP', 'AUROPHARMA')"
 #        select_sql = "select symbol nseid from stocksdb.fo_mktlots sn "
 
         #Only amit_portfolio
@@ -316,6 +316,7 @@ class Process_MACD_Volume_Analysis:
                         row['actual'] = 'Neutral'
                     
                     #Calculate Outcome 
+                    """                
                     row['outcome']=''
                     if row.macd_prediction == row.actual and row.rsi_prediction == row.actual:
                          row['outcome'] = 1
@@ -328,7 +329,26 @@ class Process_MACD_Volume_Analysis:
                          row['outcome'] = 2
                     else:
                          row['outcome'] = 3
+                    """
+                    #New way of Calculating outcome
+                    row['outcome']=''
+                    print('row.macd_prediction - ',row.macd_prediction )
+                    print('row.rsi_prediction - ',row.rsi_prediction )
                     
+                    if row.macd_prediction == "" and row.rsi_prediction == "":  # both empty
+                         row['outcome'] = 0
+                    elif row.macd_prediction == row.rsi_prediction :  #if RSI and MACD telling same thing then most preferred.
+                         row['outcome'] = 1
+                    #treat Potetial Sel  and sell same     
+                    elif row.macd_prediction.find(row.rsi_prediction) != -1 and (row.macd_prediction != "" and row.rsi_prediction != ""):
+                         row['outcome'] = 1                         
+                    elif row.macd_prediction != "" or row.rsi_prediction != "":
+                         row['outcome'] = 2
+                    else:
+                         row['outcome'] = 0
+                         
+                         
+                         
                     newDf = newDf.append(row)    
                     
                     

@@ -1,6 +1,6 @@
 
 
-from custom_logging import logger
+#from custom_logging import logger
 #from dbHandler import DBHandler
 #import dataProcessing
 #from collections import OrderedDict
@@ -13,13 +13,12 @@ import shutil
 import datetime
 import time
 import EmailUtil
+import Constants
 
 
 class Process_Screener_Excel_Data:
 
     def __init__(self):
-        #logger.info("Execeution Begins")
-        #logger.info("******************************")
 
         self.con = DBManager.connectDB()
         self.cur = self.con.cursor()
@@ -27,24 +26,30 @@ class Process_Screener_Excel_Data:
         self.module_Choose_Consolidated_Or_Standalone = Module_Choose_Consolidated_Or_Standalone.Module_Choose_Consolidated_Or_Standalone()
         #self.module_Screener_Excel_Data = Module_Screener_Excel_Data.Module_Screener_Excel_Data()
 
-        # with scraping() as sc:
-        #     sc.export_to_excel(email='d.aggarwal07@yahoo.com', password='dishu@07')
-        #
-        #
-        # dataProcessing.read_from_xlsx()#cell_range=OrderedDict([('A1','C1'),('A2','C2'),('A3','C3')]))
 
 
     def getStockNames(self):
         #select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names_temp sn "  \
          #            " where enable_for_vendor_data = 1"
 
-        #select_sql = "select fullid, nseid  from stocksdb.amit_portfolio where is_index='n' "
-#        select_sql = "select fullid, nseid  from stocksdb.stock_names_for_forecasting where nseid='BEPL' "
-        select_sql = "select fullid, nseid from stocksdb.stock_names_for_forecasting where update_now='y' "
-        self.cur.execute(select_sql)
+        #Working sql        
+#        select_sql = "select fullid, nseid from stocksdb.stock_names_for_forecasting where update_now='y' "
+        
+        # This sql will get the nseid which has latest results announced but not yet scrapped for Excek data.
+        select_sql = "select distinct fullid, nseid from stocksdb.stock_forecasting_pe_eps_past_years_data sf where "
+        select_sql += " nseid not in (select nseid from stocksdb.stock_forecasting_pe_eps_past_years_data where seq_no = 10 and fin_year='"+Constants.latest_period+"') and nseid in "
+        select_sql += " (select nseid from"
+        select_sql += " (select nseid from stocksdb.fa_quaterly_data_secondary where  period = '"+Constants.latest_period+"' and quater_sequence=5 "
+        select_sql += " union "
+        select_sql += " select nseid from stocksdb.fa_quaterly_data where period = '"+Constants.latest_period+"' and quater_sequence=5 ) temp ) " 
 
+        #testing sql
+#        select_sql = "select fullid, nseid  from stocksdb.stock_names_for_forecasting where nseid='NCC' "
+        
+        print("select_sql - ", select_sql)
+        self.cur.execute(select_sql)
         rows = self.cur.fetchall()
-        data = list()
+        data = []
         for row in rows:
             # print row[0], row[1]
             dd = dict()
@@ -61,6 +66,8 @@ class Process_Screener_Excel_Data:
         # call module_Screener_Excel_Data for each stock
         count = 1;
         size = stock_names.__len__();
+#        module_Screener_Excel_Data = Module_Screener_Excel_Data.Module_Screener_Excel_Data()
+        
         for row in stock_names:
             nseid = row['nseid']
             try:
@@ -72,7 +79,7 @@ class Process_Screener_Excel_Data:
 
                 dir_name = env.DOWNLOAD_DIR + nseid
 
-                print (dir_name)
+                print( "dir_name - ", dir_name)
                 if os.path.exists(dir_name):
                     shutil.rmtree(dir_name)
                     #os.removedirs(dir_name)
@@ -82,7 +89,12 @@ class Process_Screener_Excel_Data:
 
                 type = self.module_Choose_Consolidated_Or_Standalone.chooseConsolidatedOrStandalone(nseid)
                 print ("Type if C or S  - ", type)
+                
+                
                 module_Screener_Excel_Data = Module_Screener_Excel_Data.Module_Screener_Excel_Data(dir_name)
+                
+                
+                module_Screener_Excel_Data.setDirName(dir_name)
                 module_Screener_Excel_Data.getStockFundamentalData(row['nseid'], type)
                 module_Screener_Excel_Data.readAllFilesData(nseid,row['fullid'], dir_name, type)
                 module_Screener_Excel_Data.__exit__()
@@ -100,11 +112,17 @@ class Process_Screener_Excel_Data:
 thisObj = Process_Screener_Excel_Data()
 
 stock_names = thisObj.getStockNames()
-thisObj.getStockFundamentalData(stock_names)
+if not stock_names:  #if empty
+    print("Stock_names list is empty, No stocks to run the process - ")
+else:
+    thisObj.getStockFundamentalData(stock_names)
+    
+
 # Run the Java process from eclipse , hit url -  http://localhost:8080/StockCircuitServer/spring/stockcircuit/getStockForecastData
-msg = "Now Run the Java process from eclipse , hit url -  http://localhost:8080/StockCircuitServer/spring/stockcircuit/getStockForecastData"
-print("\n\n", msg)
-EmailUtil.send_email_as_text("Process Screener Excel Data Done", msg, "")
+#msg = "Now Run the Java process from eclipse , hit url -  http://localhost:8080/StockCircuitServer/spring/stockcircuit/getStockForecastData"
+#print("\n\n", msg)
+
+#EmailUtil.send_email_as_text("Process Screener Excel Data Done", msg, "")
 
 
 
