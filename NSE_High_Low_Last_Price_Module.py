@@ -23,10 +23,10 @@ class NSE_High_Low_Last_Price_Update:
 
     def getStocksMarkedForUpdates(self, table_name):
 
-#        sql = "SELECT distinct fullid FROM "+table_name+"  order by fullid "
+        sql = "SELECT distinct fullid FROM "+table_name+"  order by fullid "
         #sql = "SELECT distinct fullid FROM " + table_name + " where fullid like '%-%'  order by fullid "
         #Testing sql
-        sql = "SELECT distinct fullid FROM "+table_name+" where fullid = 'NSE:NCC'  order by fullid "
+#        sql = "SELECT distinct fullid FROM "+table_name+" where fullid = 'NSE:NCC'  order by fullid "
         
         self.cur.execute(sql)
         rows = self.cur.fetchall()
