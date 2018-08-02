@@ -77,3 +77,31 @@ def send_email_as_text(process_name, updated_stock_list, url):
     except  Exception as e2:
         print ("error e2 - ", str(e2))
         print ("\n******Amit - failed to send mail, some exception sending email")
+
+def send_email_with_body(title, body):
+    import smtplib
+    gmail_user = "amit@stockcircuit.in"
+    gmail_pwd = "Amit1973$"
+    FROM = "amit@stockcircuit.in"
+    TO = "amitji@gmail.com"
+#    SUBJECT = "Process finished - ", title
+#    TEXT = process_name, updated_stock_list
+#    TEXT += "\n\nNow run the URL - ", url
+
+    message = """From: %s\nTo: %s\nSubject: %s\n\n%s
+    """ % (FROM, ", ".join(TO), title, body)
+
+
+    try:
+        # server = smtplib.SMTP("smtp.gmail.com", 465)
+        server = smtplib.SMTP("mail.stockcircuit.in", 587)
+        server.ehlo()
+        server.starttls()
+        server.login(gmail_user, gmail_pwd)
+        server.sendmail(FROM, TO, message)
+        server.close()
+        print ('successfully sent the mail')
+    except  Exception as e2:
+        print ("error e2 - ", str(e2))
+        print ("\n******Amit - failed to send mail, some exception sending email")
+

@@ -24,9 +24,9 @@ class NSE_High_Low_Last_Price_Update:
     def getStocksMarkedForUpdates(self, table_name):
 
         sql = "SELECT distinct fullid FROM "+table_name+"  order by fullid "
-        #sql = "SELECT distinct fullid FROM " + table_name + " where fullid like '%-%'  order by fullid "
+        
         #Testing sql
-#        sql = "SELECT distinct fullid FROM "+table_name+" where fullid = 'NSE:NCC'  order by fullid "
+#        sql = "select distinct fullid FROM "+table_name+" where fullid = 'NSE:NCC'  order by fullid "
         
         self.cur.execute(sql)
         rows = self.cur.fetchall()
@@ -57,8 +57,8 @@ class NSE_High_Low_Last_Price_Update:
             nseDict = NSELiveDataModule.getHighLowClose(mydata)
             
             #Amit- save data as needed
-            self.saveAllInDB(mydata,nseidModified)
-#            self.saveLastRecordInDB(mydata,nseidModified)
+#            self.saveAllInDB(mydata,nseidModified)
+            self.saveLastRecordInDB(mydata,nseidModified)
             
     
             high52 = nseDict['high52']
@@ -108,7 +108,7 @@ class NSE_High_Low_Last_Price_Update:
         df['prev_day_vol'] = df['volume'].shift(-1)
         df['vol_chg_perct'] = ((df['volume'] - df['prev_day_vol'])* 100)/df['prev_day_vol']
         df['vol_chg_perct'] = df['vol_chg_perct'].round(2)
-        df = df.drop(['prev_day_vol'],1)
+#        df = df.drop(['prev_day_vol'],1)
         
         
         #Amit - save all 250 records in database...but first delete else it will duplicate
@@ -130,7 +130,7 @@ class NSE_High_Low_Last_Price_Update:
         df['prev_day_vol'] = df['volume'].shift(-1)
         df['vol_chg_perct'] = ((df['volume'] - df['prev_day_vol'])* 100)/df['prev_day_vol']
         df['vol_chg_perct'] = df['vol_chg_perct'].round(2)
-        df = df.drop(['prev_day_vol'],1)
+#        df = df.drop(['prev_day_vol'],1)
         
         #Amit - save only last record in database...
 #        df_latest = df.iloc[0]   

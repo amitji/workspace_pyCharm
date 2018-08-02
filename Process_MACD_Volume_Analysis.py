@@ -32,7 +32,7 @@ class Process_MACD_Volume_Analysis:
 #        select_sql = "select nseid, 'y' owned from stocksdb.amit_portfolio sn where sn.is_inactive='n' order by nseid desc"        
 
         df = pd.read_sql(select_sql, self.con)
-#        df = df['nseid'].str.strip()
+#        df = df['nseid'].str.strip() 
         df = df.apply(lambda x: x.str.strip())
         return df  
 

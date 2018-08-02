@@ -44,15 +44,21 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
 
         ###expalin sql - following sql will only take those nseid where latest quater data is NOT alread scrapped.
         ###This is to avoid scrapping ones alreay have latest data.
+        #second union in the sql is to add stocks from result_calendar table who has declared results but not in the NSE
+        # csv file for some reason..
         
         select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in "
         select_sql += "(select nseid from"
         select_sql += "(select nseid from stocksdb.fa_quaterly_data_secondary where  period != '"+Constants.latest_period+"' and quater_sequence=5 and nseid in %s " %nseidString
         select_sql += " union "
         select_sql += "select nseid from stocksdb.fa_quaterly_data where period != '"+Constants.latest_period+"' and quater_sequence=5 and  nseid in %s ) temp ) " %nseidString
-        
+        select_sql += " union "
+        select_sql += " select sn.fullid, sn.nseid, sn.enable_for_vendor_data,sn.industry_vertical from stocksdb.result_calendar rc, stocksdb.stock_names sn where rc.nseid = sn.nseid and sn.fullid not in "
+        select_sql += " (select fr.fullid from stocksdb.final_rating fr  where latest_quarter = '"+Constants.latest_quarter+"') and (rc.result_date <= DATE_ADD(CURDATE(), "
+        select_sql += " INTERVAL -1 DAY) and rc.result_date >= DATE_ADD(CURDATE(), INTERVAL -7 DAY) ) "
+
         #Testing sql
-#        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in ('GMBREW') "
+#        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in ('NIITTECH') "
         
         '''
         ###Explain sql -  this sql will try update all those stocks whihc does  not have latest quater results. This could be reason that
@@ -84,8 +90,8 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
         return data
 
     def getCSVDataFromNSE(self):
-        #url = 'https://www.nseindia.com/corporates/datafiles/BM_Last_1_WeekResults.csv'
-        url = 'https://www.nseindia.com/corporates/datafiles/BM_Last_15_Days.csv'
+        url = 'https://www.nseindia.com/corporates/datafiles/BM_Last_1_WeekResults.csv'
+#        url = 'https://www.nseindia.com/corporates/datafiles/BM_Last_15_Days.csv'
         #Other urls - https://www.nseindia.com/corporates/datafiles/BM_Last_15_Days.csv
         ##  https://www.nseindia.com/corporates/datafiles/BM_Last_1_Month.csv
         ### https://www.nseindia.com/corporates/datafiles/BM_Last_1_WeekResults.csv

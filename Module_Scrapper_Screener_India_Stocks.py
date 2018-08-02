@@ -371,7 +371,7 @@ class Module_Scrapper_Screener_India_Stocks:
 #            last_price = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[1]/h4[2]/b').text
             last_price = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[2]/b').text
             if '--' not in last_price:
-                last_price = float(last_price[(last_price.rfind(' ') + 1):])
+                last_price = float(last_price[(last_price.rfind(' ') + 1):].replace(",", ""))
             else:
                 last_price = None
 
@@ -401,7 +401,10 @@ class Module_Scrapper_Screener_India_Stocks:
 
 #            roe = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[7]').text
             roe = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[8]/b').text
-            if '--' not in roe:
+
+            if roe == '':
+                roe = None
+            elif '--' not in roe:
                 roe = float(roe[(roe.rfind(' ') + 1):].replace("%", ""))
             else:
                 roe = None
@@ -451,6 +454,8 @@ class Module_Scrapper_Screener_India_Stocks:
                 #interest_coverage = interest * 10000000
             elif '--' in interest_coverage:
                 interest_coverage = None
+            elif ' ' in interest_coverage:
+                interest_coverage = None
             else:
                 interest_coverage = float(interest_coverage[(interest_coverage.rfind(' ') + 1):].replace(",", ""))
 
@@ -484,6 +489,9 @@ class Module_Scrapper_Screener_India_Stocks:
             except Exception as e:
                 print( "\n******Amit 222 - some excetion executing fa_financial_ratio_us_stocks insert sql 111 for  - " + nseid)
                 print( "error e - ", str(e))
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                print(exc_type, fname, exc_tb.tb_lineno)
                 self.sql_exception_list.append(nseid)
                 self.all_good_flag = False
                 pass
@@ -491,6 +499,9 @@ class Module_Scrapper_Screener_India_Stocks:
         except Exception as e2:
             print( "\n******Amit 333- Exception in Scrapping data for - " + fullid)
             print( str(e2))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
             self.scrapper_exception_list.append(nseid)
             self.all_good_flag = False
             pass
@@ -556,7 +567,9 @@ class Module_Scrapper_Screener_India_Stocks:
         print( "************************************************************************")
         # url = "http://localhost:8080/StockCircuitServer/spring/stockcircuit/calculateFADataPostPythonProcess"
         # print "Now run the URL ", url
-        EmailUtil.send_email_as_text("Process_NSE_Based_ResultDates_Screener_ScrapNUpdate", self.scrapper_exception_list, "")
+        
+        body = "Scrapping Exception List - "+" ".join(self.scrapper_exception_list)
+        EmailUtil.send_email_with_body("Process_NSE_Based_ResultDates_Screener_ScrapNUpdate",  body)
         return self.all_good_stock_names
 
 

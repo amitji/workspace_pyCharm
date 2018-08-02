@@ -31,12 +31,10 @@ class Process_find_pattern_Harami:
     def getStockList(self ):
 
             
-#        select_sql = "select  nseid from stocksdb.amit_portfolio where is_index='n' "
         select_sql = "select  symbol as nseid from stocksdb.fo_mktlots  "
-#        select_sql = "select nseid from stocksdb.stock_names where exchange='NSE'  "
         
         #Testing sql
-#        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in ('GMBREW') "
+#        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in ('MRF') "
         
   
 
@@ -88,6 +86,9 @@ stock_names = thisObj.getStockList()
 thisObj.findHaramiPattern(stock_names )
 print ( "Bullish Harami Stocks - ", thisObj.bullish_harami_list)
 print ( "Bearish Harami Stocks - ", thisObj.bearish_harami_list)
-EmailUtil.send_email_as_text("Process_find_pattern_Harami",  thisObj.bullish_harami_list, thisObj.bearish_harami_list)
+body = "Bullish Harami Stocks - "+" ".join(thisObj.bullish_harami_list)
+body += "                "
+body += "Bearish Harami Stocks - "+" ".join(thisObj.bearish_harami_list)
+EmailUtil.send_email_with_body("Process_find_pattern_Harami",  body)
 
 

@@ -28,6 +28,7 @@ quarter_names = {5: 'Q118', 4: 'Q417', 3: 'Q317',2: 'Q217',1: 'Q117', 0: 'Q416',
 
 #latest_period='2018-03-31' #change this when lots of results announcements starts
 latest_period='2018-06-30'
+latest_quarter='Q118'
 
 # How many quarters results needs to be processed. You need to have xpaths for those many Quarters in the xpaths table.
 number_of_quarters_to_process = 9
