@@ -90,8 +90,10 @@ def getLastDayParams(mydata,fullid,nseid):
     #    df = df.drop(['open', 'high','low','turnover'],1)
     #   This sript is run india time and Quandl last record by tnat time is 
     # already prevous trading day so no need to shift(-1)
-#        df['prev_close'] = df['close'].shift(-1)
-        df['prev_close'] = df['close']
+    
+    #Amit- now that google has stopped api, we need both today and prev day data
+        df['prev_close'] = df['close'].shift(-1)
+#        df['prev_close'] = df['close']
         #following line is commented bcoz volume as coming NaN for NIFTY and hence df was getting empties
 #        df = df.dropna(axis=0, how='any')
         df['change'] = df['close'] - df['prev_close']

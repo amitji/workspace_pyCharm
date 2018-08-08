@@ -10,12 +10,15 @@ from datetime import datetime, time
 import EmailUtil
 import time as t
 import Module_Get_Live_Data_From_Google
+import Module_Get_Live_Data_From_Zerodha
 
 class GoogleFinanceAPI:
     def __init__(self):
         self.con = DBManager.connectDB()
         self.cur = self.con.cursor()
         self.module_Get_Live_Data_From_Google = Module_Get_Live_Data_From_Google.Module_Get_Live_Data_From_Google()
+        
+        
         
         #https://finance.google.com/finance?q=NSE:NCC
 #        self.url_prefix = "https://finance.google.com/finance?q="
@@ -28,7 +31,8 @@ class GoogleFinanceAPI:
         select_sql ="select fullid, nseid from stocksdb.amit_portfolio where is_index='n' and is_inactive != 'y' order by display_seq "
         
         #testing
-#        select_sql ="select fullid, nseid from stocksdb.amit_portfolio where display_seq is not null and nseid in ('512093', '517467') order by display_seq "
+#        select_sql ="select fullid, nseid from stocksdb.amit_portfolio where nseid in ('ITC', 'NCC') "
+#        select_sql ="select fullid, nseid from stocksdb.amit_portfolio where is_fo='y' "
         
         self.cur.execute(select_sql)
 
@@ -119,27 +123,58 @@ if __name__ == "__main__":
     records = [] ## LIST OF LISTS
     minutes_count = 0  # compare with 7 Hrs run daily from 9-4 pm (7*60=420)
     #EmailUtil.send_email_as_text(" amit_portfolio_update.py job started - ", "", "")
-    print ("\n*** Amit Started getting quotes")
+    print ("\n*** Processing ", len(stock_names), " Stocks" )
     
     getDataFromQuandl = 0
     
-    if getDataFromQuandl == 1:
+    getDataFromZerodha = 1
+
+    if getDataFromZerodha == 1:
+        while (c.in_between(datetime.now().time(), time(8,40), time(19,00))):
+            print ("\n*** Getting quotes from ZERODHA one by one ************")
+
+            start_time = t.time()
+            print ("\n*** Getting quotes from Zerodha ************")
+            module_Get_Live_Data_From_Zerodha = Module_Get_Live_Data_From_Zerodha.Module_Get_Live_Data_From_Zerodha()
+    #        kite = module_Get_Live_Data_From_Zerodha.getKiteObject()
+            allQuotes = module_Get_Live_Data_From_Zerodha.getAllQuotesFromZerodha(stock_names)
+            print(allQuotes)
+     
+            if allQuotes:
+                c.saveIntoDB(allQuotes)
+            else:
+                print ("\n*** Amit All Quotes from Zerodha were empy(due to exception i guess) so not saving in DB")
+
+            if minutes_count == 0:
+                EmailUtil.send_email_as_text(" amit_portfolio_update.py job started - ", "", "")
+            minutes_count = minutes_count+1
+            print ("\n*** Amit Sleeping for 2 minute, remaining loops (420-x)- ", 420- minutes_count, " | Time - ", datetime.now())
+            t.sleep(60)
+       
+#            print ("Done !!")
+#            print("--- %s seconds ---" % (t.time() - start_time))
+#            print("--- Minutes ---", float(t.time() - start_time)/60)
+        
+    elif getDataFromQuandl == 1:
         print ("\n*** Getting quotes from Quandle ************")
         allQuotes = c.module_Get_Live_Data_From_Google.getAllQuotesFromQuandl(stock_names)
         if allQuotes:
             c.saveIntoDB(allQuotes)
+#            print("Save in DB disabled")
         else:
             print ("\n*** Amit All Quotes from Google were empy(due to exception i guess) so not saving in DB")
     else:
         # get quandl quotes only once since we need previous days data whihc is not available from the 
         # url we use in following fn
 #        quandlQuotes = c.module_Get_Live_Data_From_Google.getAllQuotesFromQuandl(stock_names)
+        print ("\n*** Getting quotes from Quandle (One time) ************")
         mylist = c.module_Get_Live_Data_From_Google.getAllQuotesFromQuandl(stock_names)
         quandlData = pd.DataFrame(mylist)
         print('quandlData  - \n',quandlData )
         #while minutes_count < 420:
         #Run b/w morning 9 am to 4:00 pm IST
         while (c.in_between(datetime.now().time(), time(8,40), time(16,00))):
+            print ("\n*** Getting quotes from Google one by one ************")
             allQuotes = c.module_Get_Live_Data_From_Google.getLiveQuotesForMultipleStock(stock_names,quandlData)
 #            allQuotes = c.getAllQuotesFromQuandl(stock_names)
             
@@ -154,4 +189,4 @@ if __name__ == "__main__":
             t.sleep(60)
 
     
-    print ("\n*** Amit Exiting the google quote process...TIME is  - ", datetime.now().time())
+    print ("\n*** Amit Exiting the quote process...SINCE TIME is  - ", datetime.now().time())

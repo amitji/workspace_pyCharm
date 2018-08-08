@@ -11,6 +11,7 @@ import DBManager
 import json
 import ModuleAmitException
 import NSELiveDataModule
+import time as t
 
 
 class Module_Get_Live_Data_From_Google:
@@ -178,12 +179,17 @@ class Module_Get_Live_Data_From_Google:
                     else:
                         url = url_prefix+ "%s" % ( nseid)+url_suffix_nse   
                         
+#                    print(' Amit 111 calling geturl ')
                     rsp = requests.get(url,headers={'User-Agent': 'Mozilla/5.0'})
                     content2 = {}
+#                    print(' rsp.status_code ', rsp.status_code)
                     if rsp.status_code in (200,):
+#                        print(' Amit 222 inside 200 code ')
                         temp = rsp.content
                         last_line = temp.splitlines()[-1]
+                        print('last_line - ', last_line)
                         fin_data = last_line.decode("utf-8").split(',')
+#                        print('fin_data - ', fin_data)
                         qrow = quandlData.loc[quandlData['fullid'] == fullid]
                         lp = float(fin_data[1])
                         volume = float(fin_data[5])                        
@@ -199,10 +205,18 @@ class Module_Get_Live_Data_From_Google:
                         content2['cp'] = '{}'.format(change_percent).replace(",", "");
                         content2['pcls'] = '{}'.format(prev_close);
                         content2['volume'] = '{}'.format(volume);
+                    else:
+                        print ("\n******Amit getLiveQuotesForMultipleStock rsp.status_code is NOT 200, code is - ", rsp.status_code)
+                        print('\n**** Hence Sleeping for a minute ')
+                        t.sleep(60)
+
                 except Exception as e1:
-                    print ("\n******Amit exception in getAllQuotes for fullid - \n ", fullid)
+                    print ("\n******getLiveQuotesForMultipleStock() exception in  getting quote from google url for fullid - \n ", fullid)
                     print (str(e1))
                     ModuleAmitException.printInfo()
+                    #Amit - remove this later
+                    print('\n**** Sleeping for a minute since Google url get had an exception...\n')
+                    t.sleep(60)
                     pass
                 content.append(content2);
         except Exception as e:
@@ -272,7 +286,7 @@ class Module_Get_Live_Data_From_Google:
                     mydata = NSELiveDataModule.getQuandlData(fullid,nseid)
                     fin_data = NSELiveDataModule.getLastDayParams(mydata,fullid,nseid)
                     
-#                    print(fin_data)
+                    print(fin_data)
             
     
                     content2['fullid'] = fullid
@@ -298,7 +312,7 @@ class Module_Get_Live_Data_From_Google:
                     ModuleAmitException.printInfo()
                     pass
     
-                print (content2)
+#                print (content2)
                 content.append(content2);
 
             #print content
