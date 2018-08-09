@@ -21,11 +21,12 @@ class Process_MACD_Volume_Analysis:
     def getStockList(self):
 
         ##Get all stocks from amit_portfolio and all FO stocks         
+        #prod sql
         select_sql = "select symbol nseid, 'n' owned from stocksdb.fo_mktlots fo where symbol not in (select nseid from stocksdb.amit_portfolio ) "
         select_sql += " union select nseid, 'y' owned from stocksdb.amit_portfolio sn where sn.is_inactive='n' order by nseid desc "
         
         #testing
-#        select_sql = "select symbol nseid, 'y' owned from stocksdb.fo_mktlots sn where symbol in ('NCC', 'HCC', 'AJANTPHARM', 'ALBK', 'EDUCOMP', 'AUROPHARMA')"
+#        select_sql = "select symbol nseid, 'y' owned from stocksdb.fo_mktlots sn where symbol in ('NCC')"
 #        select_sql = "select symbol nseid from stocksdb.fo_mktlots sn "
 
         #Only amit_portfolio
@@ -295,12 +296,15 @@ class Process_MACD_Volume_Analysis:
         newDf = pd.DataFrame()
         for i, row in df.iterrows():
             nseid = row.nseid
+#            fullid = "NSE:"+nseid
             #only get live data for NON hold predictions
             macd_pred = row.macd_prediction
 
             if not macd_pred == 'HOLD':
-                print('Getting live quotes...................\n')
-                liveData = self.module_Get_Live_Data_From_Google.getLiveQuotesForAStock(nseid)
+                print('Getting quotes from Quandl...................\n')
+#                liveData = self.module_Get_Live_Data_From_Google.getLiveQuotesForAStock(nseid)
+                liveData = self.module_Get_Live_Data_From_Google.getQuoteFromQuandl(nseid) 
+#                liveData = liveDict.items()
                 print('liveData - ',liveData )
                 change = liveData.get('c')
                 if change is not None :

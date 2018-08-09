@@ -126,7 +126,7 @@ class Process_SEPA_Analysis:
         #Stage 1->2 Logic
         elif((mydf['50dma'] < mydf['100dma'] ).bool() and (mydf['100dma'] < mydf['200dma']).bool()):
             if(((mydf['5d_avg_vol'] > mydf['10d_avg_vol'] ).bool() or (mydf['10d_avg_vol'] > mydf['15d_avg_vol']).bool() )and pos_days_vol_sum > neg_days_vol_sum  
-                   and (neg_close_chg_sum+pos_close_chg_sum) > 4 and (mydf['close'] > mydf['50dma']).bool()): #and (mydf['10d_avg_vol'] > mydf['15d_avg_vol']).bool()):
+                   and (neg_close_chg_sum+pos_close_chg_sum) > 4 and (mydf['close'] > mydf['100dma']).bool()): #and (mydf['10d_avg_vol'] > mydf['15d_avg_vol']).bool()):
                 mydf['Stage'] = ['Stage 1->2']
                 print("\n\n**** Stage 1->2 for ", nseid , "\n\n")
 #            else:
@@ -214,7 +214,8 @@ df = df.loc[df['Stage'] == 'Stage 1->2']
 
 
 
-print(df)
+print(df, "\n # of stocks - ", len(df))
+
 #df = df[(df['close'] < 400) & (df['dist_50dma'] > 9)]
 
 # uncomment 2 lines for prod

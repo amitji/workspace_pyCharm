@@ -116,7 +116,7 @@ class GoogleFinanceAPI:
 if __name__ == "__main__":
     c = GoogleFinanceAPI()
 
-    stock_names = c.getStockList()
+#    stock_names = c.getStockList()
     #Get only FO when Google is slow...
 #    stock_names = c.getFOStockList()
 
@@ -130,7 +130,8 @@ if __name__ == "__main__":
     getDataFromZerodha = 1
 
     if getDataFromZerodha == 1:
-        while (c.in_between(datetime.now().time(), time(8,40), time(19,00))):
+        stock_names = c.getStockList()
+        while (c.in_between(datetime.now().time(), time(8,40), time(14,00))):
             print ("\n*** Getting quotes from ZERODHA one by one ************")
 
             start_time = t.time()
@@ -156,6 +157,7 @@ if __name__ == "__main__":
 #            print("--- Minutes ---", float(t.time() - start_time)/60)
         
     elif getDataFromQuandl == 1:
+        stock_names = c.getStockList()
         print ("\n*** Getting quotes from Quandle ************")
         allQuotes = c.module_Get_Live_Data_From_Google.getAllQuotesFromQuandl(stock_names)
         if allQuotes:
