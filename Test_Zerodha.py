@@ -33,6 +33,7 @@ def on_connect(ws, response):
 def on_close(ws, code, reason):
     # On connection close stop the main loop
     # Reconnection will not happen after executing `ws.stop()`
+    logging.error("Closing Socket")
     ws.stop()
 
 def on_error(ws, code, reason):
@@ -64,5 +65,5 @@ kws.on_order_update = on_order_update
 #kws.connect()
 
 print('calling KWS.connect')
-kws.connect(threaded=True)
+kws.connect()
 print('finished kws connect process')

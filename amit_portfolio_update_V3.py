@@ -11,6 +11,11 @@ import EmailUtil
 import time as t
 import Module_Get_Live_Data_From_Google
 import Module_Get_Live_Data_From_Zerodha
+from kiteconnect import KiteConnect
+import zerodha_const as zc
+import sys
+import ModuleAmitException
+
 
 class GoogleFinanceAPI:
     def __init__(self):
@@ -85,9 +90,9 @@ class GoogleFinanceAPI:
 
             try:
                 #print "fullid - ", fullid
-                print(row)
+#                print(row)
                 record = (( row['l'], row['c'],row['cp'],row['pcls'],row['volume'], row['fullid']))
-                print (record)
+#                print (record)
                 records.append(record )
 
             except Exception as e:
@@ -113,10 +118,17 @@ class GoogleFinanceAPI:
         else:  # over midnight e.g., 23:30-04:15
             return start <= now or now < end
 
+    def printZerodhaAccess_token(self, request_token):
+        kite = KiteConnect(api_key="l5r6aemba2mjr14s")
+#        print(kite.login_url())
+        data = kite.generate_session(request_token, zc.secret_key)
+        print(data)
+        sys.exit()
+
 if __name__ == "__main__":
     c = GoogleFinanceAPI()
 
-#    stock_names = c.getStockList()
+    stock_names = c.getStockList()
     #Get only FO when Google is slow...
 #    stock_names = c.getFOStockList()
 
@@ -130,19 +142,38 @@ if __name__ == "__main__":
     getDataFromZerodha = 1
 
     if getDataFromZerodha == 1:
-        stock_names = c.getStockList()
-        while (c.in_between(datetime.now().time(), time(8,40), time(14,00))):
+#        stock_names = c.getStockList()
+        module_Get_Live_Data_From_Zerodha = Module_Get_Live_Data_From_Zerodha.Module_Get_Live_Data_From_Zerodha()
+        
+#        c.printZerodhaAccess_token('JDhR8cMB69slj3j4LzKEjBDoYEajiray')
+        
+        while (c.in_between(datetime.now().time(), time(5,30), time(15,40))):
             print ("\n*** Getting quotes from ZERODHA one by one ************")
-
             start_time = t.time()
-            print ("\n*** Getting quotes from Zerodha ************")
-            module_Get_Live_Data_From_Zerodha = Module_Get_Live_Data_From_Zerodha.Module_Get_Live_Data_From_Zerodha()
-    #        kite = module_Get_Live_Data_From_Zerodha.getKiteObject()
             allQuotes = module_Get_Live_Data_From_Zerodha.getAllQuotesFromZerodha(stock_names)
-            print(allQuotes)
+#            print(allQuotes)
      
             if allQuotes:
-                c.saveIntoDB(allQuotes)
+                try:
+                    c.saveIntoDB(allQuotes)
+                except Exception as e1:
+                    print ("\n******Exception in saving quotes in DB, sleep for a minute and try...\n\n\n" )
+                    print (str(e1))
+                    ModuleAmitException.printInfo()
+                    #May be Db conn has gone bad so close it and initialize again.. Lets try !
+                    c.con.close()                    
+                    c.con = DBManager.connectDB()
+                    c.cur = c.con.cursor()
+
+                    t.sleep(60)
+                    try:
+                        c.saveIntoDB(allQuotes)
+                    except Exception as e2: 
+                        print ("\n******Second time Exception in saving quotes in DB, skip this cycle and continue...\n\n\n" )    
+                        print (str(e1))
+                        ModuleAmitException.printInfo()
+                        EmailUtil.send_email_as_text(" Save ib DB is failing amit_portfolio_update.py, Check Now", "", "")
+  
             else:
                 print ("\n*** Amit All Quotes from Zerodha were empy(due to exception i guess) so not saving in DB")
 
@@ -157,7 +188,7 @@ if __name__ == "__main__":
 #            print("--- Minutes ---", float(t.time() - start_time)/60)
         
     elif getDataFromQuandl == 1:
-        stock_names = c.getStockList()
+#        stock_names = c.getStockList()
         print ("\n*** Getting quotes from Quandle ************")
         allQuotes = c.module_Get_Live_Data_From_Google.getAllQuotesFromQuandl(stock_names)
         if allQuotes:

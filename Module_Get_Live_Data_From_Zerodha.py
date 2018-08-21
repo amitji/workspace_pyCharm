@@ -24,51 +24,57 @@ class Module_Get_Live_Data_From_Zerodha:
     def getAllQuotesFromZerodha(self, stock_names):
         
         content = []
-        for row in stock_names:
-            fullid = row['fullid']
-            nseid = row['nseid']
-            if nseid == 'NIFTY':
-                nseid = 'NIFTY 50'
-                fullid = 'NSE:NIFTY 50'
-            
-            quote = self.kite.quote(fullid)
-            t.sleep(1)
-            if quote:
+        try:
+            for row in stock_names:
+                fullid = row['fullid']
+                nseid = row['nseid']
+                if nseid == 'NIFTY':
+                    nseid = 'NIFTY 50'
+                    fullid = 'NSE:NIFTY 50'
                 
-#                print(fullid, " -- ", quote)
-#                s1 = json.dumps(quote)
-                s1=json.dumps(quote, indent=4, sort_keys=True, default=str)
-                data = json.loads(s1)
-                lp = data[fullid]['last_price']
-                try:
-                    volume = data[fullid]['volume']
-                except Exception as e1:
-                    print ("\n******No Volume  for fullid -", fullid)
-#                    print (str(e1))
-                    ModuleAmitException.printInfo()
-                    volume = ''
-#                    pass    
-                change = data[fullid]['net_change']
-                prev_close = data[fullid]['ohlc']['close']
-                change_percent = round((change*100)/prev_close, 2)
-#                print("lp -- ", lp)
-#                print("volume  -- ", volume)
-    #            quote = self.kite.ltp(fullid)
-                content2 = {}            
-                content2['fullid'] = fullid
-                content2['l'] = '{}'.format(lp).replace(",", "");
-                content2['c'] = '{}'.format(change).replace(",", "");
-                content2['cp'] = '{}'.format(change_percent).replace(",", "");
-                content2['pcls'] = '{}'.format(prev_close);
-                content2['volume'] = '{}'.format(volume);    
-                print(content2)
-                
-                content.append(content2);
-            else:
-                print("\n*** NO qoute for - ", fullid, "\n")
+                quote = self.kite.quote(fullid)
+                t.sleep(1)
+                if quote:
+                    
+    #                print(fullid, " -- ", quote)
+    #                s1 = json.dumps(quote)
+                    s1=json.dumps(quote, indent=4, sort_keys=True, default=str)
+                    data = json.loads(s1)
+                    lp = data[fullid]['last_price']
+                    try:
+                        volume = data[fullid]['volume']
+                    except Exception as e1:
+                        print ("\n******No Volume  for fullid -", fullid)
+    #                    print (str(e1))
+                        ModuleAmitException.printInfo()
+                        volume = ''
+    #                    pass    
+                    change = data[fullid]['net_change']
+                    prev_close = data[fullid]['ohlc']['close']
+                    change_percent = round((change*100)/prev_close, 2)
+    #                print("lp -- ", lp)
+    #                print("volume  -- ", volume)
+        #            quote = self.kite.ltp(fullid)
+                    content2 = {}            
+                    content2['fullid'] = fullid
+                    content2['l'] = '{}'.format(lp).replace(",", "");
+                    content2['c'] = '{}'.format(change).replace(",", "");
+                    content2['cp'] = '{}'.format(change_percent).replace(",", "");
+                    content2['pcls'] = '{}'.format(prev_close);
+                    content2['volume'] = '{}'.format(volume);    
+                    print(content2)
+                    
+                    content.append(content2);
+                else:
+                    print("\n*** NO qoute for - ", fullid, "\n")
+        except Exception as e1:
+            print ("\n******getAllQuotesFromZerodha() exception in  getting quote from Zerodha for fullid - \n ", fullid)
+            print (str(e1))
+            ModuleAmitException.printInfo()
+            #Amit - remove this later
+            print('\n**** Sleeping for a minute since Zerodha API had an exception...\n')
+            t.sleep(60)
+            pass
             
         return content
-            
-# Infinite loop on the main thread. Nothing after this will run.
-# You have to use the pre-defined callbacks to manage subscriptions.
-#kws.connect()
+

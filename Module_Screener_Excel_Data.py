@@ -9,6 +9,7 @@ import win32com.client
 import datetime
 import DBManager
 import Constants
+import ModuleAmitException
 
 print (__name__)
 
@@ -188,6 +189,7 @@ class Module_Screener_Excel_Data:
 
                 except Exception as e:
                     print( str(e))
+                    ModuleAmitException.printInfo()
 
                 else:
                     wb.Close(True)
@@ -199,17 +201,23 @@ class Module_Screener_Excel_Data:
         return
 
     def saveToDB(self, records, fullid):
-
-        delete_sql = "delete from stock_forecasting_pe_eps_past_years_data where fullid = '%s'" % fullid
-        self.cur.execute(delete_sql)
-        self.con.commit()
-
-        insert_sql = ("INSERT INTO stock_forecasting_pe_eps_past_years_data (nseid,fullid, seq_no, fin_year, profit,revenue, eps, pe, price,  no_of_shares ,type, last_modified, created_on ) VALUES (%s,%s,%s,%s,%s, %s, %s, %s,%s, %s, %s,%s, %s)")
-
-        self.cur.executemany(insert_sql, records)
-        self.con.commit()
-        #Now set the update_now flag to 'n' so that its not processed again for the same quarter
-        self.updateFlag(fullid)
+        try:
+            delete_sql = "delete from stock_forecasting_pe_eps_past_years_data where fullid = '%s'" % fullid
+            self.cur.execute(delete_sql)
+            self.con.commit()
+    
+            insert_sql = ("INSERT INTO stock_forecasting_pe_eps_past_years_data (nseid,fullid, seq_no, fin_year, profit,revenue, eps, pe, price,  no_of_shares ,type, last_modified, created_on ) VALUES (%s,%s,%s,%s,%s, %s, %s, %s,%s, %s, %s,%s, %s)")
+    
+            self.cur.executemany(insert_sql, records)
+            self.con.commit()
+            #Now set the update_now flag to 'n' so that its not processed again for the same quarter
+            self.updateFlag(fullid)
+            print ("\n****** Saved excel data in DB for  - ", fullid)
+        except Exception as e1:
+            print ("\n******Amit Exception in saving excel data in DB for  - ", fullid, "...\n\n" )
+            print (str(e1))
+            ModuleAmitException.printInfo()
+   
 
 
     def updateFlag(self, fullid):
