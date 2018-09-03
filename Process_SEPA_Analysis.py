@@ -10,6 +10,8 @@ import DBManager
 import Module_Get_Live_Data_From_Google
 import time
 import EmailUtil
+import ModuleAmitException
+import time as t
 
 class Process_SEPA_Analysis:
     
@@ -77,21 +79,24 @@ class Process_SEPA_Analysis:
 
         ##Get all stocks from amit_portfolio and all FO stocks         
 
-        select_sql = " select SUBSTR(fullid, 5) nseid, short_name, 'n' as isFO FROM stocksdb.fa_financial_ratio  "
-        select_sql += " union " 
-        select_sql += " select  SUBSTR(fullid, 5) nseid, short_name, 'n' as isFO  FROM stocksdb.fa_financial_ratio_secondary  "
-        select_sql += " union "         
-        select_sql += " select symbol nseid , symbol as short_name, 'y' as isFO  from stocksdb.fo_mktlots sn "
-#        
+        select_sql = " select SUBSTR(fullid, 5) nseid, short_name, 'n' as isFO FROM stocksdb.fa_financial_ratio "
+        select_sql += " where SUBSTR(fullid, 5) not in (select symbol from  stocksdb.fo_mktlots )  "
+        select_sql += " union "
+        select_sql += " select  SUBSTR(fullid, 5) nseid, short_name, 'n' as isFO  FROM stocksdb.fa_financial_ratio_secondary "
+        select_sql += " where SUBSTR(fullid, 5) not in (select symbol from stocksdb.fo_mktlots )   "
+        select_sql += " union "
+        select_sql += " select symbol nseid,sn.name,  'y' as isFO  from stocksdb.fo_mktlots fo, stock_names sn "
+        select_sql += " where sn.nseid = fo.symbol "
+        
         # sql to try on less records
-#        select_sql = "SELECT SUBSTR(fullid, 5) nseid, short_name FROM stocksdb.fa_financial_ratio  "
+#        select_sql = "SELECT SUBSTR(fullid, 5) nseid, short_name, 'n' as isFO FROM stocksdb.fa_financial_ratio  "
         
         #testing 1
 #        select_sql = "select nseid, nseid as short_name,'n' as isFO from stocksdb.stock_names sn where nseid in ('AXISBANK')"
 
 #        select_sql = "select  nseid, nseid as short_name,'n' as isFO from stocksdb.amit_portfolio sn where nseid in ('APOLLOTYRE')"
         #testing 2 
-#        select_sql = "select symbol nseid , symbol as short_name, 'y' as isFO  from stocksdb.fo_mktlots sn where symbol = 'ACC' "
+#        select_sql = "select symbol nseid , symbol as short_name, 'y' as isFO  from stocksdb.fo_mktlots sn "
 
 
         df = pd.read_sql(select_sql, self.con)
@@ -110,7 +115,7 @@ class Process_SEPA_Analysis:
         neg_days_vol_sum = 1
         pos_close_chg_sum = 0
         neg_close_chg_sum = 0
-        neg_to_pos_vol_ratio = 0
+#        neg_to_pos_vol_ratio = 0
         
         for index, row in last_x_records_df.iterrows():
 #            print(row)
@@ -123,53 +128,99 @@ class Process_SEPA_Analysis:
                 neg_days_vol_sum +=row['volume']
                 neg_close_chg_sum +=row['perct_change']
             
-        neg_to_pos_vol_ratio = round(neg_days_vol_sum/pos_days_vol_sum, 2)
+#        neg_to_pos_vol_ratio = round(neg_days_vol_sum/pos_days_vol_sum, 2)
         pos_close_chg_sum = round(pos_close_chg_sum,2)
         neg_close_chg_sum = round(neg_close_chg_sum,2)
-        print(nseid, pos_day_count,neg_day_count,pos_days_vol_sum,neg_days_vol_sum,neg_to_pos_vol_ratio,pos_close_chg_sum, neg_close_chg_sum)
+        total_price_change = round(pos_close_chg_sum+neg_close_chg_sum, 2)
+        gap_100dma_200dma = mydf['100dma'].values[0] - mydf['200dma'].values[0] # assuming 100d > 200d
+        
+        pivot_point1 =  round((mydf['100dma'].values[0] - 0.4 * gap_100dma_200dma),2)
+        pivot_point2 =  round((mydf['200dma'].values[0] - 0.2 * gap_100dma_200dma),2)
+        
+        close = mydf['close'].values[0]
+        volume = mydf['volume'].values[0]
+        min_volume =  50000
+#        print(nseid, pos_day_count,neg_day_count,pos_days_vol_sum,neg_days_vol_sum,neg_to_pos_vol_ratio,pos_close_chg_sum, neg_close_chg_sum)
+        print(nseid, close,volume, gap_100dma_200dma,pivot_point1, total_price_change)
         
 
-        #Stage 1->2 Logic
+        #Stage 1->2 bw_050_100_dma Logic
         if((mydf['50dma'] < mydf['100dma'] ).bool() and (mydf['100dma'] < mydf['200dma']).bool()
              and (mydf['5d_avg_vol'] > mydf['10d_avg_vol'] ).bool()  and pos_days_vol_sum > neg_days_vol_sum  
-                   and (pos_close_chg_sum + neg_close_chg_sum) > 4 and ((mydf['close'] > mydf['50dma']).bool() and (mydf['close'] < mydf['100dma']).bool())): # or (mydf['close'] > mydf['50dma']).bool()
-                mydf['Stage'] = ['Stage 1->2']
-#                print("\n\n**** Stage 1->2 for ", nseid , "\n\n")
+             and (mydf['close'] > mydf['50dma']).bool() and (mydf['close'] < mydf['100dma']).bool()
+             and total_price_change > 4 ): 
+            
+            mydf['Stage'] = ['Stage 1->2 bw_050_100_dma']
+            print("\n\n**** Stage 1->2 for bw_050_100_dma", nseid , "\n\n")
 
+        #Stage 1->2 bw_100_200_dma Logic
+        elif((mydf['50dma'] < mydf['100dma'] ).bool() and (mydf['100dma'] < mydf['200dma']).bool()
+             and (mydf['5d_avg_vol'] > mydf['10d_avg_vol'] ).bool()  and pos_days_vol_sum > neg_days_vol_sum  
+             and (mydf['close'] > mydf['100dma']).bool() and (mydf['close'] < mydf['200dma']).bool()
+             and total_price_change > 4 ): 
+            
+            mydf['Stage'] = ['Stage 1->2 bw_100_200_dma']
+            print("\n\n**** Stage 1->2 bw_100_200_dma for ", nseid , "\n\n")
+            
+            
         #Stage 2
         elif((mydf['50dma'] > mydf['100dma'] ).bool() and (mydf['100dma'] > mydf['200dma']).bool() 
                 and (mydf['5d_avg_vol'] > mydf['10d_avg_vol'] ).bool() #and (mydf['10d_avg_vol'] > mydf['15d_avg_vol']).bool()
-                  and pos_days_vol_sum > neg_days_vol_sum and (mydf['close'] > mydf['50dma']).bool()    ):
+                  and pos_days_vol_sum > neg_days_vol_sum and (mydf['close'] > mydf['50dma']).bool()  ):   
                 
             mydf['Stage'] = ['Stage 2']
             
-#            elif((mydf['5d_avg_vol'] > mydf['10d_avg_vol'] ).bool()):
-#                mydf['Stage'] = ['Stage 1->2 May be']
-#            
-#            else:
-#                mydf['Stage'] = ['Stage 1 May be']
         
-        #Stage 3        
-        elif((mydf['close'] < mydf['50dma']).bool() and (mydf['close'] > mydf['100dma']).bool() 
-                  and (mydf['50dma'] > mydf['100dma']).bool() and (mydf['100dma'] > mydf['200dma']).bool() ):
-                 #and (mydf['50dma'] > mydf['100dma'] ).bool()  and (mydf['50dma'] > mydf['200dma'] ).bool() ):
-            mydf['Stage'] = ['Stage 3']
-#            print("\n\n**** Stage 3 ! for ", nseid , "\n\n")
+        #Stage 3   
+        # This stage was not useful hence commenting and earlier stage3->4 made as stage 3
+        # and new logic for actula 3->4
+        
+#        elif((mydf['close'] < mydf['50dma']).bool() and (mydf['close'] > mydf['100dma']).bool() 
+#                  and (mydf['50dma'] > mydf['100dma']).bool() and (mydf['100dma'] > mydf['200dma']).bool() ):
+#                 #and (mydf['50dma'] > mydf['100dma'] ).bool()  and (mydf['50dma'] > mydf['200dma'] ).bool() ):
+#            mydf['Stage'] = ['Stage 3']
+##            print("\n\n**** Stage 3 ! for ", nseid , "\n\n")
 
         
-        #Stage 3->4 logic
-        elif(neg_days_vol_sum > pos_days_vol_sum and (neg_close_chg_sum+pos_close_chg_sum) < -4
-              and  (mydf['50dma'] < mydf['100dma']).bool() and (mydf['100dma'] > mydf['200dma']).bool() ):
-            mydf['Stage'] = ['Stage 3->4']
+#        #Stage 3->4 logic
+#        elif(neg_days_vol_sum > pos_days_vol_sum and total_price_change < -4
+#              and  (mydf['50dma'] < mydf['100dma']).bool() and (mydf['100dma'] > mydf['200dma']).bool() ):
+#            mydf['Stage'] = ['Stage 3->4']
+##            print("\n\n**** Stage 3->4 for ", nseid , "\n\n")
+
+#        #Stage 3->4 logic Amit Try new logic - I
+#        elif((mydf['50dma'] > mydf['100dma']).bool() and (mydf['100dma'] > mydf['200dma']).bool() 
+#                and (mydf['close'] < mydf['200dma']).bool() 
+#                ):
+#            mydf['Stage'] = ['Stage 3->4']
 #            print("\n\n**** Stage 3->4 for ", nseid , "\n\n")
+            
+        #Stage 3 logic Amit Try new logic (earleir was stage 3-4)
+        elif((mydf['50dma'] > mydf['100dma']).bool() and (mydf['100dma'] > mydf['200dma']).bool() 
+                and (mydf['close'] < mydf['100dma']).bool() and (mydf['close'] > mydf['200dma']).bool()
+                and (mydf['close'] < pivot_point1).bool()
+                and total_price_change < 0    ):
+            
+            mydf['Stage'] = ['Stage 3']
+            print("\n\n**** Stage 3 for ", nseid , "\n\n")
 
+        #Stage 3->4 logic Amit Try new logic -  333
+        elif((mydf['50dma'] > mydf['100dma']).bool() and (mydf['100dma'] > mydf['200dma']).bool() 
+                and (mydf['close'] < mydf['200dma']).bool() #and (mydf['close'] > mydf['200dma']).bool()
+                and (mydf['close'] < pivot_point2).bool()
+                and total_price_change < 0
+                ):
+            mydf['Stage'] = ['Stage 3->4']
+            print("\n\n**** Stage 3->4 for ", nseid , "\n\n")
+
+            
         #Stage 1->2 Sideways for FO stocks
         elif(isFO == 'y' and (mydf['5d_avg_vol'] > mydf['10d_avg_vol'] ).bool() and pos_days_vol_sum > neg_days_vol_sum 
              and (mydf['close'] > mydf['50dma']).bool() and (mydf['close'] > mydf['100dma']).bool()
-             and (mydf['close'] > mydf['200dma']).bool()):
+             and (mydf['close'] > mydf['200dma']).bool() ):
                 
             mydf['Stage'] = ['Stage 1->2 Sideways FO']
-            print("\n\n****Stage 1->2 Sideways FO for ", nseid , "\n\n")
+#            print("\n\n****Stage 1->2 Sideways FO for ", nseid , "\n\n")
 
         
         #No Stage perhaphs...
@@ -211,7 +262,8 @@ class Process_SEPA_Analysis:
     
     def saveInDB(self, df):
         df = self.copyCommentsFromPreviousRecords(df)
-        df.to_sql('stock_sepa_analysis', self.engine, if_exists='append', index=False)         
+        df.to_sql('stock_sepa_analysis', self.engine, if_exists='append', index=False)
+        print("SEPA saved in DB")         
 
     def copyCommentsFromPreviousRecords(self,df):
         
@@ -244,16 +296,29 @@ df = thisObj.findSEPA(stock_names)
 
 if not df.empty:
     df = df.loc[df['Stage'] != 'None']
-#    df = df.loc[df['Stage'] == 'Stage 1->2 Sideways FO']
+#    df = df.loc[df['Stage'] == 'Stage 1->2']
     
     tempdf = df[['nseid','Stage']]
     print(tempdf.to_string())
     print("\n # of stocks - ", len(tempdf))
           
     #df = df[(df['close'] < 400) & (df['dist_50dma'] > 9)]
+    try:
+        # uncomment folowing lines for prod
+        thisObj.saveInDB(df)
+#        print(" NOT Saved in DB")
+    except Exception as e1:
+        print ("\n******Exception in saving SEPA in DB, sleep for 5 minute and try...\n\n\n" )
+        print (str(e1))
+        ModuleAmitException.printInfo()
+        #May be Db conn has gone bad so close it and initialize again.. Lets try !
+        thisObj.con.close()                    
+        thisObj.con = DBManager.connectDB()
+        thisObj.cur = c.con.cursor()
     
-    # uncomment folowing lines for prod
-    thisObj.saveInDB(df)
+        t.sleep(300)
+        thisObj.saveInDB(df)
+
 
 #print ("\n\n****** Saved results in DB *****************" )
 #print("Total time taken by process --- %s seconds ---" % (time.time() - start_time))
