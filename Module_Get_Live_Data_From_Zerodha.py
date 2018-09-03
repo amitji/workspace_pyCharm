@@ -24,8 +24,8 @@ class Module_Get_Live_Data_From_Zerodha:
     def getAllQuotesFromZerodha(self, stock_names):
         
         content = []
-        try:
-            for row in stock_names:
+        for row in stock_names:
+            try:
                 fullid = row['fullid']
                 nseid = row['nseid']
                 if nseid == 'NIFTY':
@@ -57,24 +57,25 @@ class Module_Get_Live_Data_From_Zerodha:
         #            quote = self.kite.ltp(fullid)
                     content2 = {}            
                     content2['fullid'] = fullid
+                    content2['nseid'] = nseid
                     content2['l'] = '{}'.format(lp).replace(",", "");
-                    content2['c'] = '{}'.format(change).replace(",", "");
+                    content2['c'] = '{0:.2f}'.format(change).replace(",", "");
                     content2['cp'] = '{}'.format(change_percent).replace(",", "");
-                    content2['pcls'] = '{}'.format(prev_close);
+                    content2['pcls'] = '{0:.2f}'.format(prev_close);
                     content2['volume'] = '{}'.format(volume);    
                     print(content2)
                     
                     content.append(content2);
                 else:
                     print("\n*** NO qoute for - ", fullid, "\n")
-        except Exception as e1:
-            print ("\n******getAllQuotesFromZerodha() exception in  getting quote from Zerodha for fullid - \n ", fullid)
-            print (str(e1))
-            ModuleAmitException.printInfo()
-            #Amit - remove this later
-            print('\n**** Sleeping for a minute since Zerodha API had an exception...\n')
-            t.sleep(60)
-            pass
+            except Exception as e1:
+                print ("\n******getAllQuotesFromZerodha() exception in  getting quote from Zerodha for fullid - \n ", fullid)
+                print (str(e1))
+                ModuleAmitException.printInfo()
+#                print('\n**** Sleeping for a minute since Zerodha API had an exception...\n')
+#                t.sleep(60)
+                pass           
+
             
         return content
 

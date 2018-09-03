@@ -8,6 +8,7 @@ import datetime
 import QuandlDataModule
 import Constants as C
 import operator
+import ModuleAmitException
 
 
 class Module_Final_Rating:
@@ -142,6 +143,7 @@ class Module_Final_Rating:
         except Exception as e2:
             print( str(e2))
             print( "\n******Amit - Exception in inserting final_rating_temp data for - " + fullid)
+            ModuleAmitException.printInfo()
             self.sql_exception_list.append(nseid)
             self.all_good_flag = False
             pass
@@ -161,7 +163,9 @@ class Module_Final_Rating:
             de = list_item['debt_equity_ratio']
             roe = list_item['roe']
 
-            if roe > 50:
+            if roe is None or roe == '':
+                roeI = 0  # beyond 50 there are industry 'type' and other reasons for high ROE
+            elif roe > 50:
                 roeI = 1  # beyond 50 there are industry 'type' and other reasons for high ROE
             elif roe > 20:
                 roeI = 2
@@ -174,14 +178,16 @@ class Module_Final_Rating:
             else:
                 roeI = 0
 
-            if ic > 2 or ic is None:
+            if ic is None or ic > 2 :
                 icI = 2
             elif ic > 1:
                 icI = 1
             else:
                 icI = 0
 
-            if de > 2 or de < 0:  # negative de means equity is negative which is not good for company
+            if de is None or de == '':
+                deI = 2  
+            elif de > 2 or de < 0:  # negative de means equity is negative which is not good for company
                 deI = 0
             elif de > 1:
                 deI = 1
@@ -448,6 +454,7 @@ class Module_Final_Rating:
         except Exception as e2:
             print( str(e2))
             print( "\n******Amit - Exception in inserting final_rating data for - " + fullid)
+            ModuleAmitException.printInfo()
             self.sql_exception_list.append(nseid)
             self.all_good_flag = False
             pass

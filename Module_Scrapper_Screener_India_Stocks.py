@@ -53,7 +53,10 @@ class Module_Scrapper_Screener_India_Stocks:
         password = self.browser.find_element_by_name('password')
         username.send_keys('amitji@gmail.com')
         password.send_keys('amit1973')
-        login_attempt = self.browser.find_element_by_class_name("button-primary")
+#        login_attempt = self.browser.find_element_by_class_name("button-primary")
+        login_attempt = self.browser.find_element_by_xpath("/html/body/main/form/p[1]/button")
+#        time.sleep(5)
+#        Waiting.Until(ExpectedConditions.ElementExists(By.Id("ctl00")));
         login_attempt.click()
 
 
@@ -385,7 +388,10 @@ class Module_Scrapper_Screener_India_Stocks:
 
 #            pe = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[1]/h4[4]/b').text
             pe = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[5]/b').text
-            if '--' not in pe:
+            
+            if pe =='':
+                pe = None
+            elif '--' not in pe:
                 pe = float(pe[(pe.rfind(' ') + 1):])
             else:
                 pe = None
@@ -393,7 +399,9 @@ class Module_Scrapper_Screener_India_Stocks:
 
 #            pb = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[8]').text
             pb = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[19]/b').text
-            if '--' not in pb:
+            if pb == '':
+                pb = None
+            elif '--' not in pb:
                 pb = float(pb[(pb.rfind(' ') + 1):])
             else:
                 pb = None
@@ -454,7 +462,7 @@ class Module_Scrapper_Screener_India_Stocks:
                 #interest_coverage = interest * 10000000
             elif '--' in interest_coverage:
                 interest_coverage = None
-            elif ' ' in interest_coverage:
+            elif '' in interest_coverage:
                 interest_coverage = None
             else:
                 interest_coverage = float(interest_coverage[(interest_coverage.rfind(' ') + 1):].replace(",", ""))

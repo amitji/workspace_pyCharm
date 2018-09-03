@@ -1,8 +1,5 @@
 
 #import urllib2
-from urllib.request import urlopen,Request
-import urllib.request
-import json
 import DBManager
 import pandas as pd
 import numpy as np
@@ -15,41 +12,37 @@ from kiteconnect import KiteConnect
 import zerodha_const as zc
 import sys
 import ModuleAmitException
+import winsound
 
 
 class GoogleFinanceAPI:
     def __init__(self):
         self.con = DBManager.connectDB()
         self.cur = self.con.cursor()
+        self.engine = DBManager.createEngine()
         self.module_Get_Live_Data_From_Google = Module_Get_Live_Data_From_Google.Module_Get_Live_Data_From_Google()
+        self.highVolumeStocks = pd.DataFrame()
+        self.volumeForImpStocks = pd.DataFrame()
+        pd.set_option('expand_frame_repr', False)
         
-        
-        
-        #https://finance.google.com/finance?q=NSE:NCC
-#        self.url_prefix = "https://finance.google.com/finance?q="
-
-
     def getStockList(self):
-#        select_sql ="select fullid, nseid from stocksdb.amit_portfolio where display_seq is not null and is_inactive != 'y' order by display_seq "
         
-        #Prod sql
+#        Prod sql
         select_sql ="select fullid, nseid from stocksdb.amit_portfolio where is_index='n' and is_inactive != 'y' order by display_seq "
         
         #testing
-#        select_sql ="select fullid, nseid from stocksdb.amit_portfolio where nseid in ('ITC', 'NCC') "
+#        select_sql ="select fullid, nseid from stocksdb.amit_portfolio where nseid in ('CAPF','JSWSTEEL','ITC', 'HCC') "
 #        select_sql ="select fullid, nseid from stocksdb.amit_portfolio where is_fo='y' "
+#        select_sql ="select fullid, nseid from stocksdb.stock_names where nseid in ('RBLBANK','HAVELLS','ITC') "
         
         self.cur.execute(select_sql)
-
         rows = self.cur.fetchall()
         data = [] # list
         for row in rows:
-            # print row[0], row[1]
             dd = dict()
             dd["fullid"] = row[0]
             dd["nseid"] = row[1]
             data.append(dd)
-        # print data
         return data
 
     def getFOStockList(self):
@@ -78,34 +71,103 @@ class GoogleFinanceAPI:
         obj = json.loads(content[3:])
         return obj[0]
     '''
+    def getMarketDataForAStock(self, nseid):
+        
+        select_sql = "select * from stocksdb.stock_market_data smd where smd.nseid = '%s' order by my_date  " % (nseid)
+        df = pd.read_sql(select_sql, self.con)
+        return df  
 
+    def getMarketDataForStocks(self, stock_names):
+        
+        #Get prev day Vol, 5 days avg vol for each stock
+        outputDf = pd.DataFrame()
+        self.highVolumeStocks = pd.DataFrame()
+        for row in stock_names:
+#            fullid = row['fullid']
+#            nseid = row['nseid']
+            df = self.getMarketDataForAStock(row['nseid'])
+            
+            if df.empty:
+                continue
+            
+            fulldf = df.drop(['id','high', 'low', 'open','last', 'turnover', 'last_modified'], axis=1)
+            fulldf['5d_avg_vol'] = fulldf['volume'].rolling(window=5).mean()
+            newdf = fulldf[-1:]
+            outputDf = outputDf.append(newdf)
+        
+        print(outputDf)
+        return  outputDf 
+    
+    def doIntraDayVolumeAnalysis_New(self, market_data,allQuotes):
+        
+        #Imp stocks to be watched for Vol Movements
+        imp_stocks_to_watch = ['YESBANK','JSWSTEEL', 'JINDALSTEL', 'GMRINFRA','KAJARIACER','RBLBANK','CAPF','BHARATFORG','HEXAWARE', 'CADILAHC','DCBBANK']
+        
+        outputDf = pd.DataFrame()
+        self.highVolumeStocks = pd.DataFrame()
+        self.volumeForImpStocks = pd.DataFrame()
+        
+        allQuotesDf = pd.DataFrame(allQuotes)
+        for index, row in  market_data.iterrows():
+#            fullid = row['fullid']
+            try:
+                nseid = row['nseid']
+                
+                quotedf = allQuotesDf.loc[allQuotesDf['nseid'] == nseid]
+                curr_vol =  float(quotedf['volume'].values[0])
+                
+                prev_vol = float(row['volume'])
+                fiveDay_avg_vol = float(row['5d_avg_vol'])
+                
+    #            print(curr_vol, prev_vol, fiveDay_avg_vol )
+                pc_from_prev = round(((curr_vol - prev_vol)/prev_vol)*100 , 2)
+                pc_from_5day_avg_vol = round(((curr_vol - fiveDay_avg_vol)/fiveDay_avg_vol)*100,2)
+                outputDf['nseid'] = [nseid]
+                outputDf['curr_vol'] = [curr_vol]
+                outputDf['prev_vol'] = [prev_vol]
+                outputDf['fiveDay_avg_vol'] = [fiveDay_avg_vol]
+                outputDf['pc_from_prev'] = [pc_from_prev]
+                outputDf['pc_from_5day_avg_vol'] = [pc_from_5day_avg_vol]
+                outputDf['last_trade'] = [quotedf['l'].values[0]]
+                outputDf['change'] = [quotedf['c'].values[0]]
+                outputDf['chg_perct'] = [quotedf['cp'].values[0]]
+                
+                
+                if(curr_vol > prev_vol or curr_vol > fiveDay_avg_vol):
+#                    print("\nCurrent Vol is high for ", nseid) 
+#                    print(outputDf)
+                    self.highVolumeStocks = self.highVolumeStocks.append(outputDf)
+    #            else:
+    #                print("Current Vol is less than prev or 5 day Avg for ", nseid)
+                
+                elif nseid in imp_stocks_to_watch:
+                    self.volumeForImpStocks = self.volumeForImpStocks.append(outputDf)
+                    
+            except Exception as e1:
+                print ("\n******Exception in doIntraDayVolumeAnalysis_New for - ", nseid, curr_vol )
+                print (str(e1))
+                ModuleAmitException.printInfo()
+                pass
 
+        self.highVolumeStocks.to_sql('intraday_volume_details', self.engine, if_exists='append', index=False)
+        print("highVolumeStocks saved in DB")  
+        
+        print("\n****** Volume Info for Important Stocks - \n", self.volumeForImpStocks)
+        return  self.highVolumeStocks 
+              
 
     def saveIntoDB(self, allQuotes):
 
-        print ("\n*** Amit saving following qoutes to database")
+        print ("\n*** Amit saving qoutes to database")
         records = []
-        fullid= ""
         for row in allQuotes:
-
             try:
-                #print "fullid - ", fullid
-#                print(row)
                 record = (( row['l'], row['c'],row['cp'],row['pcls'],row['volume'], row['fullid']))
-#                print (record)
                 records.append(record )
-
             except Exception as e:
                 print ("\n******Amit saveIntoDB, some issue with quotes, row data - ", row)
                 print (str(e))
                 pass
-
-        # for record in records:
-        #     print record
-        #     print record[0], record[1]
-        #     sql = "update amit_portfolio set last_trade_price=%s,  price_change=%s, change_perct=%s, previous_close=%s where nseid=%s"
-        #     self.cur.execute(sql, tuple(record))
-
         #use batch execute rahter above  1by 1
         sql = "update amit_portfolio set last_trade_price=%s,  price_change=%s, change_perct=%s, previous_close=%s, volume=%s where fullid=%s"
         self.cur.executemany(sql, records)
@@ -142,12 +204,12 @@ if __name__ == "__main__":
     getDataFromZerodha = 1
 
     if getDataFromZerodha == 1:
-#        stock_names = c.getStockList()
+        marketData = c.getMarketDataForStocks(stock_names)
         module_Get_Live_Data_From_Zerodha = Module_Get_Live_Data_From_Zerodha.Module_Get_Live_Data_From_Zerodha()
+            
+#        c.printZerodhaAccess_token('nCS0XhI7aKKQlo7k5zbP0KOeHLE5p2li')
         
-#        c.printZerodhaAccess_token('JDhR8cMB69slj3j4LzKEjBDoYEajiray')
-        
-        while (c.in_between(datetime.now().time(), time(5,30), time(15,40))):
+        while (c.in_between(datetime.now().time(), time(4,30), time(18,40))):
             print ("\n*** Getting quotes from ZERODHA one by one ************")
             start_time = t.time()
             allQuotes = module_Get_Live_Data_From_Zerodha.getAllQuotesFromZerodha(stock_names)
@@ -156,6 +218,13 @@ if __name__ == "__main__":
             if allQuotes:
                 try:
                     c.saveIntoDB(allQuotes)
+                    df = c.doIntraDayVolumeAnalysis_New(marketData,allQuotes) 
+                    print("\n\n ******************* Stocks with High Volume - \n", df)
+                    
+                    frequency = 500  # Set Frequency To 2500 Hertz
+                    duration = 500  # Set Duration To 1000 ms == 1 second
+                    winsound.Beep(frequency, duration)
+                                                       
                 except Exception as e1:
                     print ("\n******Exception in saving quotes in DB, sleep for a minute and try...\n\n\n" )
                     print (str(e1))
@@ -206,7 +275,7 @@ if __name__ == "__main__":
         print('quandlData  - \n',quandlData )
         #while minutes_count < 420:
         #Run b/w morning 9 am to 4:00 pm IST
-        while (c.in_between(datetime.now().time(), time(8,40), time(16,00))):
+        while (c.in_between(datetime.now().time(), time(8,40), time(19,00))):
             print ("\n*** Getting quotes from Google one by one ************")
             allQuotes = c.module_Get_Live_Data_From_Google.getLiveQuotesForMultipleStock(stock_names,quandlData)
 #            allQuotes = c.getAllQuotesFromQuandl(stock_names)
