@@ -98,10 +98,8 @@ class GoogleFinanceAPI:
         print(outputDf)
         return  outputDf 
     
-    def doIntraDayVolumeAnalysis_New(self, market_data,allQuotes):
+    def doIntraDayVolumeAnalysis_New(self, market_data,allQuotes, imp_stocks_to_watch):
         
-        #Imp stocks to be watched for Vol Movements
-        imp_stocks_to_watch = ['YESBANK','JSWSTEEL', 'JINDALSTEL', 'GMRINFRA','KAJARIACER','RBLBANK','CAPF','BHARATFORG','HEXAWARE', 'CADILAHC','DCBBANK']
         
         outputDf = pd.DataFrame()
         self.highVolumeStocks = pd.DataFrame()
@@ -206,8 +204,9 @@ if __name__ == "__main__":
     if getDataFromZerodha == 1:
         marketData = c.getMarketDataForStocks(stock_names)
         module_Get_Live_Data_From_Zerodha = Module_Get_Live_Data_From_Zerodha.Module_Get_Live_Data_From_Zerodha()
-            
-#        c.printZerodhaAccess_token('nCS0XhI7aKKQlo7k5zbP0KOeHLE5p2li')
+         
+        #Amit   
+#        c.printZerodhaAccess_token('eqOYRTR02WyJQIj2EI01neXmwef4YwDs')
         
         while (c.in_between(datetime.now().time(), time(4,30), time(18,40))):
             print ("\n*** Getting quotes from ZERODHA one by one ************")
@@ -218,7 +217,11 @@ if __name__ == "__main__":
             if allQuotes:
                 try:
                     c.saveIntoDB(allQuotes)
-                    df = c.doIntraDayVolumeAnalysis_New(marketData,allQuotes) 
+                    #Imp stocks to be watched for Vol Movements
+                    imp_stocks_to_watch = ['BERGEPAINT','UBL','VOLTAS','NCC','ITC','BATAINDIA', 'JINDALSTEL', 'GMRINFRA','KAJARIACER','RBLBANK',
+                               'LUPIN','CADILAHC','DCBBANK','SREINFRA','YESBANK','HEXAWARE', 'KPIT', 'RELINFRA', 'GRANULES']
+
+                    df = c.doIntraDayVolumeAnalysis_New(marketData,allQuotes, imp_stocks_to_watch) 
                     print("\n\n ******************* Stocks with High Volume - \n", df)
                     
                     frequency = 500  # Set Frequency To 2500 Hertz
