@@ -68,7 +68,8 @@ class Module_Screener_Excel_Data:
         username.send_keys(Constants.screener_userid)
         password.send_keys(Constants.screener_pwd)
 
-        login_attempt = self.driver.find_element_by_class_name("button-primary")
+#        login_attempt = self.driver.find_element_by_class_name("button-primary")
+        login_attempt = self.driver.find_element_by_xpath("/html/body/main/form/p[1]/button")
         login_attempt.click()
 #        self.driver.find_element_by_tag_name('button-primary').submit()
 #        time.sleep(2)

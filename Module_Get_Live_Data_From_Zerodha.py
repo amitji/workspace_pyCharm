@@ -33,7 +33,7 @@ class Module_Get_Live_Data_From_Zerodha:
                     fullid = 'NSE:NIFTY 50'
                 
                 quote = self.kite.quote(fullid)
-                t.sleep(1)
+                t.sleep(1.5)
                 if quote:
                     
     #                print(fullid, " -- ", quote)

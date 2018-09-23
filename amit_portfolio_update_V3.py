@@ -28,10 +28,10 @@ class GoogleFinanceAPI:
     def getStockList(self):
         
 #        Prod sql
-        select_sql ="select fullid, nseid from stocksdb.amit_portfolio where is_index='n' and is_inactive != 'y' order by display_seq "
+        select_sql ="select fullid, nseid,is_fo from stocksdb.amit_portfolio where is_index='n' and is_inactive != 'y' order by display_seq "
         
         #testing
-#        select_sql ="select fullid, nseid from stocksdb.amit_portfolio where nseid in ('CAPF','JSWSTEEL','ITC', 'HCC') "
+#        select_sql ="select fullid, nseid, is_fo from stocksdb.amit_portfolio where nseid in ('CAPF','JSWSTEEL','ITC', 'HCC') "
 #        select_sql ="select fullid, nseid from stocksdb.amit_portfolio where is_fo='y' "
 #        select_sql ="select fullid, nseid from stocksdb.stock_names where nseid in ('RBLBANK','HAVELLS','ITC') "
         
@@ -42,12 +42,18 @@ class GoogleFinanceAPI:
             dd = dict()
             dd["fullid"] = row[0]
             dd["nseid"] = row[1]
+            dd["is_fo"] = row[2]
             data.append(dd)
         return data
 
     def getFOStockList(self):
         print ("\n\n***************  Running it for only FO stocks\n\n")
-        select_sql ="select fullid, nseid from stocksdb.amit_portfolio where display_seq is not null and is_fo = 'y' and is_inactive != 'y'  order by display_seq "
+        #prod_sql
+        if zc.run_for_all_fo == 1:
+            select_sql ="select fullid, nseid, is_fo from stocksdb.amit_portfolio where is_index='n' and is_inactive != 'y' and is_fo = 'y'  "
+            select_sql +=" union select concat('NSE:',TRIM(symbol)) as fullid, TRIM(symbol) as nseid, 'y' as is_fo from stocksdb.fo_mktlots where watch_for_volume='y'  ";    
+        else:
+            select_sql ="select fullid, nseid, is_fo from stocksdb.amit_portfolio where is_index='n' and is_inactive != 'y' and is_fo = 'y'  "
 
         self.cur.execute(select_sql)
 
@@ -58,8 +64,11 @@ class GoogleFinanceAPI:
             dd = dict()
             dd["fullid"] = row[0]
             dd["nseid"] = row[1]
+            dd["is_fo"] = row[2]
             data.append(dd)
         # print data
+#        data = [x.strip(' ') for x in data]
+#        data = data.apply(lambda x: x.str.strip())
         return data
 
     '''
@@ -80,7 +89,7 @@ class GoogleFinanceAPI:
     def getMarketDataForStocks(self, stock_names):
         
         #Get prev day Vol, 5 days avg vol for each stock
-        outputDf = pd.DataFrame()
+        market_data = pd.DataFrame()
         self.highVolumeStocks = pd.DataFrame()
         for row in stock_names:
 #            fullid = row['fullid']
@@ -93,23 +102,31 @@ class GoogleFinanceAPI:
             fulldf = df.drop(['id','high', 'low', 'open','last', 'turnover', 'last_modified'], axis=1)
             fulldf['5d_avg_vol'] = fulldf['volume'].rolling(window=5).mean()
             newdf = fulldf[-1:]
-            outputDf = outputDf.append(newdf)
+#            is_fo = row['is_fo']
+            #this is to supress the copy warning..
+            newdf.is_copy = False
+            newdf['is_fo'] = row['is_fo']
+            market_data = market_data.append(newdf)
         
-        print(outputDf)
-        return  outputDf 
+        print(market_data)
+        return  market_data 
     
-    def doIntraDayVolumeAnalysis_New(self, market_data,allQuotes, imp_stocks_to_watch):
+    def doIntraDayVolumeAnalysis_New(self, market_data,allQuotes):
         
         
         outputDf = pd.DataFrame()
+        dbDf = pd.DataFrame()
         self.highVolumeStocks = pd.DataFrame()
+        highVolumeStocksForPrint = pd.DataFrame()
         self.volumeForImpStocks = pd.DataFrame()
+        volumeForImpStocksForPrint = pd.DataFrame()
         
         allQuotesDf = pd.DataFrame(allQuotes)
         for index, row in  market_data.iterrows():
 #            fullid = row['fullid']
             try:
                 nseid = row['nseid']
+                is_fo = row['is_fo']
                 
                 quotedf = allQuotesDf.loc[allQuotesDf['nseid'] == nseid]
                 curr_vol =  float(quotedf['volume'].values[0])
@@ -120,26 +137,54 @@ class GoogleFinanceAPI:
     #            print(curr_vol, prev_vol, fiveDay_avg_vol )
                 pc_from_prev = round(((curr_vol - prev_vol)/prev_vol)*100 , 2)
                 pc_from_5day_avg_vol = round(((curr_vol - fiveDay_avg_vol)/fiveDay_avg_vol)*100,2)
-                outputDf['nseid'] = [nseid]
-                outputDf['curr_vol'] = [curr_vol]
-                outputDf['prev_vol'] = [prev_vol]
-                outputDf['fiveDay_avg_vol'] = [fiveDay_avg_vol]
-                outputDf['pc_from_prev'] = [pc_from_prev]
-                outputDf['pc_from_5day_avg_vol'] = [pc_from_5day_avg_vol]
-                outputDf['last_trade'] = [quotedf['l'].values[0]]
-                outputDf['change'] = [quotedf['c'].values[0]]
-                outputDf['chg_perct'] = [quotedf['cp'].values[0]]
                 
+                #add million separator
+                curr_vol_str =  "{:,}".format(curr_vol)
+                prev_vol_str =  "{:,}".format(prev_vol)
+                fiveDay_avg_vol_str =  "{:,}".format(fiveDay_avg_vol)
+                
+                outputDf['nseid'] = [nseid]
+                outputDf['pc_from_prev'] = [pc_from_prev]
+                outputDf['chg_perct'] = [quotedf['cp'].values[0]]
+                outputDf['change'] = [quotedf['c'].values[0]]
+                outputDf['last_trade'] = [quotedf['l'].values[0]]
+                
+                outputDf['curr_vol'] = [curr_vol_str]
+                outputDf['prev_vol'] = [prev_vol_str]
+                outputDf['pc_from_5day_avg_vol'] = [pc_from_5day_avg_vol]
+                outputDf['fiveDay_avg_vol'] = [fiveDay_avg_vol_str]
+                
+                dbDf['nseid'] = [nseid]
+                dbDf['pc_from_prev'] = [pc_from_prev]
+                dbDf['chg_perct'] = [quotedf['cp'].values[0]]
+                dbDf['change'] = [quotedf['c'].values[0]]
+                dbDf['last_trade'] = [quotedf['l'].values[0]]
+                
+                dbDf['curr_vol'] = [curr_vol]
+                dbDf['prev_vol'] = [prev_vol]
+                dbDf['pc_from_5day_avg_vol'] = [pc_from_5day_avg_vol]
+                dbDf['fiveDay_avg_vol'] = [fiveDay_avg_vol]
+                
+                
+
                 
                 if(curr_vol > prev_vol or curr_vol > fiveDay_avg_vol):
 #                    print("\nCurrent Vol is high for ", nseid) 
 #                    print(outputDf)
-                    self.highVolumeStocks = self.highVolumeStocks.append(outputDf)
+                    self.highVolumeStocks = self.highVolumeStocks.append(dbDf)
+                    highVolumeStocksForPrint = highVolumeStocksForPrint.append(outputDf)
+                    
+                    
+                    
     #            else:
     #                print("Current Vol is less than prev or 5 day Avg for ", nseid)
                 
-                elif nseid in imp_stocks_to_watch:
-                    self.volumeForImpStocks = self.volumeForImpStocks.append(outputDf)
+#                elif nseid in imp_stocks_to_watch:
+                elif is_fo == 'y' :
+                    if (pc_from_prev > zc.min_vol_perct_to_compare):  #This is to ignore morning stream where all stocks shows up with -99% vol
+                        self.volumeForImpStocks = self.volumeForImpStocks.append(dbDf)
+                        volumeForImpStocksForPrint = volumeForImpStocksForPrint.append(outputDf)
+                        
                     
             except Exception as e1:
                 print ("\n******Exception in doIntraDayVolumeAnalysis_New for - ", nseid, curr_vol )
@@ -147,10 +192,16 @@ class GoogleFinanceAPI:
                 ModuleAmitException.printInfo()
                 pass
 
+        self.volumeForImpStocks.to_sql('intraday_volume_details', self.engine, if_exists='append', index=False)
+        print("volumeForImpStocks saved in DB")  
+
         self.highVolumeStocks.to_sql('intraday_volume_details', self.engine, if_exists='append', index=False)
         print("highVolumeStocks saved in DB")  
         
-        print("\n****** Volume Info for Important Stocks - \n", self.volumeForImpStocks)
+        print("\n****** Volume Info for All FO Stocks - \n", volumeForImpStocksForPrint)
+        
+        print("\n\n ******************* Stocks with High Volume - \n", highVolumeStocksForPrint )
+        
         return  self.highVolumeStocks 
               
 
@@ -188,9 +239,14 @@ class GoogleFinanceAPI:
 if __name__ == "__main__":
     c = GoogleFinanceAPI()
 
-    stock_names = c.getStockList()
-    #Get only FO when Google is slow...
-#    stock_names = c.getFOStockList()
+    #Amit   
+#    c.printZerodhaAccess_token('EEaH70wNRxKeE6aLKTmQ5IGrjRU2sNaV')   
+    
+    
+    if zc.run_for_only_amit_fo == 1 :
+        stock_names = c.getFOStockList()
+    else:
+        stock_names = c.getStockList()
 
     records = [] ## LIST OF LISTS
     minutes_count = 0  # compare with 7 Hrs run daily from 9-4 pm (7*60=420)
@@ -205,8 +261,6 @@ if __name__ == "__main__":
         marketData = c.getMarketDataForStocks(stock_names)
         module_Get_Live_Data_From_Zerodha = Module_Get_Live_Data_From_Zerodha.Module_Get_Live_Data_From_Zerodha()
          
-        #Amit   
-#        c.printZerodhaAccess_token('eqOYRTR02WyJQIj2EI01neXmwef4YwDs')
         
         while (c.in_between(datetime.now().time(), time(4,30), time(18,40))):
             print ("\n*** Getting quotes from ZERODHA one by one ************")
@@ -216,17 +270,19 @@ if __name__ == "__main__":
      
             if allQuotes:
                 try:
-                    c.saveIntoDB(allQuotes)
-                    #Imp stocks to be watched for Vol Movements
-                    imp_stocks_to_watch = ['BERGEPAINT','UBL','VOLTAS','NCC','ITC','BATAINDIA', 'JINDALSTEL', 'GMRINFRA','KAJARIACER','RBLBANK',
-                               'LUPIN','CADILAHC','DCBBANK','SREINFRA','YESBANK','HEXAWARE', 'KPIT', 'RELINFRA', 'GRANULES']
-
-                    df = c.doIntraDayVolumeAnalysis_New(marketData,allQuotes, imp_stocks_to_watch) 
-                    print("\n\n ******************* Stocks with High Volume - \n", df)
                     
-                    frequency = 500  # Set Frequency To 2500 Hertz
-                    duration = 500  # Set Duration To 1000 ms == 1 second
+                    #Imp stocks to be watched for Vol Movements
+#                    imp_stocks_to_watch = ['BERGEPAINT','UBL','VOLTAS','NCC','ITC','BATAINDIA', 'JINDALSTEL', 'GMRINFRA','KAJARIACER','RBLBANK',
+#                               'LUPIN','CADILAHC','DCBBANK','SREINFRA','YESBANK','HEXAWARE', 'KPIT', 'RELINFRA', 'GRANULES']
+
+#                    df = c.doIntraDayVolumeAnalysis_New(marketData,allQuotes, imp_stocks_to_watch) 
+                    df = c.doIntraDayVolumeAnalysis_New(marketData,allQuotes) 
+                    
+                    frequency = 1000  # Set Frequency To 2500 Hertz
+                    duration = 700  # Set Duration To 1000 ms == 1 second
                     winsound.Beep(frequency, duration)
+                    
+                    c.saveIntoDB(allQuotes)
                                                        
                 except Exception as e1:
                     print ("\n******Exception in saving quotes in DB, sleep for a minute and try...\n\n\n" )
@@ -237,7 +293,7 @@ if __name__ == "__main__":
                     c.con = DBManager.connectDB()
                     c.cur = c.con.cursor()
 
-                    t.sleep(60)
+                    t.sleep(30)
                     try:
                         c.saveIntoDB(allQuotes)
                     except Exception as e2: 
@@ -252,13 +308,14 @@ if __name__ == "__main__":
             if minutes_count == 0:
                 EmailUtil.send_email_as_text(" amit_portfolio_update.py job started - ", "", "")
             minutes_count = minutes_count+1
-            print ("\n*** Amit Sleeping for 2 minute, remaining loops (420-x)- ", 420- minutes_count, " | Time - ", datetime.now())
-            t.sleep(60)
+            print ("\n*** Amit Sleeping for ",zc.sleep_time, " seconds , remaining loops (420-x)- ", 420- minutes_count, " | Time - ", datetime.now())
+            t.sleep(zc.sleep_time)
        
 #            print ("Done !!")
 #            print("--- %s seconds ---" % (t.time() - start_time))
 #            print("--- Minutes ---", float(t.time() - start_time)/60)
-        
+    '''      
+    # Amit - commented till Zerodha works fine...
     elif getDataFromQuandl == 1:
 #        stock_names = c.getStockList()
         print ("\n*** Getting quotes from Quandle ************")
@@ -293,5 +350,6 @@ if __name__ == "__main__":
             print ("\n*** Amit Sleeping for 2 minute, remaining loops (420-x)- ", 420- minutes_count, " | Time - ", datetime.now())
             t.sleep(60)
 
+    '''
     
     print ("\n*** Amit Exiting the quote process...SINCE TIME is  - ", datetime.now().time())
