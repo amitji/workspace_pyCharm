@@ -22,8 +22,8 @@ class Process_MACD_Volume_Analysis:
 
         ##Get all stocks from amit_portfolio and all FO stocks         
         #prod sql
-        select_sql = "select symbol nseid, 'n' owned from stocksdb.fo_mktlots fo where symbol not in (select nseid from stocksdb.amit_portfolio ) "
-        select_sql += " union select nseid, 'y' owned from stocksdb.amit_portfolio sn where sn.is_inactive='n' order by nseid desc "
+        select_sql = "select symbol nseid, 'n' owned from stocksdb.fo_mktlots fo where  not exists (select nseid from stocksdb.amit_portfolio ap where ap.nseid = fo.symbol ) "
+        select_sql += " union select nseid, 'y' owned from stocksdb.amit_portfolio sn where sn.is_inactive='n' order by nseid  "
         
         #testing
 #        select_sql = "select symbol nseid, 'y' owned from stocksdb.fo_mktlots sn where symbol in ('NCC')"
