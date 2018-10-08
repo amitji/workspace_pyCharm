@@ -380,6 +380,9 @@ class Module_Scrapper_Screener_India_Stocks:
 
 #            eps = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[1]').text
             eps = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[13]/b').text
+            #Amit- below timeout also doesnt work..
+#            eps = WebDriverWait(self.browser, 20).until(EC.presence_of_element_located((By.XPATH, '//*[@id="main-area"]/section[1]/ul/li[13]/b')))
+            print("eps-",eps)
             if '--' not in eps:
                 eps = float(eps[(eps.rfind(' ') + 1):])
             else:

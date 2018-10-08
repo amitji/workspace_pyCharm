@@ -71,6 +71,15 @@ class Process_Kangaroo_Pattern__Analysis:
         df = pd.read_sql(select_sql, self.con)
         df = df.apply(lambda x: x.str.strip())
         return df  
+
+    def getAllStockList(self):
+        # sql to run for all NSE stocks
+        select_sql = "select distinct nseid, nseid as short_name, 'n' as isFO from stocksdb.stock_market_data " 
+        
+        df = pd.read_sql(select_sql, self.con)
+#        df = df['nseid'].str.strip() 
+        df = df.apply(lambda x: x.str.strip())
+        return df  
     
     def getStockList(self):
 
@@ -81,8 +90,8 @@ class Process_Kangaroo_Pattern__Analysis:
         select_sql += " select nseid, name as short_name, 'n' as isFO from stocksdb.amit_portfolio ap where ap.is_inactive='n' order by nseid  "
 
         
-        # sql to try on less records
-#        select_sql = "SELECT SUBSTR(fullid, 5) nseid, short_name, 'n' as isFO FROM stocksdb.fa_financial_ratio  "
+        # sql to run for all NSE stocks
+#        select_sql = "select distinct nseid, nseid as short_name, 'n' as isFO from stocksdb.stock_market_data " 
         
         #testing 1
 #        select_sql = "select nseid, nseid as short_name,'n' as isFO from stocksdb.stock_names sn where nseid in ('AXISBANK')"
@@ -102,6 +111,7 @@ class Process_Kangaroo_Pattern__Analysis:
         
         last_record = fulldf.iloc[-1:]
         second_last_record = fulldf.iloc[-2:]
+        
         nseid = last_record['nseid'].values[0]
         my_date = last_record['my_date'].values[0]
         prev_high = second_last_record['high'].values[0]
@@ -189,9 +199,16 @@ thisObj = Process_Kangaroo_Pattern__Analysis()
 pd.set_option('display.expand_frame_repr', False)
 np.set_printoptions(suppress=True)
 pd.options.display.float_format = '{:.2f}'.format
-
 start_time = time.time()
-stock_names= thisObj.getStockList()
+
+run_for_all_stocks = 1
+
+if run_for_all_stocks == 1:
+    stock_names= thisObj.getAllStockList()
+else:
+    stock_names= thisObj.getStockList()
+    
+    
 #fo_stocks= thisObj.getFOStockList()
 print ("stock_names - \n", stock_names)
 print('Processing # of stocks - ', len(stock_names))
@@ -199,17 +216,25 @@ df = thisObj.findKangarooPattern(stock_names)
 
 if not df.empty:
     df = df.loc[df['Stage'] != 'None']
-#    df = df.loc[df['Stage'] == 'Stage 1->2 bw_100_200_dma']
+    bulldf = df.loc[df['Stage'] == 'Bullish Kangaroo']
+    bearishdf = df.loc[df['Stage'] == 'Bearish Kangaroo']
     
-    tempdf = df[['nseid','Stage']]
-    print(tempdf.to_string())
-    print("\n # of stocks - ", len(tempdf))
+    bulldf = bulldf[['nseid','Stage']]
+    print("\n # of bULLISH stocks - ", len(bulldf))
+    print(bulldf.to_string())
+    
+
+    bearishdf = bearishdf[['nseid','Stage']]
+    print("\n # of bEARISH stocks - ", len(bearishdf))
+    print(bearishdf.to_string())
+    
+
           
     #df = df[(df['close'] < 400) & (df['dist_50dma'] > 9)]
     try:
         # uncomment folowing lines for prod
-        thisObj.saveInDB(df)
-#        print(" NOT Saved in DB")
+#        thisObj.saveInDB(df)
+        print(" NOT Saved in DB")
     except Exception as e1:
         print ("\n******Exception in saving SEPA in DB, sleep for 5 minute and try...\n\n\n" )
         print (str(e1))
@@ -225,5 +250,5 @@ if not df.empty:
 
 #print ("\n\n****** Saved results in DB *****************" )
 #print("Total time taken by process --- %s seconds ---" % (time.time() - start_time))
-EmailUtil.send_email_with_body("Process_Kangaroo_Pattern__Analysis.py",tempdf.to_string())
+EmailUtil.send_email_with_body("Process_Kangaroo_Pattern__Analysis.py",bulldf.to_string()+"\n\n"+ bearishdf.to_string())
 #    

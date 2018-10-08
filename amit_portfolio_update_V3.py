@@ -120,7 +120,7 @@ class GoogleFinanceAPI:
         highVolumeStocksForPrint = pd.DataFrame()
         self.volumeForImpStocks = pd.DataFrame()
         volumeForImpStocksForPrint = pd.DataFrame()
-        
+        vol_threshold = 10000000  # 10 million
         allQuotesDf = pd.DataFrame(allQuotes)
         for index, row in  market_data.iterrows():
 #            fullid = row['fullid']
@@ -168,7 +168,7 @@ class GoogleFinanceAPI:
                 
 
                 
-                if(curr_vol > prev_vol or curr_vol > fiveDay_avg_vol):
+                if(curr_vol > prev_vol or curr_vol > fiveDay_avg_vol or curr_vol > vol_threshold):
 #                    print("\nCurrent Vol is high for ", nseid) 
 #                    print(outputDf)
                     self.highVolumeStocks = self.highVolumeStocks.append(dbDf)
@@ -181,7 +181,7 @@ class GoogleFinanceAPI:
                 
 #                elif nseid in imp_stocks_to_watch:
                 elif is_fo == 'y' :
-                    if (pc_from_prev > zc.min_vol_perct_to_compare):  #This is to ignore morning stream where all stocks shows up with -99% vol
+                    if (pc_from_prev > zc.min_vol_perct_to_compare or curr_vol > vol_threshold):  #This is to ignore morning stream where all stocks shows up with -99% vol
                         self.volumeForImpStocks = self.volumeForImpStocks.append(dbDf)
                         volumeForImpStocksForPrint = volumeForImpStocksForPrint.append(outputDf)
                         
@@ -240,7 +240,7 @@ if __name__ == "__main__":
     c = GoogleFinanceAPI()
 
     #Amit   
-#    c.printZerodhaAccess_token('EEaH70wNRxKeE6aLKTmQ5IGrjRU2sNaV')   
+#    c.printZerodhaAccess_token('Ew31tyGz861or2XzIpkY3kNRklnj0SIm')   
     
     
     if zc.run_for_only_amit_fo == 1 :
@@ -262,7 +262,7 @@ if __name__ == "__main__":
         module_Get_Live_Data_From_Zerodha = Module_Get_Live_Data_From_Zerodha.Module_Get_Live_Data_From_Zerodha()
          
         
-        while (c.in_between(datetime.now().time(), time(4,30), time(18,40))):
+        while (c.in_between(datetime.now().time(), time(8,00), time(15,40))):
             print ("\n*** Getting quotes from ZERODHA one by one ************")
             start_time = t.time()
             allQuotes = module_Get_Live_Data_From_Zerodha.getAllQuotesFromZerodha(stock_names)

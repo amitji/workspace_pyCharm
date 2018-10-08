@@ -7,7 +7,7 @@ Created on Mon Jan  8 06:28:00 2018
 import numpy as np
 import pandas as pd
 import DBManager
-import Module_Get_Live_Data_From_Google
+#import Module_Get_Live_Data_From_Google
 import time
 import EmailUtil
 import ModuleAmitException
@@ -19,7 +19,7 @@ class Process_SEPA_Analysis:
         self.con = DBManager.connectDB()
         self.engine = DBManager.createEngine()
         self.cur = self.con.cursor()
-        self.module_Get_Live_Data_From_Google = Module_Get_Live_Data_From_Google.Module_Get_Live_Data_From_Google()
+#        self.module_Get_Live_Data_From_Google = Module_Get_Live_Data_From_Google.Module_Get_Live_Data_From_Google()
 
 
     def getLastComment(self):
@@ -50,20 +50,18 @@ class Process_SEPA_Analysis:
             
 #            print('Processing  - ', nseid, ' at # - ', index)
             df = self.getMarketDataForAStock(row['nseid'])
-            
             if df.empty:
 #                print("No Data for ", nseid)
                 continue
-            
             fulldf = df.drop(['id','high', 'low', 'open','last', 'turnover', 'last_modified'], axis=1)
            
             
-            newdf = self.calculateAverages(fulldf) 
-            #newdf has only one record now
-            newdf['short_name'] = [short_name]
-            newdf['isFO'] = [isFO]
-            newdf = self.findSEPAStage(newdf, fulldf) # you need complere df to get last 10 records for filtering volumes for up/down days
-            outputDf = outputDf.append(newdf)
+            MAdf = self.calculateAverages(fulldf) 
+            #MAdf has only one record now
+            MAdf['short_name'] = [short_name]
+            MAdf['isFO'] = [isFO]
+            MAdf = self.findSEPAStage(MAdf, fulldf) # you need complere df to get last 10 records for filtering volumes for up/down days
+            outputDf = outputDf.append(MAdf)
             
         return outputDf
 
@@ -305,8 +303,8 @@ if not df.empty:
     #df = df[(df['close'] < 400) & (df['dist_50dma'] > 9)]
     try:
         # uncomment folowing lines for prod
-        thisObj.saveInDB(df)
-#        print(" NOT Saved in DB")
+#        thisObj.saveInDB(df)
+        print(" NOT Saved in DB")
     except Exception as e1:
         print ("\n******Exception in saving SEPA in DB, sleep for 5 minute and try...\n\n\n" )
         print (str(e1))
@@ -314,7 +312,7 @@ if not df.empty:
         #May be Db conn has gone bad so close it and initialize again.. Lets try !
         thisObj.con.close()                    
         thisObj.con = DBManager.connectDB()
-        thisObj.cur = c.con.cursor()
+        thisObj.cur = thisObj.con.cursor()
     
         t.sleep(300)
         thisObj.saveInDB(df)
