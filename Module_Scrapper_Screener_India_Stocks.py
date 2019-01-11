@@ -379,15 +379,15 @@ class Module_Scrapper_Screener_India_Stocks:
                 last_price = None
 
 #            eps = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[1]').text
-            eps = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[13]/b').text
             #Amit- below timeout also doesnt work..
+#            #eps = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[13]/b').text
 #            eps = WebDriverWait(self.browser, 20).until(EC.presence_of_element_located((By.XPATH, '//*[@id="main-area"]/section[1]/ul/li[13]/b')))
-            print("eps-",eps)
-            if '--' not in eps:
-                eps = float(eps[(eps.rfind(' ') + 1):])
-            else:
-                eps = None
-
+#            print("eps-",eps)
+#            if '--' not in eps:
+#                eps = float(eps[(eps.rfind(' ') + 1):])
+#            else:
+#                eps = None
+            eps = 0  
 
 #            pe = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[1]/h4[4]/b').text
             pe = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[5]/b').text
@@ -401,14 +401,15 @@ class Module_Scrapper_Screener_India_Stocks:
 
 
 #            pb = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[8]').text
-            pb = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[19]/b').text
-            if pb == '':
-                pb = None
-            elif '--' not in pb:
-                pb = float(pb[(pb.rfind(' ') + 1):])
-            else:
-                pb = None
-
+#            #Amit - following find element is not working
+#            pb = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[19]/b').text
+#            if pb == '':
+#                pb = None
+#            elif '--' not in pb:
+#                pb = float(pb[(pb.rfind(' ') + 1):])
+#            else:
+#                pb = None
+            pb = 0
 
 #            roe = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[7]').text
             roe = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[8]/b').text
@@ -438,46 +439,51 @@ class Module_Scrapper_Screener_India_Stocks:
 
 
 #            debt = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[3]').text
-            debt = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[14]/b').text
-            if 'Cr.' in debt:
-                debt = debt.replace(" Cr.", "")
-                debt = float(debt[(debt.rfind(' ') + 1):].replace(",", ""))
-            elif '--' in debt:
-                debt = 0
-            else:
-                debt = float(debt[(debt.rfind(' ') + 1):].replace(",", ""))
-
-            print( 'debt - ', debt)
+#            #Amit - following find element is not working    
+#            debt = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[14]/b').text
+#            if 'Cr.' in debt:
+#                debt = debt.replace(" Cr.", "")
+#                debt = float(debt[(debt.rfind(' ') + 1):].replace(",", ""))
+#            elif '--' in debt:
+#                debt = 0
+#            else:
+#                debt = float(debt[(debt.rfind(' ') + 1):].replace(",", ""))
+            debt = 0
 
 #            interest = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[4]').text
-            interest = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[15]/b').text
-
-            if 'Cr.' in interest:
-                interest = interest.replace(" Cr.", "")
-                interest = float(interest[(interest.rfind(' ') + 1):].replace(",", ""))
-                #interest = interest * 10000000
-
+#            #Amit - following find element is not working
+#            interest = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[15]/b').text
+#            if 'Cr.' in interest:
+#                interest = interest.replace(" Cr.", "")
+#                interest = float(interest[(interest.rfind(' ') + 1):].replace(",", ""))
+            interest = 0
+            
 #            interest_coverage = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[5]').text
-            interest_coverage = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[16]/b').text
-            if 'Cr.' in interest_coverage:
-                interest_coverage = interest_coverage.replace(" Cr.", "")
-                interest_coverage = float(interest_coverage[(interest_coverage.rfind(' ') + 1):].replace(",", ""))
-                #interest_coverage = interest * 10000000
-            elif '--' in interest_coverage:
-                interest_coverage = None
-            elif '' in interest_coverage:
-                interest_coverage = None
-            else:
-                interest_coverage = float(interest_coverage[(interest_coverage.rfind(' ') + 1):].replace(",", ""))
-
+#            #Amit - following find element is not working
+#            interest_coverage = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[16]/b').text
+#            if 'Cr.' in interest_coverage:
+#                interest_coverage = interest_coverage.replace(" Cr.", "")
+#                interest_coverage = float(interest_coverage[(interest_coverage.rfind(' ') + 1):].replace(",", ""))
+#                #interest_coverage = interest * 10000000
+#            elif '--' in interest_coverage:
+#                interest_coverage = None
+#            elif '' in interest_coverage:
+#                interest_coverage = None
+#            else:
+#                interest_coverage = float(interest_coverage[(interest_coverage.rfind(' ') + 1):].replace(",", ""))
+            interest_coverage = 0
+            
             current_ratio = ""
+            
 #            debt_equity_ratio = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[6]').text
-            debt_equity_ratio = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[17]/b').text
-            if '--' in debt_equity_ratio:
-                debt_equity_ratio = 0
-            else:
-                debt_equity_ratio = float(debt_equity_ratio[(debt_equity_ratio.rfind(' ') + 1):])
-
+#            #Amit - following find element is not working
+#            debt_equity_ratio = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[17]/b').text
+#            if '--' in debt_equity_ratio:
+#                debt_equity_ratio = 0
+#            else:
+#                debt_equity_ratio = float(debt_equity_ratio[(debt_equity_ratio.rfind(' ') + 1):])
+            debt_equity_ratio = 0
+            
             last_price_vs_high52 = (last_price / high52) * 100
 
             short_name = self.quandlDataObject.getShortName(fullid, table_name)

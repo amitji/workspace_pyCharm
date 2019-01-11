@@ -11,6 +11,9 @@ import DBManager
 import Constants
 import ModuleAmitException
 
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+
 print (__name__)
 
 class Module_Screener_Excel_Data:
@@ -47,7 +50,15 @@ class Module_Screener_Excel_Data:
 
         ##############################################################
         try:
-            self.driver = webdriver.Firefox(executable_path=env.BROWSER_PATH, firefox_profile=self.profile)
+            cap = DesiredCapabilities().FIREFOX
+            cap["marionette"] = False
+            #Amit - you need firefox version 46.0.1 to work with selenium and geckodriver....
+            #This has wasted lot of my time. Last updated nad worked - 25-Dec-2018
+            # install from https://ftp.mozilla.org/pub/firefox/releases/46.0.1/
+            binary = FirefoxBinary('D:\\software\\firefox-46.0.1\\bin\\firefox.exe')
+            
+            self.driver = webdriver.Firefox(firefox_binary=binary, executable_path=env.BROWSER_PATH, firefox_profile=self.profile)
+#            self.driver = webdriver.Firefox(capabilities=cap, executable_path=env.BROWSER_PATH, firefox_profile=self.profile)
             #self.driver.set_window_size(0, 0)
             self.driver.set_window_position(1920,1080)
 #            self.driver.set_window_position(-2000, 0)

@@ -20,9 +20,9 @@ class GoogleFinanceAPI:
 #    useLocalDBConnection = 1
     
     def __init__(self):
-        self.con = DBManager.connectDB()
+        self.con = DBManager.connectLocalDB()
         self.cur = self.con.cursor()
-        self.engine = DBManager.createEngine()
+        self.engine = DBManager.createLocalDBEngine()
         self.module_Get_Live_Data_From_Google = Module_Get_Live_Data_From_Google.Module_Get_Live_Data_From_Google()
         self.highVolumeStocks = pd.DataFrame()
         self.volumeForImpStocks = pd.DataFrame()
@@ -252,12 +252,12 @@ if __name__ == "__main__":
     #EmailUtil.send_email_as_text(" amit_portfolio_update.py job started - ", "", "")
     print ("\n*** Processing ", len(stock_names), " Stocks" )
     
-    getDataFromQuandl = 0
+    getDataFromQuandl = 1
     
-    getDataFromZerodha = 1
+    getDataFromZerodha = 0
 
     if getDataFromZerodha == 1:
-        marketData = c.getMarketDataForStocks(stock_names)
+#        marketData = c.getMarketDataForStocks(stock_names)
         module_Get_Live_Data_From_Zerodha = Module_Get_Live_Data_From_Zerodha.Module_Get_Live_Data_From_Zerodha()
          
         
@@ -270,12 +270,7 @@ if __name__ == "__main__":
             if allQuotes:
                 try:
                     
-                    #Imp stocks to be watched for Vol Movements
-#                    imp_stocks_to_watch = ['BERGEPAINT','UBL','VOLTAS','NCC','ITC','BATAINDIA', 'JINDALSTEL', 'GMRINFRA','KAJARIACER','RBLBANK',
-#                               'LUPIN','CADILAHC','DCBBANK','SREINFRA','YESBANK','HEXAWARE', 'KPIT', 'RELINFRA', 'GRANULES']
-
-#                    df = c.doIntraDayVolumeAnalysis_New(marketData,allQuotes, imp_stocks_to_watch) 
-                    df = c.doIntraDayVolumeAnalysis_New(marketData,allQuotes) 
+#                    df = c.doIntraDayVolumeAnalysis_New(marketData,allQuotes) 
                     
                     frequency = 500  # Set Frequency To 2500 Hertz
                     duration = 400  # Set Duration To 1000 ms == 1 second

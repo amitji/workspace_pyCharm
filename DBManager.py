@@ -19,6 +19,18 @@ def connectDB():
     #cursor = db.cursor()
     return db
 
+def connectLocalDB():
+    # connect
+#    db = mysql.connector.connect(host="103.35.123.14", user="shop_dba", passwd="shop2015",db="stocksdb")
+    db = mysql.connector.connect(host="localhost", user="shop_dba", passwd="shop2015", db="stocksdb")
+
+    #cursor = db.cursor()
+    return db
+
+def createLocalDBEngine():
+    return create_engine('mysql+mysqlconnector://shop_dba:shop2015@localhost:3306/stocksdb', echo=False)
+
+
 def disconnectDB():
     print ("Empty disconnect")
 # execute SQL select statement

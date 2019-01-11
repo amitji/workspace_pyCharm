@@ -162,15 +162,15 @@ class Nifty_Regression_Ex:
         result = pd.DataFrame()
         
         #For testing        
-        activationL = ['logistic'] #activationL = ['logistic','tanh','relu']
-        solverL = ['lbfgs'] #solverL = ['lbfgs', 'sgd', 'adam']
-        learning_rateL=['adaptive'] #learning_rateL=['constant', 'invscaling', 'adaptive'] 
-        hidden_layer_sizesL=[10] #hidden_layer_sizesL=[10,50,100]
+#        activationL = ['logistic'] #activationL = ['logistic','tanh','relu']
+#        solverL = ['lbfgs'] #solverL = ['lbfgs', 'sgd', 'adam']
+#        learning_rateL=['adaptive'] #learning_rateL=['constant', 'invscaling', 'adaptive'] 
+#        hidden_layer_sizesL=[10] #hidden_layer_sizesL=[10,50,100]
 
-#        activationL = ['logistic','tanh']
-#        solverL = ['lbfgs', 'sgd', 'adam']
-#        learning_rateL=['constant', 'invscaling', 'adaptive'] 
-#        hidden_layer_sizesL=[10]
+        activationL = ['logistic','tanh', 'relu']
+        solverL = ['lbfgs', 'sgd', 'adam']
+        learning_rateL=['constant', 'invscaling', 'adaptive'] 
+        hidden_layer_sizesL=[10,50]
 #        
         for activationV in activationL:
             for solverV in solverL:
@@ -268,7 +268,7 @@ if __name__ == "__main__":
     useOI = 0
     useMACD = 1
     # NN algo ro run or not
-    runNN = 0
+    runNN = 1
     
     results = pd.DataFrame()
     for ticker in  tickerL:

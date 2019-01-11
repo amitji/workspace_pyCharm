@@ -152,7 +152,7 @@ class Module_Get_Live_Data_From_Google:
                     mydata = NSELiveDataModule.getQuandlData(fullid,nseid)
                     fin_data = NSELiveDataModule.getLastDayParams(mydata,fullid,nseid)
                     
-                    print(fin_data)
+                    print(fin_data[:1])
             
     
                     content2['fullid'] = fullid

@@ -34,6 +34,7 @@ class Module_Choose_Consolidated_Or_Standalone:
         password.send_keys(const.screener_pwd)
 #        login_attempt = self.browser.find_element_by_class_name("button-primary")
         login_attempt = self.browser.find_element_by_xpath("/html/body/main/form/p[1]/button")
+#        login_attempt = self.browser.find_element_by_xpath('//*[@id="main-area"]/form/p[1]/button')
         login_attempt.click()
 
 
