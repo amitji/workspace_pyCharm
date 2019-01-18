@@ -5,9 +5,12 @@ from pathlib import Path
 from datetime import datetime, timedelta
 import pandas as pd
 import DBManager
-
+import EmailUtil
+import time
 
 download_path = os.path.join(str(Path(__file__).resolve().parent), "downloads")
+#cron job needs complete path name...
+directory = "//home//shopbindaas//python-workspace//downloads//nse"
 #supported_exchanges = ["bse", "nse"]
 supported_exchanges = ["nse"]
 
@@ -25,10 +28,14 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
     
     def createDirectory(self):
         # Make sure we have downloads directory
-        Path(download_path).mkdir(parents=True, exist_ok=True)
-        # Make sure we also have other directories
-        for current_exchange in supported_exchanges:
-            Path(os.path.join(download_path, current_exchange)).mkdir(parents=True, exist_ok=True)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+    
+#        Path(download_path).mkdir(parents=True, exist_ok=True)
+#        # Make sure we also have other directories
+#        for current_exchange in supported_exchanges:
+#            
+#            Path(os.path.join(download_path, current_exchange)).mkdir(parents=True, exist_ok=True)
     
     def yesterday(self):
         """
@@ -36,6 +43,13 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
         """
         yesterday = datetime.now() - timedelta(days=1)
         return str(yesterday.date().strftime("%d/%m/%Y"))
+    def today(self):
+        """
+        formats date in british format
+        """
+        today = datetime.now()
+        return str(today.date().strftime("%d/%m/%Y"))
+    
     
     def download(self,download_url, file_path):
         """
@@ -58,9 +72,18 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
         download_and_unzip takes care of both downloading and uncompressing
         """
         self.download(download_url, file_path)
-        with zipfile.ZipFile(file_path, "r") as compressed_file:
-            compressed_file.extractall(Path(file_path).parent)
+        
+#        with zipfile.ZipFile(file_path, "r") as compressed_file:
+##            compressed_file.extractall(Path(file_path).parent)
+#            compressed_file.extractall(directory)
+        compressed_file = zipfile.ZipFile(file_path, "r")   
+        compressed_file.extractall(directory)
+        compressed_file.close()
+            
+            
         print("Completed un-compressing")
+        #print("Amit sleeping for a minute, check file")
+        #time.sleep(60)
     
     def download_nse_bhavcopy(self,for_date):
         """
@@ -70,33 +93,36 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
         month = for_date_parsed.strftime("%b").upper()
         year = for_date_parsed.year
         day = "%02d" % for_date_parsed.day
-        url = f"https://www.nseindia.com/content/historical/EQUITIES/{year}/{month}/cm{day}{month}{year}bhav.csv.zip"
-        file_path = os.path.join(download_path, "nse", f"cm{day}{month}{year}bhav.csv.zip")
+        url = "https://www.nseindia.com/content/historical/EQUITIES/{year1}/{month1}/cm{day1}{month2}{year2}bhav.csv.zip".format(year1=year,month1=month,day1=day,month2=month,year2=year)
+        file_path = os.path.join(download_path, "nse", "cm{day1}{month1}{year1}bhav.csv.zip".format(day1=day,month1=month,year1=year))
         try:
             self.download_and_unzip(url, file_path)
-        except zipfile.BadZipFile:
-            print(f"Skipping downloading data for {for_date}")
+        except zipfile.BadZipFile as e1:
+            print("BadZipFile exception - ", str(e1))	
+            print("Skipping downloading data for {for_date1}".format(for_date1=for_date))
             return
+        print("Amit 111")    
         os.remove(file_path)
+        print("Amit 222")    
         return file_path
     
-    def download_bse_bhavcopy(self,for_date):
-        """
-        this function is used to download bhavcopy from BSE
-        """
-        for_date_parsed = datetime.strptime(for_date, "%d/%m/%Y")
-        month = "%02d" % for_date_parsed.month
-        day = "%02d" % for_date_parsed.day
-        year = for_date_parsed.strftime("%y")
-        file_name = f"EQ{day}{month}{year}_CSV.ZIP"
-        url = f"http://www.bseindia.com/download/BhavCopy/Equity/{file_name}"
-        file_path = os.path.join(download_path, "bse", file_name)
-        try:
-            self.download_and_unzip(url, file_path)
-        except zipfile.BadZipFile:
-            print(f"Skipping downloading data for {for_date}")
-        os.remove(file_path)
-        return file_path
+#    def download_bse_bhavcopy(self,for_date):
+#        """
+#        this function is used to download bhavcopy from BSE
+#        """
+#        for_date_parsed = datetime.strptime(for_date, "%d/%m/%Y")
+#        month = "%02d" % for_date_parsed.month
+#        day = "%02d" % for_date_parsed.day
+#        year = for_date_parsed.strftime("%y")
+#        file_name = f"EQ{day}{month}{year}_CSV.ZIP"
+#        url = f"http://www.bseindia.com/download/BhavCopy/Equity/{file_name}"
+#        file_path = os.path.join(download_path, "bse", file_name)
+#        try:
+#            self.download_and_unzip(url, file_path)
+#        except zipfile.BadZipFile:
+#            print(f"Skipping downloading data for {for_date}")
+#        os.remove(file_path)
+#        return file_path
     
     
     
@@ -119,15 +145,16 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
                 ts = ts.strftime("%d/%m/%Y")
                 if exchange == "nse":
                     file_path = self.download_nse_bhavcopy(ts)
-                else:
-                    file_path = self.download_bse_bhavcopy(ts)
+#                else:
+#                    file_path = self.download_bse_bhavcopy(ts)
         else:
             if exchange == "nse":
                 file_path = self.download_nse_bhavcopy(for_date)
+                print("Amit 2233")  
             else:
                 file_path = self.download_bse_bhavcopy(for_date)
         
-        
+        print("Amit 333")    
         return file_path
         
     def getPrevDayMarketData(self):
@@ -153,53 +180,66 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
 #        pd.to_datetime(df['my_date']).apply(lambda x: x.date())
         df['my_date'] = pd.to_datetime(df['my_date'], format='%d-%b-%Y')
         
-#        df.columns = ['open', 'high', 'low','last', 'close', 'volume', 'turnover']
-#        df['nseid'] = nseid
-#        df['my_date'] = df.index
-#        df['prev_day_close'] = df['close'].shift(-1)
         df['perct_change'] = ((df['close'] - df['prev_day_close'])* 100)/df['prev_day_close']
         df['perct_change'] = df['perct_change'].round(2)
-
-#        for i, row in df.iterrows():
-#            nseid = row['nseid'] 
-#            prev_day_vol = prev_day_df.loc[prev_day_df['nseid'] == nseid , 'volume' ]
-##            prev_day_vol = prev_day_df.query('nseid=='+nseid2)['volume']
-#            df.at[i,'prev_day_vol'] = prev_day_vol
-        
         df['prev_day_vol'] = ''
+        
         for i, row in prev_day_df.iterrows():
             nseid = row['nseid']
             prev_day_vol = row['volume']
-            
             df.loc[df['nseid'] == nseid, 'prev_day_vol'] = prev_day_vol
-#            print("updated prev_vol for ", nseid)
+            print("updated prev_vol for - ", nseid, "  and prev vol is - ",prev_day_vol)
         
         df["prev_day_vol"] = pd.to_numeric(df["prev_day_vol"])    
-
-        #Amit - for now we dont have pre  day vol so keep it zero
-#        df['prev_day_vol'] = prev_day_df['volume'] prev_day_df.loc[df['nseid'] == 3, 'A']
-#        df['prev_day_vol'] = df['volume'].shift(-1)
         df['vol_chg_perct'] = ((df['volume'] - df['prev_day_vol'])* 100)/df['prev_day_vol']
         df['vol_chg_perct'] = df['vol_chg_perct'].round(2)
-#        df = df.drop(['prev_day_vol'],1)
         
         #Amit - save only last record in database...
-#        df_latest = df.iloc[0]   
-        df_latest = df[:1]   
         df.to_sql('stock_market_data', self.engine, if_exists='append', index=False) 
-        print("saveLastRecordInDB done ")
+        print("Table stock_market_data  is updated with latest data....")
+        
+        #update fa_financial_ratio and fa_financial_ratio_secondary for last_price etc.
+        self.update_fa_financial_ratio_tables(df)
+        return df
         
     
+    def update_fa_financial_ratio_tables(self,df):
         
+         #write df into a temp table
+        df.to_sql('stock_market_data_temp_table', self.engine, if_exists='replace')
+        update_sql = " update fa_financial_ratio fa inner join stock_market_data_temp_table t "
+        update_sql += " on fa.nseid = t.nseid set fa.last_price = t.close, fa.last_modified = now() " 
         
+        with self.engine.begin() as conn:
+            conn.execute(update_sql)  
+        print("updated last_price in fa_financial_ratio table ")  
+        
+        #update secondary table... 
+        update_sql = " update fa_financial_ratio_secondary fa inner join stock_market_data_temp_table t "
+        update_sql += " on fa.nseid = t.nseid set fa.last_price = t.close, fa.last_modified = now() " 
+        
+        with self.engine.begin() as conn:
+            conn.execute(update_sql)            
+        
+        print("updated last_price in fa_financial_ratio_secondary table ")    
         
         
         
 thisObj = Process_NSE_BhavCopy_Download_and_Update_DB()
 thisObj.createDirectory()
 #file_path = thisObj.execute("nse",thisObj.yesterday(),1)
-file_path = thisObj.execute("nse","10/01/2019",1)
-file_path = file_path[:-4] 
-print(file_path)
-thisObj.saveToDB(file_path)
+#file_path = thisObj.execute("nse","16/01/2019",1)
+file_path = thisObj.execute("nse",thisObj.today(),1)
 
+print("Amit 444")    
+df = pd.DataFrame()
+if file_path == None:
+    print("File might not be available for this date.. may be weekend ! ")
+else:
+    file_path = file_path[:-4] 
+    print(file_path)
+    df = thisObj.saveToDB(file_path)
+    df = df[['nseid','close', 'prev_day_vol']]
+    print(df)
+
+EmailUtil.send_email_with_body("Process_NSE_BhavCopy_Download_and_Update_DB",df.to_string())
