@@ -199,40 +199,61 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
         print("Table stock_market_data  is updated with latest data....")
         
         #update fa_financial_ratio and fa_financial_ratio_secondary for last_price etc.
-        self.update_fa_financial_ratio_tables(df)
+        self.update_other_tables(df)
+        
         return df
         
     
-    def update_fa_financial_ratio_tables(self,df):
+    def update_other_tables(self,df):
+        
         
          #write df into a temp table
         df.to_sql('stock_market_data_temp_table', self.engine, if_exists='replace')
-        update_sql = " update fa_financial_ratio fa inner join stock_market_data_temp_table t "
-        update_sql += " on fa.nseid = t.nseid set fa.last_price = t.close, fa.last_modified = now() " 
         
+        # update fa_financial_ratio table
+        update_sql = " update fa_financial_ratio fa inner join stock_market_data_temp_table t "
+        update_sql += " on fa.nseid = t.nseid set fa.last_price = t.close, fa.last_modified = now() "         
         with self.engine.begin() as conn:
             conn.execute(update_sql)  
         print("updated last_price in fa_financial_ratio table ")  
         
-        #update secondary table... 
+        #update fa_financial_ratio_secondary table... 
         update_sql = " update fa_financial_ratio_secondary fa inner join stock_market_data_temp_table t "
-        update_sql += " on fa.nseid = t.nseid set fa.last_price = t.close, fa.last_modified = now() " 
-        
+        update_sql += " on fa.nseid = t.nseid set fa.last_price = t.close, fa.last_modified = now() "         
         with self.engine.begin() as conn:
-            conn.execute(update_sql)            
-        
+            conn.execute(update_sql)                    
         print("updated last_price in fa_financial_ratio_secondary table ")    
         
         
         
+        
+        #update amit_portfolio table... 
+        update_sql = " update amit_portfolio ap inner join stock_market_data_temp_table t "
+        update_sql += " on ap.nseid = t.nseid set ap.last_trade_price = t.close, ap.previous_close = t.prev_day_close,  ap.last_modified = now() , "         
+        update_sql += " ap.price_change = (t.close - t.prev_day_close), ap.change_perct= t.perct_change, ap.volume = t.volume "         
+        
+        with self.engine.begin() as conn:
+            conn.execute(update_sql)                    
+        print("updated amit_portfolio table ")    
+
+
+        
+        
 thisObj = Process_NSE_BhavCopy_Download_and_Update_DB()
+
+df = pd.DataFrame()
+#### testing
+#thisObj.update_other_tables(df)
+#####
+
 thisObj.createDirectory()
+
 #file_path = thisObj.execute("nse",thisObj.yesterday(),1)
 #file_path = thisObj.execute("nse","16/01/2019",1)
 file_path = thisObj.execute("nse",thisObj.today(),1)
 
 print("Amit 444")    
-df = pd.DataFrame()
+
 if file_path == None:
     print("File might not be available for this date.. may be weekend ! ")
 else:
