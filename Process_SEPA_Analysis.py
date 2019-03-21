@@ -303,7 +303,7 @@ if not df.empty:
     #df = df[(df['close'] < 400) & (df['dist_50dma'] > 9)]
     try:
         # uncomment folowing lines for prod
-#        thisObj.saveInDB(df)
+        thisObj.saveInDB(df)
         print(" NOT Saved in DB")
     except Exception as e1:
         print ("\n******Exception in saving SEPA in DB, sleep for 5 minute and try...\n\n\n" )

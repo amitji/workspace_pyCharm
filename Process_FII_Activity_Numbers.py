@@ -24,8 +24,11 @@ if __name__ == "__main__":
         soup = BeautifulSoup(page,  "lxml")
         #soup.prettify()
         
-        div = soup.find("div",{"class":"fidi_tbl CTR"})
-        table1 = div.find("table")
+#        div = soup.find("div",{"class":"fidi_tbl CTR"})
+#        div = soup.find("div",{"class":"jspContainer"})
+        
+        table1 = soup.find("table",{"class":"mctable1 tble1 n18_res_table responsive"})
+#        table1 = div.find("table")
         
         #EmailUtil.send_email("FII Numbers", str(table1), "")
         

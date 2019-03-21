@@ -264,8 +264,8 @@ if __name__ == "__main__":
 #    tickerL = ['AUROPHARMA', 'FEDERALBNK','INFY','AJANTPHARM','JINDALSTEL','GMRINFRA', 'NCC', 'ASHOKLEY', 'DCBBANK']
 #    tickerL = ['ICICIBANK','MARUTI','AUROPHARMA', 'FEDERALBNK']
     tickerL = ['HDFCBANK']
-    real_time_flag = 1
-    useOI = 0
+    real_time_flag = 0
+    useOI = 1
     useMACD = 1
     # NN algo ro run or not
     runNN = 1

@@ -26,8 +26,8 @@ class Process_MACD_Volume_Analysis:
         select_sql += " union select nseid, 'y' owned from stocksdb.amit_portfolio sn where sn.is_inactive='n' order by nseid  "
         
         #testing
-#        select_sql = "select symbol nseid, 'y' owned from stocksdb.fo_mktlots sn where symbol in ('NCC')"
-#        select_sql = "select symbol nseid from stocksdb.fo_mktlots sn "
+#        select_sql = "select symbol nseid, 'y' owned from stocksdb.fo_mktlots sn where symbol in ('NCC', 'YESBANK')"
+##        select_sql = "select symbol nseid from stocksdb.fo_mktlots sn "
 
         #Only amit_portfolio
 #        select_sql = "select nseid, 'y' owned from stocksdb.amit_portfolio sn where sn.is_inactive='n' order by nseid desc"        
@@ -301,17 +301,18 @@ class Process_MACD_Volume_Analysis:
             macd_pred = row.macd_prediction
 
             if not macd_pred == 'HOLD':
-                print('Getting quotes from Quandl...................\n')
+#                print('Getting quotes from Quandl...................\n')
 #                liveData = self.module_Get_Live_Data_From_Google.getLiveQuotesForAStock(nseid)
-                liveData = self.module_Get_Live_Data_From_Google.getQuoteFromQuandl(nseid) 
-#                liveData = liveDict.items()
-                print('liveData - ',liveData )
-                change = liveData.get('c')
+#                liveData = self.module_Get_Live_Data_From_Google.getQuoteFromQuandl(nseid) 
+#                print('liveData - ',liveData )
+#                change = liveData.get('c')
+                change = row['close'] - row['prev_close']
                 if change is not None :
-                    close = float(liveData.get('l'))
-                    row['close'] = close
-                    row['prev_close'] = float(liveData.get('pcls'))
-                    change = float(liveData.get('c'))
+#                    close = float(liveData.get('l'))
+#                    row['close'] = close
+#                    row['prev_close'] = float(liveData.get('pcls'))
+#                    change = float(liveData.get('c'))
+#                    row['change'] = change 
                     if change > 0:
                         row['actual'] = 'Buy'
                     elif change < 0:

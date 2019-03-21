@@ -11,6 +11,9 @@ import time
 download_path = os.path.join(str(Path(__file__).resolve().parent), "downloads")
 #cron job needs complete path name...
 directory = "//home//shopbindaas//python-workspace//downloads//nse"
+#for windows
+#directory = ".//downloads//nse"
+
 #supported_exchanges = ["bse", "nse"]
 supported_exchanges = ["nse"]
 
@@ -173,6 +176,9 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
         prev_day_df = self.getPrevDayMarketData();
         
         df = pd.read_csv(file_path)
+        #filter only series type 'EQ'
+        df = df.loc[df['SERIES'] == 'EQ']
+        
         df = df.rename(columns={'OPEN': 'open', 'HIGH': 'high','LOW': 'low' ,'LAST': 'last' ,'CLOSE': 'close' , \
                            'SYMBOL': 'nseid' ,'PREVCLOSE': 'prev_day_close','TOTTRDQTY': 'volume' ,\
                            'TOTTRDVAL': 'turnover', 'TIMESTAMP':'my_date'  })
@@ -188,12 +194,13 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
             nseid = row['nseid']
             prev_day_vol = row['volume']
             df.loc[df['nseid'] == nseid, 'prev_day_vol'] = prev_day_vol
-            print("updated prev_vol for - ", nseid, "  and prev vol is - ",prev_day_vol)
+            #print("updated prev_vol for - ", nseid, "  and prev vol is - ",prev_day_vol)
         
         df["prev_day_vol"] = pd.to_numeric(df["prev_day_vol"])    
         df['vol_chg_perct'] = ((df['volume'] - df['prev_day_vol'])* 100)/df['prev_day_vol']
         df['vol_chg_perct'] = df['vol_chg_perct'].round(2)
         
+        print("Stocks to be updated in stock_market_data table -  \n", df)
         #Amit - save only last record in database...
         df.to_sql('stock_market_data', self.engine, if_exists='append', index=False) 
         print("Table stock_market_data  is updated with latest data....")
@@ -249,7 +256,7 @@ df = pd.DataFrame()
 thisObj.createDirectory()
 
 #file_path = thisObj.execute("nse",thisObj.yesterday(),1)
-#file_path = thisObj.execute("nse","16/01/2019",1)
+#file_path = thisObj.execute("nse","18/01/2019",1)
 file_path = thisObj.execute("nse",thisObj.today(),1)
 
 print("Amit 444")    
