@@ -74,8 +74,6 @@ class Module_Screener_Excel_Data:
 
         #password = self.driver.find_element_by_name('password')
         password = self.driver.find_element_by_id('id_password')
-        # username.send_keys('amitji@gmail.com')
-        # password.send_keys('amit1973')
         username.send_keys(Constants.screener_userid)
         password.send_keys(Constants.screener_pwd)
 

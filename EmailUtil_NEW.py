@@ -11,7 +11,7 @@ def send_email( subject,updated_stock_list, url):
     # me == my email address
     # you == recipient's email address
     me = "amit@stockcircuit.in"
-    me_pwd = "Amit1973$"
+    me_pwd = ""
     you = "amitji@gmail.com"
 
     # Create message container - the correct MIME type is multipart/alternative.

@@ -10,9 +10,9 @@ import time
 
 download_path = os.path.join(str(Path(__file__).resolve().parent), "downloads")
 #cron job needs complete path name...
-directory = "//home//shopbindaas//python-workspace//downloads//nse"
+#directory = "//home//shopbindaas//python-workspace//downloads//nse"
 #for windows
-#directory = ".//downloads//nse"
+directory = ".//downloads//nse"
 
 #supported_exchanges = ["bse", "nse"]
 supported_exchanges = ["nse"]
@@ -96,9 +96,11 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
         month = for_date_parsed.strftime("%b").upper()
         year = for_date_parsed.year
         day = "%02d" % for_date_parsed.day
-        url = "https://www.nseindia.com/content/historical/EQUITIES/{year1}/{month1}/cm{day1}{month2}{year2}bhav.csv.zip".format(year1=year,month1=month,day1=day,month2=month,year2=year)
+        #      https://www1.nseindia.com/content/historical/EQUITIES/2020/JUL/cm13JUL2020bhav.csv.zip
+        url = "https://www1.nseindia.com/content/historical/EQUITIES/{year1}/{month1}/cm{day1}{month2}{year2}bhav.csv.zip".format(year1=year,month1=month,day1=day,month2=month,year2=year)
         file_path = os.path.join(download_path, "nse", "cm{day1}{month1}{year1}bhav.csv.zip".format(day1=day,month1=month,year1=year))
         try:
+            print ("bhavcopy nse url - ",url)
             self.download_and_unzip(url, file_path)
         except zipfile.BadZipFile as e1:
             print("BadZipFile exception - ", str(e1))	
@@ -177,7 +179,7 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
         
         df = pd.read_csv(file_path)
         #filter only series type 'EQ'
-        df = df.loc[df['SERIES'] == 'EQ']
+        df = df.loc[(df['SERIES'] == 'EQ') | (df['SERIES'] == 'BZ') | (df['SERIES'] == 'BE')]
         
         df = df.rename(columns={'OPEN': 'open', 'HIGH': 'high','LOW': 'low' ,'LAST': 'last' ,'CLOSE': 'close' , \
                            'SYMBOL': 'nseid' ,'PREVCLOSE': 'prev_day_close','TOTTRDQTY': 'volume' ,\
@@ -256,7 +258,7 @@ df = pd.DataFrame()
 thisObj.createDirectory()
 
 #file_path = thisObj.execute("nse",thisObj.yesterday(),1)
-#file_path = thisObj.execute("nse","18/01/2019",1)
+#file_path = thisObj.execute("nse","10/07/2020",1)
 file_path = thisObj.execute("nse",thisObj.today(),1)
 
 print("Amit 444")    

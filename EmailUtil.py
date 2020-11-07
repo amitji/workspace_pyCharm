@@ -10,9 +10,10 @@ def __init__(self):
 def send_email( subject,updated_stock_list, url):
     # me == my email address
     # you == recipient's email address
-    me = "amit@stockcircuit.in"
-    me_pwd = "Amit1973$"
-    you = "amitji@gmail.com"
+    #update these from my_server_info
+    me = ""
+    me_pwd = ""
+    you = ""
 
     # Create message container - the correct MIME type is multipart/alternative.
     msg = MIMEMultipart('alternative')
@@ -53,10 +54,11 @@ def send_email( subject,updated_stock_list, url):
 
 def send_email_as_text(process_name, updated_stock_list, url):
     import smtplib
-    gmail_user = "amit@stockcircuit.in"
-    gmail_pwd = "Amit1973$"
+    #update these from my_server_info
+    gmail_user = ""
+    gmail_pwd = "A"
     FROM = "amit@stockcircuit.in"
-    TO = "amitji@gmail.com"
+    TO = ""
     SUBJECT = "Process finished - ", process_name
     TEXT = process_name, updated_stock_list
     TEXT += "\n\nNow run the URL - ", url
@@ -80,10 +82,10 @@ def send_email_as_text(process_name, updated_stock_list, url):
 
 def send_email_with_body(title, body):
     import smtplib
-    gmail_user = "amit@stockcircuit.in"
-    gmail_pwd = "Amit1973$"
+    gmail_user = "a"
+    gmail_pwd = ""
     FROM = "amit@stockcircuit.in"
-    TO = "amitji@gmail.com"
+    TO = ""
 #    SUBJECT = "Process finished - ", title
 #    TEXT = process_name, updated_stock_list
 #    TEXT += "\n\nNow run the URL - ", url
