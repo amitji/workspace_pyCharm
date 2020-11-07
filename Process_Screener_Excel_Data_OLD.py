@@ -35,7 +35,7 @@ class Process_Screener_Excel_Data:
         username = self.driver.find_element_by_name('username')
         password = self.driver.find_element_by_name('password')
         username.send_keys('amitji@gmail.com')
-        password.send_keys('Welcome2020!')
+        password.send_keys('Welcome2020!') 
         login_attempt = self.driver.find_element_by_class_name("btn-primary")
         login_attempt.click()
 

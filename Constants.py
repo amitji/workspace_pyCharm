@@ -121,7 +121,7 @@ excel_output_excel='C:/xampp/htdocs/stockcircuitserver/fund_analysis/screener_ex
 
 # screener userid 7 pwd
 screener_userid = 'richasharma2099@gmail.com'
-screener_pwd = 'Welcome2020!'
+screener_pwd = 'Welcome2020!' 
 
 #
 PHANTOMJS_PATH ='D:/workspace_pyCharm/phantomjs.exe'
