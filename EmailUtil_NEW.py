@@ -10,9 +10,10 @@ def __init__(self):
 def send_email( subject,updated_stock_list, url):
     # me == my email address
     # you == recipient's email address
-    me = "amit@stockcircuit.in"
-    me_pwd = "Amit1973$"
-    you = "amitji@gmail.com"
+    # update these from your my_server_info 
+    me = ""
+    me_pwd = ""
+    you = ""
 
     # Create message container - the correct MIME type is multipart/alternative.
     msg = MIMEMultipart('alternative')
