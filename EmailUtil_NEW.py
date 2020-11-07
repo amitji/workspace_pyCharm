@@ -9,7 +9,7 @@ def __init__(self):
 
 def send_email( subject,updated_stock_list, url):
     # me == my email address
-    # you == recipient's email address
+    # you == recipient's email address 
     me = "amit@stockcircuit.in"
     me_pwd = ""
     you = "amitji@gmail.com"
