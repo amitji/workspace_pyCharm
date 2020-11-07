@@ -10,7 +10,7 @@ def __init__(self):
 def send_email( subject,updated_stock_list, url):
     # me == my email address
     # you == recipient's email address
-    #update these from my_server_info
+    #update these from my_server_info 
     me = ""
     me_pwd = ""
     you = ""
