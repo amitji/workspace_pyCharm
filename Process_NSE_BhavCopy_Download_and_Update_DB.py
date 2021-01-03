@@ -7,12 +7,13 @@ import pandas as pd
 import DBManager
 import EmailUtil
 import time
+import sys
 
 download_path = os.path.join(str(Path(__file__).resolve().parent), "downloads")
 #cron job needs complete path name...
-#directory = "//home//shopbindaas//python-workspace//downloads//nse"
+directory = "//home//shopbindaas//python-workspace//downloads//nse"
 #for windows
-directory = ".//downloads//nse"
+#directory = ".//downloads//nse"
 
 #supported_exchanges = ["bse", "nse"]
 supported_exchanges = ["nse"]
@@ -59,32 +60,43 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
         download function is used to fetch the data
         """
         print("Downloading file at", file_path)
-    
-        # Don't download file if we've done that already
-        if not os.path.exists(file_path):
-            file_to_save = open(file_path, "wb")
-            with requests.get(download_url, verify=False, stream=True) as response:
-                for chunk in response.iter_content(chunk_size=1024):
-                    file_to_save.write(chunk)
-            print("Completed downloading file")
-        else:
-            print("We already have this file cached locally")
+        
+        try:
+            # Don't download file if we've done that already
+            if not os.path.exists(file_path):
+                file_to_save = open(file_path, "wb")
+                with requests.get(download_url, verify=False, stream=True) as response:
+                    for chunk in response.iter_content(chunk_size=1024):
+                        file_to_save.write(chunk)
+                print("Amit - Completed downloading file")
+            else:
+                print("Amit - We already have this file cached locally")
+        except exception as e:
+             print("Amit - Error in downloading file...", str(e))
+             #return
+             sys.exit(1)
+
     
     def download_and_unzip(self,download_url, file_path):
         """
         download_and_unzip takes care of both downloading and uncompressing
         """
-        self.download(download_url, file_path)
         
-#        with zipfile.ZipFile(file_path, "r") as compressed_file:
-##            compressed_file.extractall(Path(file_path).parent)
-#            compressed_file.extractall(directory)
-        compressed_file = zipfile.ZipFile(file_path, "r")   
-        compressed_file.extractall(directory)
-        compressed_file.close()
-            
-            
-        print("Completed un-compressing")
+        self.download(download_url, file_path)
+        try:    
+    #        with zipfile.ZipFile(file_path, "r") as compressed_file:
+    ##            compressed_file.extractall(Path(file_path).parent)
+    #            compressed_file.extractall(directory)
+            compressed_file = zipfile.ZipFile(file_path, "r")   
+            compressed_file.extractall(directory)
+            compressed_file.close()
+                
+                
+            print("Completed un-compressing")
+        except zipfile.BadZipFile as e1:
+             print("Amit - Error in decompressing file...", str(e1))
+             #return
+             sys.exit(1)
         #print("Amit sleeping for a minute, check file")
         #time.sleep(60)
     
@@ -98,36 +110,14 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
         day = "%02d" % for_date_parsed.day
         #      https://www1.nseindia.com/content/historical/EQUITIES/2020/JUL/cm13JUL2020bhav.csv.zip
         url = "https://www1.nseindia.com/content/historical/EQUITIES/{year1}/{month1}/cm{day1}{month2}{year2}bhav.csv.zip".format(year1=year,month1=month,day1=day,month2=month,year2=year)
+        print("Downloding file URL - ",url)
         file_path = os.path.join(download_path, "nse", "cm{day1}{month1}{year1}bhav.csv.zip".format(day1=day,month1=month,year1=year))
-        try:
-            print ("bhavcopy nse url - ",url)
-            self.download_and_unzip(url, file_path)
-        except zipfile.BadZipFile as e1:
-            print("BadZipFile exception - ", str(e1))	
-            print("Skipping downloading data for {for_date1}".format(for_date1=for_date))
-            return
-        print("Amit 111")    
+        print ("bhavcopy nse url - ",url)
+        self.download_and_unzip(url, file_path)
+
+        print("Amit - looks like download and decompression successful !")    
         os.remove(file_path)
-        print("Amit 222")    
         return file_path
-    
-#    def download_bse_bhavcopy(self,for_date):
-#        """
-#        this function is used to download bhavcopy from BSE
-#        """
-#        for_date_parsed = datetime.strptime(for_date, "%d/%m/%Y")
-#        month = "%02d" % for_date_parsed.month
-#        day = "%02d" % for_date_parsed.day
-#        year = for_date_parsed.strftime("%y")
-#        file_name = f"EQ{day}{month}{year}_CSV.ZIP"
-#        url = f"http://www.bseindia.com/download/BhavCopy/Equity/{file_name}"
-#        file_path = os.path.join(download_path, "bse", file_name)
-#        try:
-#            self.download_and_unzip(url, file_path)
-#        except zipfile.BadZipFile:
-#            print(f"Skipping downloading data for {for_date}")
-#        os.remove(file_path)
-#        return file_path
     
     
     
@@ -155,11 +145,10 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
         else:
             if exchange == "nse":
                 file_path = self.download_nse_bhavcopy(for_date)
-                print("Amit 2233")  
             else:
                 file_path = self.download_bse_bhavcopy(for_date)
         
-        print("Amit 333")    
+    
         return file_path
         
     def getPrevDayMarketData(self):
@@ -175,6 +164,7 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
         
     def saveToDB(self, file_path):
         #get prev day daya for calculating volume change
+        print("Amit - saving data now to Database")
         prev_day_df = self.getPrevDayMarketData();
         
         df = pd.read_csv(file_path)
@@ -258,10 +248,10 @@ df = pd.DataFrame()
 thisObj.createDirectory()
 
 #file_path = thisObj.execute("nse",thisObj.yesterday(),1)
-#file_path = thisObj.execute("nse","10/07/2020",1)
+#file_path = thisObj.execute("nse","31/12/2020",1)
 file_path = thisObj.execute("nse",thisObj.today(),1)
 
-print("Amit 444")    
+print("Amit - Looks like DB save is all good.... ")    
 
 if file_path == None:
     print("File might not be available for this date.. may be weekend ! ")
