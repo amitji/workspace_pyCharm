@@ -16,18 +16,30 @@ Vendor_Name = 'DEB'
 #quarter_names = {5: 'Q218', 4: 'Q118', 3: 'Q417', 2: 'Q317',1: 'Q217',0: 'Q117', -1: 'Q416', -2: 'Q316', -3: 'Q216'}
 
 
-quarter_dates_v1 = {5:'2018-09-30', 4:'2018-06-30', 3: '2018-03-31', 2: '2017-12-31', 1: '2017-09-30', 0: '2017-06-30', -1: '2017-03-31', -2: '2016-12-31', -3: '2016-09-30'}
-screener_quarter_dates_v1 = {5: 'Sep 2018', 4: 'Jun 2018', 3: 'Mar 2018', 2: 'Dec 2017', 1: 'Sep 2017', 0: 'Jun 2017', -1: 'Mar 2017', -2: 'Dec 2016', -3: 'Sep 2016'}
-quarter_names_v1 = {5: 'Q218', 4: 'Q118', 3: 'Q417', 2: 'Q317',1: 'Q217',0: 'Q117', -1: 'Q416', -2: 'Q316', -3: 'Q216'}
+# quarter_dates_v1 = {5:'2018-09-30', 4:'2018-06-30', 3: '2018-03-31', 2: '2017-12-31', 1: '2017-09-30', 0: '2017-06-30', -1: '2017-03-31', -2: '2016-12-31', -3: '2016-09-30'}
+# screener_quarter_dates_v1 = {5: 'Sep 2018', 4: 'Jun 2018', 3: 'Mar 2018', 2: 'Dec 2017', 1: 'Sep 2017', 0: 'Jun 2017', -1: 'Mar 2017', -2: 'Dec 2016', -3: 'Sep 2016'}
+# quarter_names_v1 = {5: 'Q218', 4: 'Q118', 3: 'Q417', 2: 'Q317',1: 'Q217',0: 'Q117', -1: 'Q416', -2: 'Q316', -3: 'Q216'}
 
-quarter_dates = {5:'2018-12-31', 4:'2018-09-30', 3:'2018-06-30', 2: '2018-03-31', 1: '2017-12-31', 0: '2017-09-30', -1: '2017-06-30', -2: '2017-03-31', -3: '2016-12-31'}
-screener_quarter_dates = {5: 'Dec 2018', 4: 'Sep 2018', 3: 'Jun 2018', 2: 'Mar 2018', 1: 'Dec 2017', 0: 'Sep 2017', -1: 'Jun 2017', -2: 'Mar 2017', -3: 'Dec 2016'}
-quarter_names = {5: 'Q318', 4: 'Q218', 3: 'Q118', 2: 'Q417', 1: 'Q317',0: 'Q217',-1: 'Q117', -2: 'Q416', -3: 'Q316'}
+# quarter_dates = {5:'2018-12-31', 4:'2018-09-30', 3:'2018-06-30', 2: '2018-03-31', 1: '2017-12-31', 0: '2017-09-30', -1: '2017-06-30', -2: '2017-03-31', -3: '2016-12-31'}
+# screener_quarter_dates = {5: 'Dec 2018', 4: 'Sep 2018', 3: 'Jun 2018', 2: 'Mar 2018', 1: 'Dec 2017', 0: 'Sep 2017', -1: 'Jun 2017', -2: 'Mar 2017', -3: 'Dec 2016'}
+# quarter_names = {5: 'Q318', 4: 'Q218', 3: 'Q118', 2: 'Q417', 1: 'Q317',0: 'Q217',-1: 'Q117', -2: 'Q416', -3: 'Q316'}
+
+
+
+quarter_dates_v1 = {5:'2020-12-31', 4:'2020-09-30', 3:'2020-06-30', 2: '2020-03-31', 1: '2019-12-31', 0: '2019-09-30', -1: '2019-06-30', -2: '2019-03-31', -3: '2018-12-31'}
+screener_quarter_dates_v1 = {5: 'Dec 2020', 4: 'Sep 2020', 3: 'Jun 2020', 2: 'Mar 2020', 1: 'Dec 2019', 0: 'Sep 2019', -1: 'Jun 2019', -2: 'Mar 2019', -3: 'Dec 2018'}
+quarter_names_v1 = {5: 'Q320', 4: 'Q220', 3: 'Q120', 2: 'Q419', 1: 'Q319',0: 'Q219',-1: 'Q119', -2: 'Q418', -3: 'Q318'}
+
+quarter_dates = {5:'2021-03-31', 4:'2020-12-31', 3:'2020-09-30', 2:'2020-06-30', 1: '2020-03-31', 0: '2019-12-31', -1: '2019-09-30', -2: '2019-06-30', -3: '2019-03-31'}
+screener_quarter_dates = {5: 'Mar 2021', 4: 'Dec 2020', 3: 'Sep 2020', 2: 'Jun 2020', 1: 'Mar 2020', 0: 'Dec 2019', -1: 'Sep 2019', -2: 'Jun 2019', -3: 'Mar 2019'}
+quarter_names = {5: 'Q420', 4: 'Q320', 3: 'Q220', 2: 'Q120', 1: 'Q419', 0: 'Q319',-1: 'Q219',-2: 'Q119', -3: 'Q418'}
+
+
 
 
 #latest_period='2018-06-30' #change this when lots of results announcements starts
-latest_period='2018-12-31'
-latest_quarter='Q318'
+latest_period='2021-03-31'
+latest_quarter='Q420'
 
 # How many quarters results needs to be processed. You need to have xpaths for those many Quarters in the xpaths table.
 number_of_quarters_to_process = 9
@@ -122,6 +134,8 @@ excel_output_excel='C:/xampp/htdocs/stockcircuitserver/fund_analysis/screener_ex
 # screener userid 7 pwd
 screener_userid = 'richasharma2099@gmail.com'
 screener_pwd = 'Welcome2020!' 
+# screener_userid = 'amitji@gmail.com'
+# screener_pwd = 'Welcome2020!' 
 
 #
 PHANTOMJS_PATH ='D:/workspace_pyCharm/phantomjs.exe'

@@ -15,9 +15,9 @@ from selenium.webdriver.common.by import By
 import datetime
 import sys, os
 
-# import FinalRatingModule
+import Module_Final_Rating
 import QuandlDataModule
-#import Scrapper_US_Stocks_Fin_Ratio_Update
+
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
@@ -29,7 +29,7 @@ class Module_Scrapper_Screener_India_Stocks:
         self.cur = self.con.cursor()
 
         self.quandlDataObject = QuandlDataModule.QuandlDataModule()
-        # self.finalRatingModule = FinalRatingModule.FinalRatingModule()
+        self.finalRatingModule = Module_Final_Rating.Module_Final_Rating()
 
 
         self.xpaths = self.getXpaths()
@@ -42,7 +42,10 @@ class Module_Scrapper_Screener_India_Stocks:
             self.PHANTOMJS_PATH = './phantomjs.exe'
         else:
             #self.PHANTOMJS_PATH = './phantomjs'
-            self.PHANTOMJS_PATH = '/home/shopbindaas/python-workspace/phantomjs'
+            #self.PHANTOMJS_PATH = '/home/shopbindaas/python-workspace/phantomjs'
+            # self.PHANTOMJS_PATH = '/Users/amimahes/Dropbox/Amit_Work-dbox/Github Repos/workspace_pyCharm/phantomjs-2.1.1-macosx/bin/phantomjs'
+            self.PHANTOMJS_PATH = './phantomjs-2.1.1-macosx/bin/phantomjs'
+            
 
         self.browser = webdriver.PhantomJS(self.PHANTOMJS_PATH)
 
@@ -54,7 +57,9 @@ class Module_Scrapper_Screener_India_Stocks:
         username.send_keys(const.screener_userid)
         password.send_keys(const.screener_pwd)
 #        login_attempt = self.browser.find_element_by_class_name("button-primary")
-        login_attempt = self.browser.find_element_by_xpath("/html/body/main/form/p[1]/button")
+        #login_attempt = self.browser.find_element_by_xpath("/html/body/main/form/p[1]/button")
+        login_attempt = self.browser.find_element_by_xpath("/html/body/main/div/div/div[2]/form/button")
+        
 #        time.sleep(5)
 #        Waiting.Until(ExpectedConditions.ElementExists(By.Id("ctl00")));
         login_attempt.click()
@@ -97,7 +102,8 @@ class Module_Scrapper_Screener_India_Stocks:
             fullid = row["fullid"]
             #fullid = 'NSE:INFY'
             #nseid = 'INFY'
-            print( fullid)
+
+            print( 'fullid - ',fullid)
 
             #These indicators are now for 9 Quarter calculations
             self.revenueIndStr=""
@@ -148,6 +154,9 @@ class Module_Scrapper_Screener_India_Stocks:
                     print( 'Consolidated latest quarter results available', short_quarter_date, temp_date)
                     quarter_version = 2
                 else:
+                    #Reverted #Amit - 25-Apr-2021. Commenting standalone since most of companies now have consolidated one
+                    # print( "Exception in Consolidated BUT NOT trying STANDALONE")
+
                     print( "Consolidated Results are NOT latest , try STANDALONE")
                     self.browser.get(const.screenerBaseUrl + nseid)
                     time.sleep(5)
@@ -157,6 +166,8 @@ class Module_Scrapper_Screener_India_Stocks:
 
 
             except Exception as e3:
+                #Reverted #Amit - 25-Apr-2021. Commenting standalone since most of companies now have consolidated one
+                # print( "Exception in Consolidated BUT NOT trying STANDALONE")
                 print( "Exception in Consolidated , try STANDALONE")
                 self.browser.get(const.screenerBaseUrl + nseid)
                 time.sleep(5)
@@ -167,6 +178,7 @@ class Module_Scrapper_Screener_India_Stocks:
             if short_quarter_date == temp_date:
                 print( 'latest quarter results available', short_quarter_date, temp_date)
                 quarter_version = 2
+            #Reverted #Amit 25-Apr-2021 - commenting elif to update data from previous quater.. not needed if you are updating data regulary    
             elif short_quarter_date_v1 == temp_date:
                 print( 'one quarter previous results available', short_quarter_date_v1, temp_date)
                 quarter_version = 1
@@ -179,6 +191,7 @@ class Module_Scrapper_Screener_India_Stocks:
                 if short_quarter_date == temp_date:
                     print( 'latest quarter STANDALONE results available', short_quarter_date, temp_date)
                     quarter_version = 2
+                #Reverted #Amit 25-Apr-2021 - commenting elif to update data from previous quater.. not needed if you are updating data regulary    
                 elif short_quarter_date_v1 == temp_date:
                     print( 'one quarter previous results available', short_quarter_date_v1, temp_date)
                     quarter_version = 1
@@ -270,7 +283,10 @@ class Module_Scrapper_Screener_India_Stocks:
                             rev_growth_rate = (100 * rev_growth) / abs(prev_rev)  # abs() is used for negative denominator
 
                         profit_growth = profit - prev_profit
-                        profit_growth_rate = (100 * profit_growth) / abs(prev_profit)
+                        if prev_profit == 0:
+                            profit_growth_rate = 0
+                        else:
+                            profit_growth_rate = (100 * profit_growth) / abs(prev_profit)
 
                         # This block is for new Indicators for 8/9 quarters
                         if quater_seq > const.min_quarter_seq_for_rev_profit_indicators:
@@ -339,14 +355,14 @@ class Module_Scrapper_Screener_India_Stocks:
                 #reverse the indicator string because Quarter Seq was from 1->5 instead 5->1
 
                 self.profitIndStr = self.profitIndStr[::-1]
-                self.profitIndStr = int(self.profitIndStr,2)
+                # self.profitIndStr = int(self.profitIndStr,2)
                 self.revenueIndStr = self.revenueIndStr[::-1]
-                self.revenueIndStr = int(self.revenueIndStr,2)
+                # self.revenueIndStr = int(self.revenueIndStr,2)
 
                 self.profitIndStr222 = self.profitIndStr222[::-1]
-                self.profitIndStr222 = int(self.profitIndStr222,2)
+                # self.profitIndStr222 = int(self.profitIndStr222,2)
                 self.revenueIndStr222 = self.revenueIndStr222[::-1]
-                self.revenueIndStr222 = int(self.revenueIndStr222,2)
+                # self.revenueIndStr222 = int(self.revenueIndStr222,2)
 
                 print ('final profitIndStr - ', self.profitIndStr)
                 print( 'final revenueIndStr - ', self.revenueIndStr)
@@ -364,7 +380,8 @@ class Module_Scrapper_Screener_India_Stocks:
         try:
             nseid = row["nseid"]
             fullid = row["fullid"]
-            print( fullid)
+
+            print( 'fullid - ',fullid)            
 
             table_name = fr_table_name
 
@@ -372,7 +389,11 @@ class Module_Scrapper_Screener_India_Stocks:
 
 
 #            last_price = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[1]/h4[2]/b').text
-            last_price = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[2]/b').text
+            #last_price = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[2]/b').text
+            last_price = self.browser.find_element_by_xpath('/html/body/main/div[2]/div[3]/div[2]/ul/li[2]/span[2]/span').text
+            
+            print ('last_price', last_price)
+            
             if '--' not in last_price:
                 last_price = float(last_price[(last_price.rfind(' ') + 1):].replace(",", ""))
             else:
@@ -390,7 +411,10 @@ class Module_Scrapper_Screener_India_Stocks:
             eps = 0  
 
 #            pe = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[1]/h4[4]/b').text
-            pe = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[5]/b').text
+            #pe = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[5]/b').text
+            pe = self.browser.find_element_by_xpath('/html/body/main/div[2]/div[3]/div[2]/ul/li[4]/span[2]/span').text
+        
+            print ('pe - ', pe)
             
             if pe =='':
                 pe = None
@@ -412,8 +436,10 @@ class Module_Scrapper_Screener_India_Stocks:
             pb = 0
 
 #            roe = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[7]').text
-            roe = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[8]/b').text
-
+            #roe = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[8]/b').text
+            roe = self.browser.find_element_by_xpath('/html/body/main/div[2]/div[3]/div[2]/ul/li[8]/span[2]/span').text
+            print ('roe - ', roe)
+            
             if roe == '':
                 roe = None
             elif '--' not in roe:
@@ -423,17 +449,17 @@ class Module_Scrapper_Screener_India_Stocks:
 
 
 #            high52 = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[9]').text
-            high52 = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[3]/b[1]').text
+            high52 = self.browser.find_element_by_xpath('/html/body/main/div[2]/div[3]/div[2]/ul/li[3]/span[2]/span[1]').text
             if '--' not in high52:
-                high52 = float(high52[(high52.rfind(' ') + 1):])
+                high52 = float(high52[(high52.rfind(' ') + 1):].replace(",", ""))
             else:
                 high52 = None
 
 
 #            low52 = self.browser.find_element_by_xpath('//*[@id="content"]/div/div/div/section[1]/div[2]/h4[10]').text
-            low52 = self.browser.find_element_by_xpath('//*[@id="main-area"]/section[1]/ul/li[3]/b[2]').text
+            low52 = self.browser.find_element_by_xpath('/html/body/main/div[2]/div[3]/div[2]/ul/li[3]/span[2]/span[2]').text
             if '--' not in low52:
-                low52 = float(low52[(low52.rfind(' ') + 1):])
+                low52 = float(low52[(low52.rfind(' ') + 1):].replace(",", ""))
             else:
                 low52 = None
 
@@ -525,15 +551,27 @@ class Module_Scrapper_Screener_India_Stocks:
 
         # Since everything went fine, update the 'update_now' flag to c
         if (self.all_good_flag):
-            self.quandlDataObject.setUpdateNowFlag(fullid, table_name, 'n')
-            self.quandlDataObject.setIsVideoAvailable(fullid)
-            self.quandlDataObject.setVideoAsOldToRecreateNextTime(fullid)
+            #self.quandlDataObject.setUpdateNowFlag(fullid, table_name, 'n')
+            #Amit - these flags not needed since Stock Circuit App is not used.
+            # self.quandlDataObject.setIsVideoAvailable(fullid)
+            # self.quandlDataObject.setVideoAsOldToRecreateNextTime(fullid)
             self.updated_stock_list.append(nseid)
             self.all_good_stock_names.append(row)
 
     # def callFinalRatingModule(self,row,qd_table_name,fr_table_name):
     #     self.finalRatingModule.updateFinalRating(row,qd_table_name,fr_table_name)
 
+    def updateIncludeInNextRunFlag(self, nseid, flag):
+        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        updateSql = "update stock_names_new set include_in_next_run = '%s', last_modified='%s' where nseid = '%s' " % ( flag,now, nseid)
+        
+        self.cur.execute(updateSql)
+        self.con.commit()
+        print( "updated the include_in_next_run column in table stock_names_new  to - ", flag)
+            
+            
+            
+    
     def updateAll(self, stock_names):
         #print stock_names
         print( "Number of Stocks processing - ", len(stock_names))
@@ -545,27 +583,37 @@ class Module_Scrapper_Screener_India_Stocks:
             count = count + 1
             print( "\n\n****************************************************************************")
             print( "calling updateQuaterlyData for - ", row['nseid'], "(", count, "/", totalCount, ")")
-            enable_for_vendor_data = row['enable_for_vendor_data']
-            if enable_for_vendor_data == '1' or enable_for_vendor_data == 'e' or enable_for_vendor_data == 'z' :
-                qd_table_name = "fa_quaterly_data"
-                fr_table_name = "fa_financial_ratio"
-                self.updateQuaterlyData(row, qd_table_name, fr_table_name)
-                if (self.all_good_flag):
-                    print( "\n\ncalling updateFinancialRatios for - ", row['nseid'], "(", count, "/", totalCount, ")")
-                    self.updateFinancialRatios(row, qd_table_name, fr_table_name)
-                    # self.finalRatingModule.updateFinalRating(row, qd_table_name, fr_table_name)
-                else:
-                    print( "*** Amit -  Since updateQuaterlyData FAILED , not calling updateFinancialRatios.Move to next one ")
-            elif enable_for_vendor_data == '2':
-                qd_table_name = "fa_quaterly_data_secondary"
-                fr_table_name = "fa_financial_ratio_secondary"
-                self.updateQuaterlyData(row, qd_table_name, fr_table_name)
-                if (self.all_good_flag):
-                    print( "\n\ncalling updateFinancialRatios for - ", row['nseid'], "(", count, "/", totalCount, ")")
-                    self.updateFinancialRatios(row, qd_table_name, fr_table_name)
-                    # self.finalRatingModule.updateFinalRating(row, qd_table_name, fr_table_name)
-                else:
-                    print( "*** Amit -  Since updateQuaterlyData FAILED , not calling updateFinancialRatios.Move to next one ")
+            
+            
+            #Amit- enable_for_vendor_data coulmn is removed from new table stock_names_new so HARD CODE for now
+            #enable_for_vendor_data = row['enable_for_vendor_data']
+            # enable_for_vendor_data=1
+            
+            
+            # if enable_for_vendor_data == '1' or enable_for_vendor_data == 'e' or enable_for_vendor_data == 'z' :
+            qd_table_name = "fa_quaterly_data"
+            fr_table_name = "fa_financial_ratio"
+            self.updateQuaterlyData(row, qd_table_name, fr_table_name)
+            if (self.all_good_flag):
+                print( "\n\ncalling updateFinancialRatios for - ", row['nseid'], "(", count, "/", totalCount, ")")
+                self.updateFinancialRatios(row, qd_table_name, fr_table_name)
+                self.updateIncludeInNextRunFlag(row['nseid'],'y');
+                #Amit - if you dont run final rating then php reports will not show data !!!
+                self.finalRatingModule.updateFinalRating(row, qd_table_name, fr_table_name)
+            else:
+                self.updateIncludeInNextRunFlag(row['nseid'],'n');
+                print( "\n*** Amit -  Since updateQuaterlyData FAILED , not calling updateFinancialRatios.Move to next one ")
+                print( "\n*** Amit -  Since updateQuaterlyData FAILED , calling updateIncludeInNextRunFlag to set FLAG to 'n' so that it not run for this stock ")
+            # elif enable_for_vendor_data == '2':
+            #     qd_table_name = "fa_quaterly_data_secondary"
+            #     fr_table_name = "fa_financial_ratio_secondary"
+            #     self.updateQuaterlyData(row, qd_table_name, fr_table_name)
+            #     if (self.all_good_flag):
+            #         print( "\n\ncalling updateFinancialRatios for - ", row['nseid'], "(", count, "/", totalCount, ")")
+            #         self.updateFinancialRatios(row, qd_table_name, fr_table_name)
+            #         # self.finalRatingModule.updateFinalRating(row, qd_table_name, fr_table_name)
+            #     else:
+            #         print( "*** Amit -  Since updateQuaterlyData FAILED , not calling updateFinancialRatios.Move to next one ")
 
         self.browser.quit();
         print( "\n\n scrapper_exception_list  - ")

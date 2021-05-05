@@ -39,21 +39,7 @@ class QuandlDataModule:
     #     # self.cur.close()
     #     print "\n\n*****  deleting FinalRatingCalculationProcess  "
 
-    """
-    def getStocksEnabledForVendorData(self):
-        self.cur.execute("SELECT distinct nseid, data_type FROM stock_names where enable_for_vendor_data = '1' and update_now = 'y' order by nseid")
-        #self.cur.execute("SELECT distinct nseid, data_type FROM stock_names where enable_for_vendor_data = '1' order by nseid")
-        rows = self.cur.fetchall()
-        data = list()
-        for row in rows:
-            # print row[0], row[1]
-            dd = dict()
-            dd["nseid"] = row[0]
-            dd["data_type"] = row[1]
-            data.append(dd)
-        # print data
-        return data
-    """
+  
 
 
     def updateQuarterlyData(self, row, table_name):
@@ -147,7 +133,7 @@ class QuandlDataModule:
                     ebidtmdataC = ebidtmdata['STANDALONE']
 
                     print( "\nAmit, changing type for this stock to Standalone\n")
-                    updateSql = "update stock_names set data_type = 'S' where fullid = '%s' " % fullid
+                    updateSql = "update stock_names_new set data_type = 'S' where fullid = '%s' " % fullid
                     self.cur.execute(updateSql)
                     self.con.commit()
 
@@ -446,7 +432,7 @@ class QuandlDataModule:
 
         #get the short name since it is manually modified
         #selectSql = "select short_name from " + table_name + " where fullid = '%s' " % fullid
-        selectSql = "select fr.short_name, sn.name from   " + table_name + " fr, stock_names sn where fr.fullid = sn.fullid and fr.fullid = '%s' " % fullid
+        selectSql = "select fr.short_name, sn.name from   " + table_name + " fr, stock_names_new sn where fr.fullid = sn.fullid and fr.fullid = '%s' " % fullid
 
         self.cur.execute(selectSql)
         short_name = ""
@@ -467,30 +453,30 @@ class QuandlDataModule:
         print( "Number of rows delete: %d" % self.cur.rowcount)
         return self.cur.rowcount
 
-    def setUpdateNowFlag(self, fullid,table_name, update_flag ):
+    # def setUpdateNowFlag(self, fullid,table_name, update_flag ):
 
-        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        if "secondary" in table_name:
-            vendor_data_flag = "2"
-        elif "us_stocks" in table_name:
-            vendor_data_flag = "3"
-        else:
-            vendor_data_flag = "1"
-        updateSql = "update stock_names set update_now = '%s', enable_for_vendor_data='%s', last_modified='%s' where fullid = '%s' " % (
-            update_flag, vendor_data_flag, now, fullid)
+    #     now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    #     if "secondary" in table_name:
+    #         vendor_data_flag = "2"
+    #     elif "us_stocks" in table_name:
+    #         vendor_data_flag = "3"
+    #     else:
+    #         vendor_data_flag = "1"
+    #     updateSql = "update stock_names set update_now = '%s', enable_for_vendor_data='%s', last_modified='%s' where fullid = '%s' " % (
+    #         update_flag, vendor_data_flag, now, fullid)
         
-        self.cur.execute(updateSql)
-        self.con.commit()
-        #self.updated_stock_list.append(fullid)
-        print( "updated the update_now column to ", update_flag)
+    #     self.cur.execute(updateSql)
+    #     self.con.commit()
+    #     #self.updated_stock_list.append(fullid)
+    #     print( "updated the update_now column to ", update_flag)
 
-    def setIsVideoAvailable(self, fullid ):
-        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        updateSql = "update stock_names set is_video_available = 'y', last_modified='%s' where fullid = '%s' " % ( now, fullid)
+    # def setIsVideoAvailable(self, fullid ):
+    #     now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    #     updateSql = "update stock_names set is_video_available = 'y', last_modified='%s' where fullid = '%s' " % ( now, fullid)
         
-        self.cur.execute(updateSql)
-        self.con.commit()
-        print( "updated the is_video_available column to y")
+    #     self.cur.execute(updateSql)
+    #     self.con.commit()
+    #     print( "updated the is_video_available column to y")
 
     def setVideoAsOldToRecreateNextTime(self, fullid ):
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')

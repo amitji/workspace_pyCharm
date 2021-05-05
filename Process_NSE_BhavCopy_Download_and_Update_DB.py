@@ -1,6 +1,7 @@
 import os
-import zipfile
-import requests
+import requests 
+import zipfile, io
+import urllib.request
 from pathlib import Path
 from datetime import datetime, timedelta
 import pandas as pd
@@ -11,9 +12,9 @@ import sys
 
 download_path = os.path.join(str(Path(__file__).resolve().parent), "downloads")
 #cron job needs complete path name...
-directory = "//home//shopbindaas//python-workspace//downloads//nse"
+#directory = "//home//shopbindaas//python-workspace//downloads//nse"
 #for windows
-#directory = ".//downloads//nse"
+directory = ".//downloads//nse"
 
 #supported_exchanges = ["bse", "nse"]
 supported_exchanges = ["nse"]
@@ -54,27 +55,54 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
         today = datetime.now()
         return str(today.date().strftime("%d/%m/%Y"))
     
-    
     def download(self,download_url, file_path):
-        """
-        download function is used to fetch the data
-        """
-        print("Downloading file at", file_path)
+        hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
+       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+       'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+       'Accept-Encoding': 'none',
+       'Accept-Language': 'en-US,en;q=0.8',
+       'Connection': 'keep-alive'}
         
-        try:
-            # Don't download file if we've done that already
-            if not os.path.exists(file_path):
-                file_to_save = open(file_path, "wb")
-                with requests.get(download_url, verify=False, stream=True) as response:
-                    for chunk in response.iter_content(chunk_size=1024):
-                        file_to_save.write(chunk)
-                print("Amit - Completed downloading file")
-            else:
-                print("Amit - We already have this file cached locally")
-        except exception as e:
-             print("Amit - Error in downloading file...", str(e))
-             #return
-             sys.exit(1)
+        r = requests.get(download_url, headers = hdr)
+        with open(file_path, 'wb') as fd:
+            for chunk in r.iter_content(chunk_size=128):
+                fd.write(chunk)
+                
+        print("Amit - file extracted")
+
+        # with urllib.request.urlopen(download_url) as dl_file:
+        #     with open(file_path, 'wb') as out_file:
+        #         out_file.write(dl_file.read())
+
+    
+    # def download(self,download_url, file_path):
+    #     r = requests.get(download_url)
+    #     z = zipfile.ZipFile(io.BytesIO(r.content))
+    #     z.extractall(directory)
+    #     print("Amit - file extracted")
+        
+        
+        
+    # def download(self,download_url, file_path):
+    #     """
+    #     download function is used to fetch the data
+    #     """
+    #     print("Downloading file at", file_path)
+        
+    #     try:
+    #         # Don't download file if we've done that already
+    #         if not os.path.exists(file_path):
+    #             file_to_save = open(file_path, "wb")
+    #             with requests.get(download_url, verify=False, stream=True) as response:
+    #                 for chunk in response.iter_content(chunk_size=1024):
+    #                     file_to_save.write(chunk)
+    #             print("Amit - Completed downloading file")
+    #         else:
+    #             print("Amit - We already have this file cached locally")
+    #     except exception as e:
+    #          print("Amit - Error in downloading file...", str(e))
+    #          #return
+    #          sys.exit(1)
 
     
     def download_and_unzip(self,download_url, file_path):
@@ -82,14 +110,18 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
         download_and_unzip takes care of both downloading and uncompressing
         """
         
-        self.download(download_url, file_path)
+        # self.download(download_url, file_path)
+        
         try:    
-    #        with zipfile.ZipFile(file_path, "r") as compressed_file:
-    ##            compressed_file.extractall(Path(file_path).parent)
-    #            compressed_file.extractall(directory)
-            compressed_file = zipfile.ZipFile(file_path, "r")   
-            compressed_file.extractall(directory)
-            compressed_file.close()
+            with zipfile.ZipFile(file_path, "r") as compressed_file:
+    #            compressed_file.extractall(Path(file_path).parent)
+                compressed_file.extractall(directory)
+
+
+            # compressed_file = zipfile.ZipFile(file_path, "r")   
+            # compressed_file.extractall(directory)
+            # time.sleep(15)
+            # compressed_file.close()
                 
                 
             print("Completed un-compressing")
@@ -116,7 +148,7 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
         self.download_and_unzip(url, file_path)
 
         print("Amit - looks like download and decompression successful !")    
-        os.remove(file_path)
+        #os.remove(file_path)
         return file_path
     
     
@@ -217,11 +249,11 @@ class Process_NSE_BhavCopy_Download_and_Update_DB:
         print("updated last_price in fa_financial_ratio table ")  
         
         #update fa_financial_ratio_secondary table... 
-        update_sql = " update fa_financial_ratio_secondary fa inner join stock_market_data_temp_table t "
-        update_sql += " on fa.nseid = t.nseid set fa.last_price = t.close, fa.last_modified = now() "         
-        with self.engine.begin() as conn:
-            conn.execute(update_sql)                    
-        print("updated last_price in fa_financial_ratio_secondary table ")    
+        #update_sql = " update fa_financial_ratio_secondary fa inner join stock_market_data_temp_table t "
+        #update_sql += " on fa.nseid = t.nseid set fa.last_price = t.close, fa.last_modified = now() "         
+        #with self.engine.begin() as conn:
+        #   conn.execute(update_sql)                    
+        #print("updated last_price in fa_financial_ratio_secondary table ")    
         
         
         
@@ -248,8 +280,8 @@ df = pd.DataFrame()
 thisObj.createDirectory()
 
 #file_path = thisObj.execute("nse",thisObj.yesterday(),1)
-#file_path = thisObj.execute("nse","31/12/2020",1)
-file_path = thisObj.execute("nse",thisObj.today(),1)
+file_path = thisObj.execute("nse","05/05/2021",1)
+#file_path = thisObj.execute("nse",thisObj.today(),1)
 
 print("Amit - Looks like DB save is all good.... ")    
 
@@ -263,3 +295,4 @@ else:
     print(df)
 
 EmailUtil.send_email_with_body("Process_NSE_BhavCopy_Download_and_Update_DB",df.to_string())
+#/Users/amimahes/opt/anaconda3/bin/python "/Users/amimahes/Dropbox/Amit_Work-dbox/Github Repos/workspace_pyCharm/Process_NSE_BhavCopy_Download_and_Update_DB.py"

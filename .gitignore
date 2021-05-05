@@ -77,3 +77,4 @@ Machine Learning/Aashish/with_pcr.py
 Machine Learning/datasets/NYSE/GOOG.xlsx
 Duplicates.txt
 *.hdf5
+*.bak

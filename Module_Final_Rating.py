@@ -59,7 +59,7 @@ class Module_Final_Rating:
 
     def getStockList(self):
         #select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and update_now='y' "
-        select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and is_video_available='y' "
+        select_sql = "select fullid, nseid from stocksdb.stock_names_new sn where exchange='NSE' and is_video_available='y' "
         self.cur.execute(select_sql)
 
         rows = self.cur.fetchall()
@@ -106,9 +106,8 @@ class Module_Final_Rating:
             nseid = row["nseid"]
             fullid = row["fullid"]
             industry_vertical = row["industry_vertical"]
-            # fullid = 'NSE:INFY'
-            # nseid = 'INFY'
-            print (fullid)
+
+            print( 'fullid - ',fullid)
 
 
             qData = self.getQuartetlyData(fullid, qd_table_name)
@@ -196,7 +195,7 @@ class Module_Final_Rating:
 
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         for list_item in qData:
-            # print list_item
+            print (list_item)
             revI = profitI = pmI = opmI = ebitI = 0
             quater_sequence = list_item['quater_sequence']
             revG = list_item['revenue_growth_rate']
@@ -384,6 +383,8 @@ class Module_Final_Rating:
             nseid = row["nseid"]
             fullid = row["fullid"]
 
+            print( 'fullid - ',fullid)
+            
             select_sql = "select * from stocksdb.final_rating_temp where fullid ='%s' " %(fullid)
             self.cur.execute(select_sql)
 
@@ -461,9 +462,9 @@ class Module_Final_Rating:
 
 
         if (self.all_good_flag):
-            self.quandlDataObject.setUpdateNowFlag(fullid, qd_table_name, 'n')
-            self.quandlDataObject.setIsVideoAvailable(fullid)
-            self.quandlDataObject.setVideoAsOldToRecreateNextTime(fullid)
+            # self.quandlDataObject.setUpdateNowFlag(fullid, qd_table_name, 'n')
+            # self.quandlDataObject.setIsVideoAvailable(fullid)
+            # self.quandlDataObject.setVideoAsOldToRecreateNextTime(fullid)
             self.updated_stock_list.append(nseid)
 
 
@@ -523,15 +524,15 @@ class Module_Final_Rating:
             # print row
             count = count + 1
             print( "\n\ncalling updateFinalRatingData for - ", row['nseid'], "(", count, "/", totalCount, ")")
-            enable_for_vendor_data = row['enable_for_vendor_data']
-            if enable_for_vendor_data == '1':
-                qd_table_name = "fa_quaterly_data"
-                fr_table_name = "fa_financial_ratio"
-                self.updateFinalRating(row,qd_table_name,fr_table_name)
-            elif enable_for_vendor_data == '2':
-                qd_table_name = "fa_quaterly_data_secondary"
-                fr_table_name = "fa_financial_ratio_secondary"
-                self.updateFinalRating(row, qd_table_name, fr_table_name)
+            # enable_for_vendor_data = row['enable_for_vendor_data']
+            # if enable_for_vendor_data == '1':
+            qd_table_name = "fa_quaterly_data"
+            fr_table_name = "fa_financial_ratio"
+            self.updateFinalRating(row,qd_table_name,fr_table_name)
+            # elif enable_for_vendor_data == '2':
+            #     qd_table_name = "fa_quaterly_data_secondary"
+            #     fr_table_name = "fa_financial_ratio_secondary"
+            #     self.updateFinalRating(row, qd_table_name, fr_table_name)
 
         # Now calibrate all rating with respect to max rating
         #commented because each stock becomes depended on other stocks rating and if few stock rating changes then you have tp calculate all stocsk again

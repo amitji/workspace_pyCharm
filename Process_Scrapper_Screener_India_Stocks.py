@@ -1,10 +1,11 @@
-#Amit Purpose - Run this program to update the last_price, 52 week high , 52 week low etc for all the stcoks in
-# fa_financial_ratio_us_stocks table
-
+#Amit Purpose
+# This process is same as Process_NSE_Based_ResultDates_Screener_ScrapNUpdate. Just us ethis process for updating all quaterly data, Financial ratios adhoc basis.
 
 import Module_Scrapper_Screener_India_Stocks
 import Module_Final_Rating
 import DBManager
+import Constants
+
 
 class Process_Scrapper_Screener_India_Stock:
     def __init__(self):
@@ -16,25 +17,37 @@ class Process_Scrapper_Screener_India_Stock:
 
 
     def getStockList(self):
-        # select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and update_now='y' "
-        # select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and enable_for_vendor_data = 'e' "
-        # select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and enable_for_vendor_data = 'z' "
-        # select_sql = "select fullid, nseid, enable_for_vendor_data from stocksdb.stock_names sn where exchange='NSE' and update_now='A' "
-        #select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names_temp sn"
-
-        ### This SQL will get all the stcoks in stock_names table which does not have any data in Fin Ratio / Quaterly tables..
-#        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where exchange='NSE' and fullid not in "
+ 
+        ####   USE NEW TABLE stock_names_new    ######
+        #
+        ##############################################
+        
+        ### This SQL will get all the stcoks in stock_names_new table which does not have any data in Fin Ratio / Quaterly tables..
+#        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names_new sn where exchange='NSE' and fullid not in "
 #        select_sql += " (select fullid from  stocksdb.fa_financial_ratio union all select fullid from  stocksdb.fa_financial_ratio_secondary )"
 
 
-        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in ('HCIL') "
-        #select_sql ="select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names where exchange='NSE' and is_video_available='y' and enable_for_vendor_data='2' and id < 500 "
+        #select_sql ="select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names_new where exchange='NSE' and is_video_available='y' and enable_for_vendor_data='2' and id < 500 "
 
-        #run it for all Amit's portfolio stocks
-        #select_sql = "select sn.fullid, sn.nseid, sn.enable_for_vendor_data, sn.industry_vertical from stocksdb.stock_names sn, amit_portfolio ap where sn.nseid = ap.nseid"
+        # Test and Run for One Stock
+        # select_sql = "select fullid, nseid,industry_vertical from stocksdb.stock_names_new sn where include_in_next_run = 'y' and nseid in ('GRAVITA') "
+        
+        
+        #Amit Portfolio Stocks Only  - run it for all Amit's portfolio stocks
+        # select_sql = "select sn.fullid, sn.nseid, sn.enable_for_vendor_data, sn.industry_vertical from stocksdb.stock_names_new sn, amit_portfolio ap where sn.nseid = ap.nseid"
+
+
+        ###Explain sql -  this sql will try update all those stocks whihc does  not have latest quater results. Run this when data is not updated for long time.
+        select_sql = "select fullid, nseid,industry_vertical from stocksdb.stock_names_new sn where sn.exchange ='NSE' and sn.include_in_next_run ='y' and  nseid not in "
+        select_sql += "(select nseid from"
+        select_sql += "(select nseid from stocksdb.fa_quaterly_data where  period = '"+Constants.latest_period+"' and quater_sequence=5 ) temp )"
+        
+
 
         #run this sql to recalculate the ratings only. Comment module_Scrapper_Screener_India_Stocks.updateAll function below.
-        #select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where fullid in (select fullid from stocksdb.final_rating ) "
+        #select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names_new sn where fullid in (select fullid from stocksdb.final_rating ) "
+        
+        print ('\n\nSelect SQL  - ',select_sql)
         self.cur.execute(select_sql)
 
         rows = self.cur.fetchall()
@@ -44,8 +57,11 @@ class Process_Scrapper_Screener_India_Stock:
             dd = dict()
             dd["fullid"] = row[0]
             dd["nseid"] = row[1]
-            dd["enable_for_vendor_data"] = row[2]
-            dd["industry_vertical"] = row[3]
+            if dd["fullid"] is None:
+                dd["fullid"] = 'NSE:'+dd["nseid"]
+            # print( 'dd["fullid"] - ',dd["fullid"])           
+            #dd["enable_for_vendor_data"] = row[2]
+            dd["industry_vertical"] = row[2]
             data.append(dd)
         # print data
         return data
@@ -54,9 +70,9 @@ class Process_Scrapper_Screener_India_Stock:
 thisObj = Process_Scrapper_Screener_India_Stock()
 stock_names= thisObj.getStockList()
 print ("stock_names - \n", stock_names)
-all_good_stock_names = thisObj.module_Scrapper_Screener_India_Stocks.updateAll(stock_names)
-if(len(all_good_stock_names) > 0):
-    thisObj.finalRatingModule.updateAll(all_good_stock_names)
+stock_names = thisObj.module_Scrapper_Screener_India_Stocks.updateAll(stock_names)
+if(len(stock_names) > 0):
+    thisObj.finalRatingModule.updateAll(stock_names)
 else:
     print (" FinalRatingModule is not run since zero stocks in GOOD list")
 
