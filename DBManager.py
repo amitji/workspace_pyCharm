@@ -13,7 +13,8 @@ def createEngine():
     
 def connectDB():
     # connect
-    db = mysql.connector.connect(host="103.35.123.14", user="shop_dba", passwd="shop2015",db="stocksdb")
+    db = mysql.connector.connect(host="localhost", user="shop_dba", passwd="shop2015",db="stocksdb")
+    #db = mysql.connector.connect(host="103.35.123.14", user="shop_dba", passwd="shop2015",db="stocksdb")
     #db = mysql.connector.connect(host="localhost", user="shop_dba", passwd="shop2015", db="stocksdb")
 
     #cursor = db.cursor()
