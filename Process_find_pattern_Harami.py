@@ -89,6 +89,6 @@ print ( "Bearish Harami Stocks - ", thisObj.bearish_harami_list)
 body = "Bullish Harami Stocks - "+" ".join(thisObj.bullish_harami_list)
 body += "                "
 body += "Bearish Harami Stocks - "+" ".join(thisObj.bearish_harami_list)
-EmailUtil.send_email_with_body("Process_find_pattern_Harami",  body)
+EmailUtil.send_email_as_text("Process_find_pattern_Harami",  body, "")
 
 

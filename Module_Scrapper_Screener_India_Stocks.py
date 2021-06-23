@@ -25,52 +25,61 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 class Module_Scrapper_Screener_India_Stocks:
     def __init__(self):
-        self.con = DBManager.connectDB()
-        self.cur = self.con.cursor()
-
-        self.quandlDataObject = QuandlDataModule.QuandlDataModule()
-        self.finalRatingModule = Module_Final_Rating.Module_Final_Rating()
-
-
-        self.xpaths = self.getXpaths()
-        self.scrapper_exception_list = []
-        self.sql_exception_list = []
-        self.updated_stock_list = []
-
-
-        if platform.system() == 'Windows':
-            self.PHANTOMJS_PATH = './phantomjs.exe'
-        else:
-            #self.PHANTOMJS_PATH = './phantomjs'
-            #self.PHANTOMJS_PATH = '/home/shopbindaas/python-workspace/phantomjs'
-            # self.PHANTOMJS_PATH = '/Users/amimahes/Dropbox/Amit_Work-dbox/Github Repos/workspace_pyCharm/phantomjs-2.1.1-macosx/bin/phantomjs'
-            self.PHANTOMJS_PATH = './phantomjs-2.1.1-macosx/bin/phantomjs'
+        try:
+            self.con = DBManager.connectDB()
+            self.cur = self.con.cursor()
+    
+            self.quandlDataObject = QuandlDataModule.QuandlDataModule()
+            self.finalRatingModule = Module_Final_Rating.Module_Final_Rating()
+    
+    
+            self.xpaths = self.getXpaths()
+            self.scrapper_exception_list = []
+            self.sql_exception_list = []
+            self.updated_stock_list = []
+    
+            print('OS  - ', platform.system())
+            if platform.system() == 'Windows':
+                self.PHANTOMJS_PATH = './phantomjs.exe'
+            elif platform.system() == 'Darwin':
+                #Mac
+                self.PHANTOMJS_PATH = '/Users/amimahes/Dropbox/Amit_Work-dbox/Github Repos/workspace_pyCharm/phantomjs-2.1.1-macosx/bin/phantomjs'
+            else:
+                #Unix
+                self.PHANTOMJS_PATH = '/home/shopbindaas/python-workspace/phantomjs'
+                
+            self.browser = webdriver.PhantomJS(self.PHANTOMJS_PATH)
             
+            ##############################################################
+            self.browser.get('https://www.screener.in/login/')
+            username = self.browser.find_element_by_name('username')
+            password = self.browser.find_element_by_name('password')
+            username.send_keys(const.screener_userid)
+            password.send_keys(const.screener_pwd)
+    #        login_attempt = self.browser.find_element_by_class_name("button-primary")
+            #login_attempt = self.browser.find_element_by_xpath("/html/body/main/form/p[1]/button")
+            login_attempt = self.browser.find_element_by_xpath("/html/body/main/div/div/div[2]/form/button")
+            print( ' Amit 111 - ggg ')
+    #        time.sleep(5)
+    #        Waiting.Until(ExpectedConditions.ElementExists(By.Id("ctl00")));
+            login_attempt.click()
+    
+            print( ' Amit 111 - hhh ')
+            #self.browser = webdriver.Firefox()
+            self.all_good_flag = True
+            self.all_good_stock_names = list()
+    
+            self.profitIndStr = ""
+            self.revenueIndStr = ""
+            print( ' Amit 111 - iii ')
+        except Exception as e:
+               print( "\n******Amit - Exception in Module_Scrapper_Screener_India_Stocks ")
+               print( str(e))
 
-        self.browser = webdriver.PhantomJS(self.PHANTOMJS_PATH)
-
-
-        ##############################################################
-        self.browser.get('https://www.screener.in/login/')
-        username = self.browser.find_element_by_name('username')
-        password = self.browser.find_element_by_name('password')
-        username.send_keys(const.screener_userid)
-        password.send_keys(const.screener_pwd)
-#        login_attempt = self.browser.find_element_by_class_name("button-primary")
-        #login_attempt = self.browser.find_element_by_xpath("/html/body/main/form/p[1]/button")
-        login_attempt = self.browser.find_element_by_xpath("/html/body/main/div/div/div[2]/form/button")
-        
-#        time.sleep(5)
-#        Waiting.Until(ExpectedConditions.ElementExists(By.Id("ctl00")));
-        login_attempt.click()
-
-
-        #self.browser = webdriver.Firefox()
-        self.all_good_flag = True
-        self.all_good_stock_names = list()
-
-        self.profitIndStr = ""
-        self.revenueIndStr = ""
+               #This is to print line # for exception
+               exc_type, exc_obj, exc_tb = sys.exc_info()
+               fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+               print(exc_type, fname, exc_tb.tb_lineno)
 
 
     def getXpaths(self):
@@ -633,8 +642,9 @@ class Module_Scrapper_Screener_India_Stocks:
         # url = "http://localhost:8080/StockCircuitServer/spring/stockcircuit/calculateFADataPostPythonProcess"
         # print "Now run the URL ", url
         
-        body = "Scrapping Exception List - "+" ".join(self.scrapper_exception_list)
-        EmailUtil.send_email_with_body("Process_NSE_Based_ResultDates_Screener_ScrapNUpdate",  body)
+        subject = "Scrapping Exception List - "+" ".join(self.scrapper_exception_list)
+        url = ""
+        EmailUtil.send_email_as_text("Process_NSE_Based_ResultDates_Screener_ScrapNUpdate", subject,url)
         return self.all_good_stock_names
 
 

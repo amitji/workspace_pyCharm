@@ -1,3 +1,4 @@
+#!/usr/bin/python
 ##Amit - Run Frequency -  daily cron job during result seasons
 #purpose - Scrap the screener based on the results dates csv file mentioned below.
 # Get all data for Quarter_date and Financial_ratio tables, update Final rating etc.
@@ -19,7 +20,6 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
     def __init__(self):
         self.con = DBManager.connectDB()
         self.cur = self.con.cursor()
-
         self.module_Scrapper_Screener_India_Stocks = Module_Scrapper_Screener_India_Stocks.Module_Scrapper_Screener_India_Stocks()
         self.finalRatingModule = Module_Final_Rating.Module_Final_Rating()
 
@@ -49,7 +49,7 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
         #
         ##############################################
         #Use this sql for running weekly , it will pick csv from last 15 days / 7 days and scrap only stocks which are not updated from that csv list.
-        select_sql = "select fullid, nseid,industry_vertical from stocksdb.stock_names_new sn where sn.exchange ='NSE' and sn.include_in_next_run ='y' and  nseid in "
+        select_sql = "select fullid, nseid,industry_vertical from stocksdb.stock_names_new sn where sn.exchange ='NSE' and sn.include_in_next_run in ('y', 'n') and  nseid in "
         select_sql += "(select nseid from"
         select_sql += "(select nseid from stocksdb.fa_quaterly_data where  period != '"+Constants.latest_period+"' and quater_sequence=5 and  nseid in %s ) temp ) " %nseidString
         
@@ -73,7 +73,7 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
         
         
         #Testing sql
-#        select_sql = "select fullid, nseid, enable_for_vendor_data,industry_vertical from stocksdb.stock_names sn where nseid in ('NIITTECH') "
+        # select_sql = "select fullid, nseid,industry_vertical from stocksdb.stock_names_new sn where nseid in ('SUPREMEIND') "
         
         
         ###Explain sql -  this sql will try update all those stocks whihc does  not have latest quater results. This could be reason that
@@ -142,20 +142,19 @@ class Process_NSE_Based_ResultDates_Screener_ScrapNUpdate:
         return nseidString
 
 
-
+if __name__ == "__main__":
 # ----------------------------------------------------------------------
-
-thisObj = Process_NSE_Based_ResultDates_Screener_ScrapNUpdate()
-nseidString = thisObj.getCSVDataFromNSE()
-# print( ' nseidString - ', nseidString)
-
-
-stock_names = thisObj.getStockDetails(nseidString)
-print( "Stocks to be processed  ", stock_names.__len__(), " -  ", stock_names)
-stock_names = thisObj.module_Scrapper_Screener_India_Stocks.updateAll(stock_names)
-if(len(stock_names) > 0):
-    thisObj.finalRatingModule.updateAll(stock_names)
-else:
-    print( " FinalRatingModule is not run since zero stocks in GOOD list")
+    thisObj = Process_NSE_Based_ResultDates_Screener_ScrapNUpdate()
+    nseidString = thisObj.getCSVDataFromNSE()
+    # print( ' nseidString - ', nseidString)
+    
+    
+    stock_names = thisObj.getStockDetails(nseidString)
+    print( "Stocks to be processed  ", stock_names.__len__(), " -  ", stock_names)
+    stock_names = thisObj.module_Scrapper_Screener_India_Stocks.updateAll(stock_names)
+    if(len(stock_names) > 0):
+        thisObj.finalRatingModule.updateAll(stock_names)
+    else:
+        print( " FinalRatingModule is not run since zero stocks in GOOD list")
 
 

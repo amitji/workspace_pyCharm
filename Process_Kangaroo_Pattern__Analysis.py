@@ -250,5 +250,5 @@ if not df.empty:
 
 #print ("\n\n****** Saved results in DB *****************" )
 #print("Total time taken by process --- %s seconds ---" % (time.time() - start_time))
-EmailUtil.send_email_with_body("Process_Kangaroo_Pattern__Analysis.py",bulldf.to_string()+"\n\n"+ bearishdf.to_string())
+EmailUtil.send_email_as_text("Process_Kangaroo_Pattern__Analysis.py",bulldf.to_string()+"\n\n"+ bearishdf.to_string(), "")
 #    

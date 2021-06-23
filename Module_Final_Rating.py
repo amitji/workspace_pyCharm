@@ -554,5 +554,6 @@ class Module_Final_Rating:
         url = "http://localhost/stockcircuitserver/php/report_two_quarters_compare.php"
         EmailUtil.send_email_as_text("Final rating Dictionary - ",self.ratingDict, url)
 
+        
 
 

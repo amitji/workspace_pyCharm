@@ -24,11 +24,11 @@ if __name__ == "__main__":
         soup = BeautifulSoup(page,  "lxml")
         #soup.prettify()
         
-#        div = soup.find("div",{"class":"fidi_tbl CTR"})
-#        div = soup.find("div",{"class":"jspContainer"})
+        div = soup.find("div",{"class":"fidi_tbescrol"})
+        # div = soup.find("div",{"class":"jspContainer"})
         
-        table1 = soup.find("table",{"class":"mctable1 tble1 n18_res_table responsive"})
-#        table1 = div.find("table")
+        # table1 = soup.find("table",{"class":"mctable1 tble1 n18_res_table responsive"})
+        table1 = div.find("table")
         
         #EmailUtil.send_email("FII Numbers", str(table1), "")
         
@@ -40,13 +40,13 @@ if __name__ == "__main__":
         #soup = BeautifulSoup(page)
         
         print ("Starting Process_FII_Activity_Numbers 222")
-        sgx_table = soup.find("table",{"class":"indexes"})
+        sgx_table = soup.find("table",{"class":"main-table bold"})
         
         print ("Starting Process_FII_Activity_Numbers 333")
         
         complete_html = "<br/><br/>"+url+"<br/>SGX Nifty<br/>"+str(sgx_table)+"<br/><br/><br/>"+str(table1)
         print (complete_html)
-        EmailUtil.send_email("SGX Nifty & FII numbers", complete_html, "")
+        EmailUtil.send_email_as_html("SGX Nifty & FII numbers", complete_html, "")
     except Exception as e:
         print ("exception in process", e)
         

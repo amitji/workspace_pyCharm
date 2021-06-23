@@ -280,7 +280,7 @@ df = pd.DataFrame()
 thisObj.createDirectory()
 
 #file_path = thisObj.execute("nse",thisObj.yesterday(),1)
-file_path = thisObj.execute("nse","05/05/2021",1)
+file_path = thisObj.execute("nse","10/06/2021",1)
 #file_path = thisObj.execute("nse",thisObj.today(),1)
 
 print("Amit - Looks like DB save is all good.... ")    
@@ -293,6 +293,6 @@ else:
     df = thisObj.saveToDB(file_path)
     df = df[['nseid','close', 'prev_day_vol']]
     print(df)
-
-EmailUtil.send_email_with_body("Process_NSE_BhavCopy_Download_and_Update_DB",df.to_string())
-#/Users/amimahes/opt/anaconda3/bin/python "/Users/amimahes/Dropbox/Amit_Work-dbox/Github Repos/workspace_pyCharm/Process_NSE_BhavCopy_Download_and_Update_DB.py"
+url=""
+EmailUtil.send_email_as_text("Process_NSE_BhavCopy_Download_and_Update_DB",df.to_string(), url)
+# /Users/amimahes/opt/anaconda3/bin/python "/Users/amimahes/Dropbox/Amit_Work-dbox/Github Repos/workspace_pyCharm/Process_NSE_BhavCopy_Download_and_Update_DB.py"

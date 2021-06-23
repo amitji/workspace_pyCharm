@@ -487,7 +487,7 @@ class QuandlDataModule:
         print( "updated the stock_recommended_videos:last_updated column to old date")
 
 
-    def __del__(self):
-        self.cur.close()
-        self.con.close()
+    # def __del__(self):
+    #     self.cur.close()
+    #     self.con.close()
 

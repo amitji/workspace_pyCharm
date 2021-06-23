@@ -1,5 +1,6 @@
 #Amit Purpose
-# This process is same as Process_NSE_Based_ResultDates_Screener_ScrapNUpdate. Just us ethis process for updating all quaterly data, Financial ratios adhoc basis.
+# This process is same as Process_NSE_Based_ResultDates_Screener_ScrapNUpdate. 
+# Just us ethis process for updating all quaterly data, Financial ratios adhoc basis.
 
 import Module_Scrapper_Screener_India_Stocks
 import Module_Final_Rating
